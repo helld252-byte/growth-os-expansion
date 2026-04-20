@@ -1,221 +1,301 @@
 "use client";
 
 import { 
-  AlertCircle, 
-  Ban, 
-  Clock, 
-  Star, 
-  Trophy, 
-  ArrowUpRight,
-  MoreVertical,
-  Calendar,
-  User,
-  ArrowRight,
-  Sparkles,
+  BarChart3, 
+  Box, 
+  Calendar, 
+  Download, 
+  Filter, 
+  Map as MapIcon, 
+  MoreHorizontal, 
+  Navigation, 
+  Plus, 
+  TrendingUp, 
+  TrendingDown,
+  Layers,
+  Search,
   Zap,
-  Target,
-  Activity,
-  ChevronRight
+  ChevronRight,
+  Globe,
+  Star
 } from "lucide-react";
-import { StatCard } from "@/components/dashboard/StatCard";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { platforms, tasks } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
+
+const analyticsData = [
+  { day: 'Mon', value: 40 },
+  { day: 'Tue', value: 30 },
+  { day: 'Wed', value: 55 },
+  { day: 'Thu', value: 45 },
+  { day: 'Fri', value: 70 },
+  { day: 'Sat', value: 35 },
+  { day: 'Sun', value: 50 },
+];
 
 export default function CommandCenter() {
   const highPriority = platforms.filter(p => p.priority === "High");
-  const blocked = platforms.filter(p => p.blockers);
-  const overdueTasks = tasks.filter(t => t.status === "Overdue");
 
   return (
-    <div className="max-w-[1600px] mx-auto flex flex-col gap-8 animate-in fade-in duration-1000">
-      {/* Top Header Row */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <div className="size-12 rounded-2xl bg-primary flex items-center justify-center active-glow">
-            <Zap className="size-6 text-white fill-white" />
-          </div>
-          <div>
-            <h1 className="text-3xl font-headline font-extrabold tracking-tight">Mission Control</h1>
-            <div className="flex items-center gap-2 mt-0.5">
-              <span className="size-1.5 rounded-full bg-green-500 animate-pulse" />
-              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em]">Operational Status: Optimal</span>
+    <div className="max-w-[1600px] mx-auto flex flex-col gap-10 animate-in fade-in duration-1000">
+      
+      {/* Dashboard Headline & Top Metrics */}
+      <div className="flex flex-col xl:flex-row justify-between gap-10">
+        <div className="flex flex-col gap-6">
+          <h1 className="text-6xl font-black tracking-tighter leading-none">
+            Growth <br /> Operations <br /> Command
+          </h1>
+          
+          <div className="flex items-center gap-4 bg-white/[0.03] border border-white/[0.05] rounded-2xl p-4 max-w-fit">
+            <div className="size-10 rounded-xl bg-accent/10 flex items-center justify-center">
+              <Globe className="size-5 text-accent" />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-xs font-bold text-white">Global Markets Database</span>
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-0.5">Updated: March 25, 2024</span>
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="hidden lg:flex flex-col items-end mr-4">
-            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Global Performance</span>
-            <span className="text-sm font-headline font-bold text-accent">+12.4% vs LY</span>
+
+        {/* Top Metric Boxes */}
+        <div className="flex flex-wrap gap-4">
+          <MetricBox 
+            label="Total Leads" 
+            value="789" 
+            trend="+5.45% ↗" 
+            trendUp={true} 
+            icon={Layers} 
+          />
+          <MetricBox 
+            label="Active Pipeline" 
+            value="120" 
+            trend="-0.45% ↘" 
+            trendUp={false} 
+            icon={Navigation} 
+          />
+          <MetricBox 
+            label="Onboarded" 
+            value="98" 
+            trend="+5.45% ↗" 
+            trendUp={true} 
+            icon={Box} 
+          />
+        </div>
+      </div>
+
+      {/* Sub Header / Filters */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 py-4 border-y border-white/[0.03]">
+        <div className="flex items-center gap-6">
+          <div className="flex items-center gap-2 text-accent font-bold text-xs uppercase tracking-widest">
+            <Zap className="size-4" /> 5 Pending actions requiring attention
           </div>
-          <Button variant="outline" className="glass-card font-bold border-white/10 gap-2 h-10">
-            <Activity className="size-4" /> System Logs
+        </div>
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" className="h-10 font-bold border border-white/5 bg-white/5 rounded-xl px-4 text-xs">
+            <Filter className="size-4 mr-2" /> Filters
           </Button>
-          <Button className="bg-primary hover:bg-primary/90 text-white font-bold gap-2 h-10 px-5 shadow-lg shadow-primary/20">
-            <Sparkles className="size-4 fill-white/20" /> Strategic AI
+          <Button variant="ghost" className="h-10 font-bold border border-white/5 bg-white/5 rounded-xl px-4 text-xs">
+            Download Report
+          </Button>
+          <Button className="h-10 font-bold bg-accent hover:bg-accent/80 text-accent-foreground rounded-full px-8 text-xs uppercase tracking-widest">
+            Create Initiative
           </Button>
         </div>
       </div>
 
-      {/* Main Grid Layout */}
-      <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+      {/* Main Operational Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
-        {/* Left Column: Metrics & Overdue (1 Col) */}
-        <div className="xl:col-span-1 flex flex-col gap-6">
-          <div className="grid grid-cols-1 gap-4">
-            <StatCard 
-              label="Urgent Action" 
-              value={3} 
-              icon={AlertCircle} 
-              iconColor="text-amber-500"
-              trend="+2 Today"
-              trendUp={false}
-            />
-            <StatCard 
-              label="Blocked" 
-              value={blocked.length} 
-              icon={Ban} 
-              iconColor="text-red-500" 
-            />
-            <StatCard 
-              label="Live Wins" 
-              value={1} 
-              icon={Trophy} 
-              iconColor="text-accent" 
-              trend="Monthly"
-              trendUp={true}
-            />
+        {/* Analytics View */}
+        <div className="lg:col-span-5 premium-panel rounded-[2.5rem] p-8 flex flex-col gap-8">
+          <div className="flex items-center justify-between">
+            <h3 className="font-bold text-lg uppercase tracking-widest text-white/90">Market Velocity</h3>
+            <div className="flex items-center gap-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
+              <span className="text-white">Week</span>
+              <span>Month</span>
+              <span>Quarter</span>
+            </div>
           </div>
 
-          <div className="premium-panel rounded-3xl p-6 flex flex-col gap-6">
+          <div className="grid grid-cols-3 gap-8">
+            <div className="flex flex-col">
+              <span className="text-2xl font-black">97 <span className="text-xs text-muted-foreground">↗</span></span>
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-1">Daily Cap</span>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-2xl font-black">120 <span className="text-xs text-muted-foreground">↗</span></span>
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-1">Avg Flow</span>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-2xl font-black">259 <span className="text-xs text-muted-foreground">↗</span></span>
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-1">Peak Volume</span>
+            </div>
+          </div>
+
+          <div className="h-48 w-full mt-4">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={analyticsData}>
+                <Bar dataKey="value" fill="hsl(var(--accent))" radius={[4, 4, 4, 4]} barSize={40} opacity={0.8} />
+                <Tooltip 
+                  cursor={{ fill: 'white', opacity: 0.05 }}
+                  contentStyle={{ backgroundColor: '#000', border: 'none', borderRadius: '12px', fontSize: '10px' }}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Strategy Tracking */}
+        <div className="lg:col-span-4 premium-panel rounded-[2.5rem] p-8 flex flex-col gap-6">
+          <div className="flex items-center justify-between">
+            <h3 className="font-bold text-lg uppercase tracking-widest text-white/90">Critical Path</h3>
+            <Button variant="ghost" size="icon" className="size-8 rounded-full border border-white/10"><MoreHorizontal className="size-4" /></Button>
+          </div>
+
+          <div className="flex flex-col gap-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-sm font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-                <Clock className="size-4 text-red-500" /> Overdue
-              </h2>
-              <Badge variant="destructive" className="rounded-md font-bold text-[10px]">{overdueTasks.length}</Badge>
+              <div className="flex flex-col">
+                <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Active Objective</span>
+                <span className="text-sm font-black mt-1">#17986-WAY-2024</span>
+              </div>
+              <Badge className="bg-accent/10 text-accent border-none text-[10px] font-black tracking-widest uppercase px-3 py-1">In Review</Badge>
             </div>
-            <div className="flex flex-col gap-3">
-              {overdueTasks.map((t) => (
-                <div key={t.id} className="glass-card p-4 rounded-xl flex flex-col gap-2 group cursor-pointer border-red-500/10 hover:border-red-500/30">
-                  <span className="font-bold text-xs group-hover:text-red-400 transition-colors leading-tight">{t.title}</span>
-                  <div className="flex items-center justify-between mt-1">
-                    <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-tighter">{t.owner.split(' ')[0]}</span>
-                    <span className="text-[9px] font-bold text-red-500/80">{t.dueDate}</span>
-                  </div>
+
+            <div className="space-y-4">
+              <TimelineItem status="complete" label="Initial Research" time="Mar 10, 2024" />
+              <TimelineItem status="active" label="Insurance Compliance" time="Mar 22, 2024" />
+              <TimelineItem status="pending" label="Catalog Finalization" time="Est. Mar 28" />
+            </div>
+
+            <div className="mt-4 p-4 bg-white/[0.03] border border-white/5 rounded-2xl flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="size-10 rounded-full overflow-hidden">
+                  <img src="https://picsum.photos/seed/sarah/100/100" alt="Owner" />
                 </div>
-              ))}
+                <div className="flex flex-col">
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase">Point of Contact</span>
+                  <span className="text-xs font-bold">Sarah Chen</span>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Button variant="ghost" size="icon" className="size-8 rounded-lg bg-white/5"><Globe className="size-3.5" /></Button>
+                <Button variant="ghost" size="icon" className="size-8 rounded-lg bg-white/5"><Star className="size-3.5" /></Button>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Center Column: Priority Board (2 Cols) */}
-        <div className="xl:col-span-2 flex flex-col gap-6">
-          <div className="premium-panel rounded-[2rem] p-8 flex flex-col gap-8">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div>
-                <h2 className="text-2xl font-headline font-bold flex items-center gap-3">
-                  <Target className="size-6 text-primary" />
-                  Execution Priorities
-                </h2>
-                <p className="text-muted-foreground text-xs mt-1 font-medium">Active high-impact growth opportunities in the pipeline</p>
-              </div>
-              <Button variant="ghost" size="sm" className="text-primary hover:text-primary/80 hover:bg-primary/5 font-bold gap-1" asChild>
-                <Link href="/channels">Full Pipeline <ChevronRight className="size-4" /></Link>
-              </Button>
-            </div>
+        {/* Market Visualizer */}
+        <div className="lg:col-span-3 premium-panel rounded-[2.5rem] p-0 overflow-hidden relative group">
+          <div className="absolute top-6 left-6 z-10 p-3 bg-background/80 backdrop-blur-md rounded-2xl border border-white/10">
+            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-accent">Deployment Map</h4>
+            <p className="text-xs font-bold mt-1">EU Expansion Zone</p>
+          </div>
+          <img 
+            src="https://picsum.photos/seed/map/800/800" 
+            alt="Operational Map" 
+            className="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-1000 grayscale group-hover:grayscale-0" 
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
+          <Button variant="ghost" size="icon" className="absolute bottom-6 right-6 size-10 rounded-full bg-accent text-accent-foreground shadow-2xl hover:scale-110 transition-all">
+            <ChevronRight className="size-5" />
+          </Button>
+        </div>
+      </div>
 
-            <div className="flex flex-col gap-4">
-              {highPriority.map((p) => (
-                <div key={p.id} className="glass-card hover:bg-white/[0.04] p-6 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-6 group">
-                  <div className="flex items-center gap-5">
-                    <div className="size-14 rounded-2xl bg-gradient-to-br from-primary/20 to-transparent border border-white/5 flex items-center justify-center font-headline font-bold text-primary group-hover:scale-105 transition-all">
-                      {p.name.charAt(0)}
-                    </div>
-                    <div className="flex flex-col">
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-bold text-lg leading-tight">{p.name}</h3>
-                        <Badge variant="outline" className="text-[9px] uppercase font-black bg-white/5 border-none text-muted-foreground py-0 tracking-tighter">{p.type}</Badge>
+      {/* Registry Table */}
+      <div className="flex flex-col gap-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-black uppercase tracking-[0.3em] text-muted-foreground/60">Expansion Registry</h2>
+          <div className="flex items-center gap-4 text-[10px] font-bold text-muted-foreground uppercase">
+             <span>Customize</span>
+             <span className="text-white">1-10 of 40</span>
+             <div className="flex gap-1">
+               <Button variant="ghost" size="icon" className="size-6 rounded-md bg-white/5 p-0"><ChevronRight className="size-3 rotate-180" /></Button>
+               <Button variant="ghost" size="icon" className="size-6 rounded-md bg-white/5 p-0"><ChevronRight className="size-3" /></Button>
+             </div>
+          </div>
+        </div>
+
+        <div className="premium-panel rounded-[2rem] overflow-hidden">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-white/[0.03] border-b border-white/[0.05]">
+                <th className="p-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Target Lead</th>
+                <th className="p-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Category</th>
+                <th className="p-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Estimated Value</th>
+                <th className="p-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Current Stage</th>
+                <th className="p-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Status</th>
+                <th className="p-6"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {platforms.map((p) => (
+                <tr key={p.id} className="border-b border-white/[0.02] hover:bg-white/[0.01] transition-colors group">
+                  <td className="p-6">
+                    <div className="flex items-center gap-4">
+                      <div className="size-10 rounded-xl bg-white/[0.03] border border-white/[0.05] flex items-center justify-center font-bold text-primary">
+                        {p.name.charAt(0)}
                       </div>
-                      <div className="flex items-center gap-4 mt-2">
-                        <span className="text-[10px] text-muted-foreground font-bold flex items-center gap-1">
-                          <User className="size-3" /> {p.owner}
-                        </span>
-                        <span className="text-[10px] text-muted-foreground font-bold flex items-center gap-1">
-                          <Activity className="size-3" /> {p.fitScore}/10 Fit
-                        </span>
-                      </div>
+                      <span className="font-bold tracking-tight text-white group-hover:text-primary transition-colors">{p.name}</span>
                     </div>
-                  </div>
-
-                  <div className="flex items-center gap-8 ml-auto md:ml-0">
-                    <div className="flex flex-col items-end min-w-24">
-                      <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mb-1.5 opacity-60">Pipeline Stage</span>
-                      <Badge className="bg-primary/10 text-primary border-primary/20 px-3 py-1 font-bold text-[10px] uppercase rounded-lg">
-                        {p.currentStage}
-                      </Badge>
-                    </div>
-                    
-                    <div className="hidden lg:flex flex-col items-start w-48 border-l border-white/5 pl-6">
-                      <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mb-1.5 opacity-60">Next Critical Step</span>
-                      <p className="text-[11px] font-bold text-white/90 truncate w-full">{p.nextStep}</p>
-                    </div>
-
-                    <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-white">
-                      <MoreVertical className="size-4" />
-                    </Button>
-                  </div>
-                </div>
+                  </td>
+                  <td className="p-6 text-[11px] font-bold text-muted-foreground uppercase tracking-widest">{p.type}</td>
+                  <td className="p-6 text-sm font-black">${p.estimatedValue.toLocaleString()}</td>
+                  <td className="p-6 text-[11px] font-bold text-white/80">{p.currentStage}</td>
+                  <td className="p-6">
+                    <Badge className={cn(
+                      "font-black text-[9px] uppercase tracking-widest rounded-md px-2.5 py-1 border-none",
+                      p.currentStage === "Live" ? "bg-green-500/10 text-green-400" : "bg-accent/10 text-accent"
+                    )}>
+                      ● {p.currentStage === "Live" ? "Delivered" : "Processing"}
+                    </Badge>
+                  </td>
+                  <td className="p-6 text-right">
+                    <Button variant="ghost" size="icon" className="size-8 rounded-lg opacity-0 group-hover:opacity-100"><MoreHorizontal className="size-4" /></Button>
+                  </td>
+                </tr>
               ))}
-            </div>
-          </div>
+            </tbody>
+          </table>
         </div>
+      </div>
+    </div>
+  );
+}
 
-        {/* Right Column: Insights & Activity (1 Col) */}
-        <div className="xl:col-span-1 flex flex-col gap-6">
-          <div className="premium-panel rounded-3xl p-6 bg-gradient-to-br from-accent/10 via-transparent to-transparent flex flex-col gap-6 border-accent/20">
-            <div className="flex items-center justify-between">
-              <h2 className="text-sm font-bold uppercase tracking-widest text-accent flex items-center gap-2">
-                <Sparkles className="size-4 fill-accent/20" /> Performance Insights
-              </h2>
-            </div>
-            <div className="flex flex-col gap-4">
-              <div className="space-y-1">
-                <h3 className="text-sm font-bold text-white">Amazon EU Scaling</h3>
-                <p className="text-[11px] text-muted-foreground leading-relaxed">
-                  Velocity has increased by 14% since budget reallocation. Recommendation: Invest an additional $5k in UK Sponsored Products.
-                </p>
-              </div>
-              <div className="h-px bg-white/5" />
-              <div className="space-y-1">
-                <h3 className="text-sm font-bold text-white">Faire Compliance</h3>
-                <p className="text-[11px] text-muted-foreground leading-relaxed">
-                  Product upload is 80% complete. Awaiting high-res imagery for the bedroom collection to finalize.
-                </p>
-              </div>
-            </div>
-            <Button size="sm" className="w-full bg-accent hover:bg-accent/80 text-accent-foreground font-bold rounded-xl gap-2 mt-2 accent-glow">
-              Explore Analytics <ArrowRight className="size-4" />
-            </Button>
-          </div>
-
-          <div className="premium-panel rounded-3xl p-6 flex flex-col gap-6">
-            <h2 className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Recent Activity</h2>
-            <div className="flex flex-col gap-5">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="flex gap-3">
-                  <div className="size-2 rounded-full bg-primary mt-1.5 ring-4 ring-primary/10" />
-                  <div className="flex flex-col gap-1">
-                    <span className="text-[11px] font-bold text-white">Applied to Wayfair US</span>
-                    <span className="text-[10px] text-muted-foreground font-medium">2 hours ago • Sarah Chen</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+function MetricBox({ label, value, trend, trendUp, icon: Icon }: any) {
+  return (
+    <div className="premium-panel rounded-[2rem] p-6 flex items-center gap-6 min-w-[260px] group hover:border-accent/30 transition-all cursor-pointer">
+      <div className="size-16 rounded-[1.5rem] bg-white/[0.03] border border-white/5 flex items-center justify-center group-hover:bg-accent/10 transition-all">
+        <Icon className="size-6 text-muted-foreground group-hover:text-accent" />
+      </div>
+      <div className="flex flex-col">
+        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">{label}</span>
+        <div className="flex items-baseline gap-3 mt-1">
+          <span className="text-3xl font-black">{value}</span>
+          <span className={cn("text-[10px] font-black", trendUp ? "text-green-500" : "text-red-500")}>
+            {trend}
+          </span>
         </div>
+      </div>
+    </div>
+  );
+}
 
+function TimelineItem({ label, time, status }: any) {
+  return (
+    <div className="flex items-start gap-4">
+      <div className={cn(
+        "mt-1.5 size-2 rounded-full",
+        status === 'complete' ? "bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.4)]" : 
+        status === 'active' ? "bg-accent animate-pulse shadow-[0_0_8px_rgba(255,0,255,0.4)]" : "bg-white/10"
+      )} />
+      <div className="flex flex-col">
+        <span className={cn("text-xs font-bold", status === 'pending' ? "text-muted-foreground" : "text-white")}>{label}</span>
+        <span className="text-[10px] font-bold text-muted-foreground mt-0.5">{time}</span>
       </div>
     </div>
   );
