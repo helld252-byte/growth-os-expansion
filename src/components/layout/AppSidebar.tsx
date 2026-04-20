@@ -10,7 +10,9 @@ import {
   BarChart3, 
   Settings,
   Zap,
-  ChevronRight
+  ChevronRight,
+  ShieldCheck,
+  Briefcase
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { 
@@ -24,81 +26,97 @@ import {
   SidebarGroupLabel,
   SidebarFooter
 } from "@/components/ui/sidebar";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const navItems = [
   { icon: LayoutDashboard, label: "Command Center", path: "/" },
-  { icon: Layers, label: "Channels", path: "/channels" },
-  { icon: CheckSquare, label: "Tasks", path: "/tasks" },
-  { icon: Library, label: "Company Hub", path: "/hub" },
-  { icon: BarChart3, label: "Reports", path: "/reports" },
+  { icon: Layers, label: "Growth Channels", path: "/channels" },
+  { icon: CheckSquare, label: "Operations", path: "/tasks" },
+  { icon: Library, label: "Intelligence Hub", path: "/hub" },
+  { icon: BarChart3, label: "Analytics", path: "/reports" },
 ];
 
 export function AppSidebar() {
   const pathname = usePathname();
 
   return (
-    <Sidebar variant="inset" className="border-r border-border/10">
-      <SidebarHeader className="py-6 px-4">
-        <div className="flex items-center gap-3 px-2">
-          <div className="size-8 rounded-lg bg-primary flex items-center justify-center">
+    <Sidebar variant="inset" className="border-r border-white/[0.03] bg-sidebar/50 backdrop-blur-3xl">
+      <SidebarHeader className="py-8 px-6">
+        <div className="flex items-center gap-4">
+          <div className="size-10 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg shadow-primary/20 ring-1 ring-white/20">
             <Zap className="size-5 text-white fill-white" />
           </div>
           <div className="flex flex-col">
-            <span className="font-headline font-bold text-lg leading-none">Growth OS</span>
-            <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold">Mission Control</span>
+            <span className="font-headline font-extrabold text-xl leading-none tracking-tight">Growth OS</span>
+            <span className="text-[9px] text-muted-foreground uppercase font-black tracking-[0.3em] mt-1.5 opacity-60">Operations Unit</span>
           </div>
         </div>
       </SidebarHeader>
 
-      <SidebarContent className="px-2">
+      <SidebarContent className="px-4">
         <SidebarGroup>
-          <SidebarGroupLabel className="px-4 text-[10px] uppercase font-bold tracking-widest text-muted-foreground/50">Navigator</SidebarGroupLabel>
-          <SidebarMenu>
+          <SidebarGroupLabel className="px-4 text-[10px] uppercase font-black tracking-[0.2em] text-muted-foreground/40 mb-4">Nav Command</SidebarGroupLabel>
+          <SidebarMenu className="gap-2">
             {navItems.map((item) => (
               <SidebarMenuItem key={item.path}>
                 <SidebarMenuButton 
                   asChild 
                   isActive={pathname === item.path}
                   className={cn(
-                    "h-11 transition-all duration-200",
+                    "h-12 rounded-xl transition-all duration-300 px-4",
                     pathname === item.path 
-                      ? "bg-primary/10 text-primary hover:bg-primary/15" 
-                      : "hover:bg-sidebar-accent/50"
+                      ? "bg-primary/10 text-primary active-glow" 
+                      : "text-muted-foreground hover:bg-white/[0.03] hover:text-white"
                   )}
                 >
                   <Link href={item.path}>
-                    <item.icon className={cn("size-5", pathname === item.path ? "text-primary" : "text-muted-foreground")} />
-                    <span className="font-medium">{item.label}</span>
-                    {pathname === item.path && <ChevronRight className="ml-auto size-4" />}
+                    <item.icon className={cn("size-5", pathname === item.path ? "text-primary" : "text-muted-foreground/60 group-hover:text-white")} />
+                    <span className="font-bold tracking-tight ml-2">{item.label}</span>
+                    {pathname === item.path && <div className="ml-auto size-1.5 rounded-full bg-primary shadow-[0_0_8px_hsl(var(--primary))]" />}
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             ))}
           </SidebarMenu>
         </SidebarGroup>
+
+        <SidebarGroup className="mt-8">
+          <SidebarGroupLabel className="px-4 text-[10px] uppercase font-black tracking-[0.2em] text-muted-foreground/40 mb-4">Strategic</SidebarGroupLabel>
+          <SidebarMenu className="gap-2">
+            <SidebarMenuItem>
+              <SidebarMenuButton className="h-12 rounded-xl text-muted-foreground hover:bg-white/[0.03] hover:text-white px-4">
+                <Briefcase className="size-5 text-muted-foreground/60" />
+                <span className="font-bold tracking-tight ml-2">Market Intel</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton className="h-12 rounded-xl text-muted-foreground hover:bg-white/[0.03] hover:text-white px-4">
+                <ShieldCheck className="size-5 text-muted-foreground/60" />
+                <span className="font-bold tracking-tight ml-2">Compliance</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="p-4">
+      <SidebarFooter className="p-6">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild className="h-11 hover:bg-sidebar-accent/50 transition-colors">
+            <SidebarMenuButton asChild className="h-12 rounded-xl hover:bg-white/[0.03] transition-colors px-4 group">
               <Link href="/settings">
-                <Settings className="size-5 text-muted-foreground" />
-                <span className="font-medium">Settings</span>
+                <Settings className="size-5 text-muted-foreground/60 group-hover:text-white group-hover:rotate-45 transition-transform" />
+                <span className="font-bold tracking-tight ml-2">System Config</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
         
-        <div className="mt-4 p-3 rounded-xl bg-muted/30 border border-white/5 flex items-center gap-3">
-          <Avatar className="size-8 border border-primary/20">
-            <AvatarImage src="https://picsum.photos/seed/user/32/32" />
-            <AvatarFallback className="bg-primary/10 text-primary text-xs">JS</AvatarFallback>
-          </Avatar>
-          <div className="flex flex-col min-w-0">
-            <span className="text-sm font-semibold truncate">James Sterling</span>
-            <span className="text-[10px] text-muted-foreground uppercase font-bold">Admin</span>
+        <div className="mt-6 flex flex-col gap-1 px-4">
+          <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-tighter text-muted-foreground/40">
+            <span>Core Version</span>
+            <span>2.5.0-ALPHA</span>
+          </div>
+          <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
+            <div className="w-3/4 h-full bg-primary/40 rounded-full" />
           </div>
         </div>
       </SidebarFooter>
