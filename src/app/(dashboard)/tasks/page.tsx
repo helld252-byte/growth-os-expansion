@@ -21,114 +21,117 @@ export default function TasksPage() {
       {/* Context Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-white/[0.03]">
         <div className="flex items-center gap-4">
-          <div className="size-10 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center">
-            <Flag className="size-5 text-accent" />
+          <div className="size-10 rounded-xl bg-accent/5 border border-accent/10 flex items-center justify-center">
+            <Flag className="size-5 text-accent/60" />
           </div>
           <div>
-            <h1 className="text-2xl font-headline font-extrabold tracking-tight">Operational Tasks</h1>
-            <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest mt-0.5">
+            <h1 className="text-2xl font-bold tracking-tight text-white">Operational Tasks</h1>
+            <p className="text-[10px] text-muted-foreground/40 font-semibold uppercase tracking-widest mt-0.5">
               Shared execution backlog for market onboarding and maintenance.
             </p>
           </div>
         </div>
-        <Button className="bg-primary hover:bg-primary/90 text-white font-bold gap-1.5 rounded-lg h-8 px-4 shadow-lg text-[9px] uppercase tracking-wider">
+        <Button className="bg-primary/20 hover:bg-primary/30 text-white font-semibold gap-2 rounded-lg h-9 px-5 shadow-lg text-[10px] uppercase tracking-wider transition-all">
           <Plus className="size-3.5" /> Quick Add
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Left Sidebar: Filters */}
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-6">
           <div className="relative group">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3 text-muted-foreground group-focus-within:text-primary" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground/30 group-focus-within:text-primary transition-colors" />
             <Input 
               placeholder="Filter tasks..." 
-              className="pl-7 h-8 bg-muted/30 border-none rounded-lg text-[10px]" 
+              className="pl-9 h-9 bg-white/[0.015] border-white/[0.05] rounded-lg text-[12px] font-medium" 
             />
           </div>
 
-          <div className="flex flex-col gap-1">
-            <h3 className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/40 mb-1 ml-1">Filter Range</h3>
-            <Button variant="ghost" className="justify-start gap-2 h-8 px-2.5 bg-primary/10 text-primary rounded-lg font-bold text-[11px]">
-              <CalendarIcon className="size-3" /> Today
-              <Badge className="ml-auto bg-primary text-white text-[7px] px-1 min-w-[14px]">2</Badge>
+          <div className="flex flex-col gap-1.5">
+            <h3 className="text-[8px] font-semibold uppercase tracking-widest text-muted-foreground/20 mb-1.5 ml-1">Timeline Filter</h3>
+            <Button variant="ghost" className="justify-start gap-3 h-9 px-3 bg-primary/10 text-white rounded-lg font-medium text-[12px]">
+              <CalendarIcon className="size-3.5 text-primary" /> Today
+              <span className="ml-auto bg-primary/20 text-primary text-[8px] font-semibold px-1.5 py-0.5 rounded">2</span>
             </Button>
-            <Button variant="ghost" className="justify-start gap-2 h-8 px-2.5 hover:bg-muted/50 rounded-lg font-bold text-muted-foreground text-[11px]">
-              <Layers className="size-3" /> Upcoming
+            <Button variant="ghost" className="justify-start gap-3 h-9 px-3 hover:bg-white/[0.02] rounded-lg font-medium text-muted-foreground/60 text-[12px] group">
+              <Layers className="size-3.5 text-muted-foreground/20 group-hover:text-primary" /> Upcoming
             </Button>
-            <Button variant="ghost" className="justify-start gap-2 h-8 px-2.5 hover:bg-muted/50 rounded-lg font-bold text-red-500 text-[11px]">
-              <Flag className="size-3" /> Overdue
+            <Button variant="ghost" className="justify-start gap-3 h-9 px-3 hover:bg-white/[0.02] rounded-lg font-medium text-red-500/60 text-[12px] group">
+              <Flag className="size-3.5 text-red-500/30 group-hover:text-red-500" /> Overdue
             </Button>
           </div>
         </div>
 
         {/* Task List */}
         <div className="lg:col-span-3 flex flex-col gap-4">
-          <div className="premium-panel rounded-xl border border-white/5 overflow-hidden">
-            <div className="px-4 py-2 border-b border-white/5 bg-muted/20 flex items-center justify-between">
-              <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/60">Execution Backlog</span>
-              <span className="text-[9px] font-bold text-muted-foreground/40">{tasks.length} total</span>
+          <div className="premium-panel rounded-xl border border-white/[0.04] overflow-hidden">
+            <div className="px-5 py-3 border-b border-white/[0.04] bg-white/[0.01] flex items-center justify-between">
+              <span className="text-[9px] font-semibold uppercase tracking-widest text-muted-foreground/20">Execution Backlog</span>
+              <span className="text-[10px] font-medium text-muted-foreground/20">{tasks.length} active missions</span>
             </div>
             
             <div className="flex flex-col">
               {tasks.map((task) => (
-                <div key={task.id} className="p-3.5 flex items-start gap-3 hover:bg-white/[0.01] transition-all group border-b border-white/5 last:border-0">
-                  <Checkbox className="mt-0.5 size-3.5 rounded border-white/20" />
+                <div key={task.id} className="p-4 flex items-start gap-4 hover:bg-white/[0.01] transition-all group border-b border-white/[0.03] last:border-0">
+                  <Checkbox className="mt-1 size-3.5 rounded border-white/10 data-[state=checked]:bg-primary/40" />
                   
-                  <div className="flex-1 flex flex-col gap-1.5">
+                  <div className="flex-1 flex flex-col gap-2">
                     <div className="flex items-start justify-between">
-                      <div className="flex flex-col">
+                      <div className="flex flex-col gap-0.5">
                         <h4 className={cn(
-                          "font-bold text-[13px] leading-tight transition-all tracking-tight",
-                          task.status === "Overdue" ? "text-red-400" : "group-hover:text-primary"
+                          "font-semibold text-[14px] leading-tight tracking-tight transition-colors",
+                          task.status === "Overdue" ? "text-red-500/80" : "text-white/90 group-hover:text-primary"
                         )}>
                           {task.title}
                         </h4>
                         {task.linkedPlatformName && (
-                          <div className="flex items-center gap-1 mt-0.5">
-                            <Layers className="size-2.5 text-muted-foreground/40" />
-                            <span className="text-[8px] text-muted-foreground/60 font-bold uppercase tracking-tighter hover:text-primary cursor-pointer transition-colors">
+                          <div className="flex items-center gap-1.5">
+                            <Layers className="size-2.5 text-muted-foreground/20" />
+                            <span className="text-[9px] text-muted-foreground/40 font-medium uppercase tracking-tight hover:text-primary cursor-pointer transition-colors">
                               {task.linkedPlatformName}
                             </span>
                           </div>
                         )}
                       </div>
-                      <Badge className={cn(
-                        "font-black px-1.5 py-0 text-[7px] uppercase tracking-wider rounded border",
-                        task.status === "Overdue" ? "bg-red-500/10 text-red-500 border-red-500/20" : "bg-muted text-muted-foreground border-white/5"
-                      )}>
+                      <Badge 
+                        variant="outline"
+                        className={cn(
+                          "font-semibold px-2 py-0 h-5 text-[8px] uppercase tracking-wider rounded border transition-all",
+                          task.status === "Overdue" ? "bg-red-500/5 text-red-500/80 border-red-500/20" : "bg-white/[0.02] text-muted-foreground/40 border-white/[0.04]"
+                        )}
+                      >
                         {task.status}
                       </Badge>
                     </div>
 
-                    <div className="flex items-center gap-4 mt-1">
-                      <div className="flex items-center gap-1.5">
-                        <div className="size-3.5 rounded-full bg-primary/10 flex items-center justify-center text-[7px] font-black text-primary">
+                    <div className="flex items-center gap-5">
+                      <div className="flex items-center gap-2">
+                        <div className="size-4 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-[7px] font-bold text-primary">
                           {task.owner.charAt(0)}
                         </div>
-                        <span className="text-[9px] font-bold text-muted-foreground/60">{task.owner}</span>
+                        <span className="text-[10px] font-medium text-muted-foreground/40">{task.owner}</span>
                       </div>
-                      <div className="flex items-center gap-1.5 text-muted-foreground/40">
-                        <CalendarIcon className="size-2.5" />
+                      <div className="flex items-center gap-1.5 text-muted-foreground/20">
+                        <CalendarIcon className="size-3" />
                         <span className={cn(
-                          "text-[9px] font-bold",
-                          task.status === "Overdue" ? "text-red-500" : ""
+                          "text-[10px] font-medium tracking-tight",
+                          task.status === "Overdue" ? "text-red-500/60" : ""
                         )}>
                           {task.dueDate}
                         </span>
                       </div>
                       <div className="flex items-center gap-1.5">
                         <Flag className={cn(
-                          "size-2.5",
-                          task.priority === "High" ? "text-red-500 fill-red-500" : "text-muted-foreground/30"
+                          "size-3",
+                          task.priority === "High" ? "text-accent/60 fill-accent/10" : "text-muted-foreground/10"
                         )} />
-                        <span className="text-[7px] font-black uppercase tracking-[0.2em] text-muted-foreground/30">{task.priority}</span>
+                        <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/20">{task.priority}</span>
                       </div>
                     </div>
                   </div>
 
-                  <Button variant="ghost" size="icon" className="size-6 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <MoreVertical className="size-3 text-muted-foreground/40" />
+                  <Button variant="ghost" size="icon" className="size-7 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground/20 hover:text-white">
+                    <MoreVertical className="size-3.5" />
                   </Button>
                 </div>
               ))}
