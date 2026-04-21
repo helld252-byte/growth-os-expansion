@@ -22,8 +22,31 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { useToast } from "@/hooks/use-toast";
 
 export default function SettingsPage() {
+  const { toast } = useToast();
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [profile, setProfile] = useState({
+    name: "James Sterling",
+    email: "j.sterling@growth-os.com",
+    role: "Growth Operations Lead",
+    zone: "Global (EU/US/APAC)"
+  });
+
+  const handleUpdateProfile = () => {
+    setIsUpdating(true);
+    
+    // Simulate tactical sync
+    setTimeout(() => {
+      setIsUpdating(false);
+      toast({
+        title: "Protocol Updated",
+        description: "Strategic profile identity has been synchronized across Unit-01.",
+      });
+    }, 1200);
+  };
+
   return (
     <div className="max-w-[1000px] mx-auto flex flex-col gap-10 animate-in fade-in duration-700">
       <header className="flex flex-col gap-3 pb-8 border-b border-white/[0.04]">
@@ -55,18 +78,20 @@ export default function SettingsPage() {
               <div className="relative group">
                 <Avatar className="size-24 border-2 border-white/[0.08] group-hover:border-primary/50 transition-all shadow-2xl">
                   <AvatarImage src="https://picsum.photos/seed/user/200/200" />
-                  <AvatarFallback className="bg-primary/10 text-primary text-2xl font-bold">JD</AvatarFallback>
+                  <AvatarFallback className="bg-primary/10 text-primary text-2xl font-bold">
+                    {profile.name.split(' ').map(n => n[0]).join('')}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 rounded-full cursor-pointer transition-opacity">
                   <Cloud className="size-6 text-white" />
                 </div>
               </div>
               <div className="flex flex-col gap-2">
-                <h3 className="text-xl font-semibold text-tier-1">James Sterling</h3>
-                <p className="text-tier-3 text-[14px]">Growth Operations Lead • Unit-01</p>
+                <h3 className="text-xl font-semibold text-tier-1">{profile.name}</h3>
+                <p className="text-tier-3 text-[14px]">{profile.role} • Unit-01</p>
                 <div className="flex gap-2 mt-1">
-                  <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 text-[10px] px-3 py-0.5 uppercase tracking-wider">Administrator</Badge>
-                  <Badge variant="outline" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-[10px] px-3 py-0.5 uppercase tracking-wider">Verified Account</Badge>
+                  <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 text-[10px] px-3 py-0.5 uppercase tracking-wider font-medium">Administrator</Badge>
+                  <Badge variant="outline" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-[10px] px-3 py-0.5 uppercase tracking-wider font-medium">Verified Account</Badge>
                 </div>
               </div>
             </div>
@@ -76,25 +101,45 @@ export default function SettingsPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="flex flex-col gap-3">
                 <Label className="text-[11px] uppercase tracking-[0.2em] text-tier-4 font-bold ml-1">Full Identity</Label>
-                <Input defaultValue="James Sterling" className="bg-white/[0.02] border-white/[0.06] h-12 px-5 text-tier-1 font-medium rounded-xl focus-visible:ring-primary/20" />
+                <Input 
+                  value={profile.name} 
+                  onChange={(e) => setProfile({...profile, name: e.target.value})}
+                  className="bg-white/[0.02] border-white/[0.06] h-12 px-5 text-tier-1 font-medium rounded-xl focus-visible:ring-primary/20" 
+                />
               </div>
               <div className="flex flex-col gap-3">
                 <Label className="text-[11px] uppercase tracking-[0.2em] text-tier-4 font-bold ml-1">Secure Email</Label>
-                <Input defaultValue="j.sterling@growth-os.com" className="bg-white/[0.02] border-white/[0.06] h-12 px-5 text-tier-1 font-medium rounded-xl focus-visible:ring-primary/20" />
+                <Input 
+                  value={profile.email}
+                  onChange={(e) => setProfile({...profile, email: e.target.value})}
+                  className="bg-white/[0.02] border-white/[0.06] h-12 px-5 text-tier-1 font-medium rounded-xl focus-visible:ring-primary/20" 
+                />
               </div>
               <div className="flex flex-col gap-3">
                 <Label className="text-[11px] uppercase tracking-[0.2em] text-tier-4 font-bold ml-1">System Role</Label>
-                <Input defaultValue="Growth Operations Lead" className="bg-white/[0.02] border-white/[0.06] h-12 px-5 text-tier-1 font-medium rounded-xl focus-visible:ring-primary/20" disabled />
+                <Input 
+                  value={profile.role} 
+                  disabled
+                  className="bg-white/[0.02] border-white/[0.06] h-12 px-5 text-tier-1 font-medium rounded-xl focus-visible:ring-primary/20 opacity-50 cursor-not-allowed" 
+                />
               </div>
               <div className="flex flex-col gap-3">
                 <Label className="text-[11px] uppercase tracking-[0.2em] text-tier-4 font-bold ml-1">Market Zone</Label>
-                <Input defaultValue="Global (EU/US/APAC)" className="bg-white/[0.02] border-white/[0.06] h-12 px-5 text-tier-1 font-medium rounded-xl focus-visible:ring-primary/20" />
+                <Input 
+                  value={profile.zone}
+                  onChange={(e) => setProfile({...profile, zone: e.target.value})}
+                  className="bg-white/[0.02] border-white/[0.06] h-12 px-5 text-tier-1 font-medium rounded-xl focus-visible:ring-primary/20" 
+                />
               </div>
             </div>
 
             <div className="flex justify-end pt-4">
-              <Button className="bg-primary hover:bg-primary/90 text-white font-bold h-11 px-8 rounded-xl transition-all shadow-xl shadow-primary/10">
-                Update Profile
+              <Button 
+                onClick={handleUpdateProfile}
+                disabled={isUpdating}
+                className="bg-primary hover:bg-primary/90 text-white font-bold h-11 px-8 rounded-xl transition-all shadow-xl shadow-primary/10 min-w-[160px]"
+              >
+                {isUpdating ? "Synchronizing..." : "Update Profile"}
               </Button>
             </div>
           </div>
