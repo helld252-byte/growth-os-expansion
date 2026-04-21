@@ -28,6 +28,27 @@ const analyticsData = [
 ];
 
 export default function CommandCenter() {
+  const getStageStyles = (stage: string) => {
+    switch (stage) {
+      case 'Live':
+        return "bg-emerald-500/15 text-emerald-400 border-emerald-500/20";
+      case 'In Review':
+        return "bg-amber-500/15 text-amber-400 border-amber-500/20";
+      case 'Approved':
+        return "bg-violet-500/15 text-violet-400 border-violet-500/20";
+      case 'Applied':
+        return "bg-blue-500/15 text-blue-400 border-blue-500/20";
+      case 'Research':
+        return "bg-slate-500/15 text-slate-300 border-slate-500/20";
+      case 'Rejected':
+        return "bg-rose-500/15 text-rose-400 border-rose-500/20";
+      case 'Onboarding':
+        return "bg-cyan-500/15 text-cyan-400 border-cyan-500/20";
+      default:
+        return "bg-slate-500/10 text-slate-400 border-slate-500/20";
+    }
+  };
+
   return (
     <div className="max-w-[1400px] mx-auto flex flex-col gap-12 animate-in fade-in duration-700">
       
@@ -126,7 +147,7 @@ export default function CommandCenter() {
                 <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.15em]">Mission ID</span>
                 <span className="text-[15px] font-semibold text-foreground mt-1 tracking-tight">#17986-WAY</span>
               </div>
-              <Badge variant="outline" className="bg-accent/5 text-accent border-accent/20 text-[10px] font-bold tracking-widest uppercase px-2.5 py-0.5 rounded-lg shadow-sm">In Review</Badge>
+              <Badge variant="outline" className="bg-emerald-500/15 text-emerald-400 border-emerald-500/20 text-[10px] font-bold tracking-widest uppercase px-2.5 py-0.5 rounded-lg shadow-sm">In Review</Badge>
             </div>
 
             <div className="space-y-5">
@@ -197,13 +218,16 @@ export default function CommandCenter() {
                   <td className="p-5 text-[14px] font-bold text-foreground/90">${(p.estimatedValue / 1000).toFixed(0)}k</td>
                   <td className="p-5 text-[11px] font-medium text-muted-foreground uppercase tracking-widest">{p.currentStage}</td>
                   <td className="p-5">
-                    <div className={cn(
-                      "inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.15em] px-3 py-1 rounded-full border border-white/[0.04] bg-white/[0.01]",
-                      p.currentStage === "Live" ? "text-green-500" : "text-accent"
-                    )}>
-                      <span className={cn("size-1.5 rounded-full", p.currentStage === "Live" ? "bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.4)]" : "bg-accent shadow-[0_0_8px_rgba(255,0,255,0.4)]")} />
-                      {p.currentStage === "Live" ? "Active" : "Processing"}
-                    </div>
+                    <Badge 
+                      variant="outline" 
+                      className={cn(
+                        "font-bold uppercase tracking-[0.1em] text-[9px] px-2.5 py-0.5 rounded-full border transition-all flex items-center gap-1.5 w-fit",
+                        getStageStyles(p.currentStage)
+                      )}
+                    >
+                      <span className={cn("size-1 rounded-full", p.currentStage === "Live" ? "bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.4)]" : "bg-current")} />
+                      {p.currentStage === "Live" ? "Active" : p.currentStage}
+                    </Badge>
                   </td>
                   <td className="p-5 text-right">
                     <Button variant="ghost" size="icon" className="size-8 rounded-xl opacity-0 group-hover:opacity-60 hover:opacity-100 transition-all text-muted-foreground hover:text-foreground"><MoreHorizontal className="size-4" /></Button>

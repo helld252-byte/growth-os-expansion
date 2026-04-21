@@ -200,21 +200,23 @@ function PlatformListItem({ platform }: { platform: any }) {
   const getStageStyles = (stage: string) => {
     switch (stage) {
       case 'Live':
-        return "bg-green-500/10 text-green-400 border-green-500/20";
+        return "bg-emerald-500/15 text-emerald-400 border-emerald-500/20";
       case 'In Review':
-        return "bg-amber-500/10 text-amber-400 border-amber-500/20";
+        return "bg-amber-500/15 text-amber-400 border-amber-500/20";
       case 'Approved':
-        return "bg-primary/10 text-primary border-primary/20";
+        return "bg-violet-500/15 text-violet-400 border-violet-500/20";
       case 'Applied':
-        return "bg-blue-500/10 text-blue-400 border-blue-500/20";
+        return "bg-blue-500/15 text-blue-400 border-blue-500/20";
       case 'Research':
-        return "bg-white/5 text-secondary border-white/10";
+        return "bg-slate-500/15 text-slate-300 border-slate-500/20";
       case 'Rejected':
-        return "bg-red-500/10 text-red-400 border-red-500/20";
+        return "bg-rose-500/15 text-rose-400 border-rose-500/20";
       case 'Onboarding':
-        return "bg-cyan-500/10 text-cyan-400 border-cyan-500/20";
+        return "bg-cyan-500/15 text-cyan-400 border-cyan-500/20";
+      case 'Not Started':
+        return "bg-zinc-500/15 text-zinc-400 border-zinc-500/20";
       default:
-        return "bg-white/5 text-secondary border-white/10";
+        return "bg-slate-500/10 text-slate-400 border-slate-500/20";
     }
   };
 
@@ -228,7 +230,7 @@ function PlatformListItem({ platform }: { platform: any }) {
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center gap-3">
             <h3 className="text-base font-semibold tracking-tight text-foreground group-hover:text-primary transition-colors">{platform.name}</h3>
-            <span className="text-[10px] font-medium uppercase tracking-[0.1em] text-muted-foreground px-2 py-0.5 border border-white/[0.05] rounded-md bg-white/[0.02]">
+            <span className="text-[10px] font-medium uppercase tracking-[0.1em] text-muted-foreground/60 px-2 py-0.5 border border-white/[0.05] rounded-md bg-white/[0.02]">
               {platform.type}
             </span>
           </div>
@@ -237,14 +239,14 @@ function PlatformListItem({ platform }: { platform: any }) {
             <Badge 
               variant="outline" 
               className={cn(
-                "border px-2.5 py-0.5 h-auto text-[10px] font-medium uppercase tracking-[0.1em] rounded-lg flex items-center gap-2 transition-all",
+                "border px-2.5 py-0.5 h-auto text-[10px] font-bold uppercase tracking-[0.1em] rounded-lg flex items-center gap-2 transition-all",
                 getStageStyles(platform.currentStage)
               )}
             >
-              <span className={cn("size-1.5 rounded-full", platform.currentStage === 'Live' ? "bg-green-500 shadow-[0_0_6px_rgba(34,197,94,0.4)]" : "bg-current")} />
+              <span className={cn("size-1.5 rounded-full", platform.currentStage === 'Live' ? "bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.4)]" : "bg-current")} />
               {platform.currentStage}
             </Badge>
-            <div className="flex items-center gap-2 text-muted-foreground">
+            <div className="flex items-center gap-2 text-muted-foreground/60">
               <Zap className={cn("size-3.5", platform.priority === 'High' ? "text-accent" : "text-muted-foreground/20")} />
               <span className="text-[11px] font-medium tracking-tight">{platform.priority} Priority</span>
             </div>
