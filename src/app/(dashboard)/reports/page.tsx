@@ -8,18 +8,10 @@ import {
   CartesianGrid, 
   Tooltip, 
   ResponsiveContainer, 
-  PieChart, 
-  Pie, 
-  Cell,
-  LineChart,
-  Line,
-  AreaChart,
-  Area
+  AreaChart, 
+  Area 
 } from "recharts";
 import { 
-  BarChart3, 
-  TrendingUp, 
-  Users, 
   Target, 
   Layers, 
   CheckCircle2, 
@@ -29,6 +21,7 @@ import {
 } from "lucide-react";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { platforms } from "@/lib/mock-data";
 
 const funnelData = [
@@ -50,8 +43,6 @@ const growthTrend = [
 
 export default function ReportsPage() {
   const liveCount = platforms.filter(p => p.currentStage === "Live").length;
-  const approvedCount = platforms.filter(p => p.currentStage === "Approved").length;
-  const inReviewCount = platforms.filter(p => p.currentStage === "In Review").length;
 
   return (
     <div className="flex flex-col gap-8 animate-in fade-in duration-700">
