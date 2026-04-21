@@ -29,11 +29,11 @@ export default function DashboardLayout({
         <AppSidebar className="hidden lg:flex" />
         <SidebarInset className="flex flex-col overflow-hidden bg-transparent">
           {/* Centralized Mission Control Header */}
-          <header className="h-20 flex items-center justify-between px-8 bg-background/40 backdrop-blur-2xl sticky top-0 z-40 border-b border-white/[0.03]">
-            <div className="flex items-center gap-6">
+          <header className="h-16 flex items-center justify-between px-6 bg-background/40 backdrop-blur-2xl sticky top-0 z-40 border-b border-white/[0.03]">
+            <div className="flex items-center gap-4">
               <SidebarTrigger className="lg:hidden" />
               <div className="flex items-center gap-2">
-                <span className="font-headline font-black text-xl tracking-tighter">GrowthOS</span>
+                <span className="font-headline font-black text-lg tracking-tighter">GrowthOS</span>
               </div>
             </div>
 
@@ -42,44 +42,44 @@ export default function DashboardLayout({
               {navItems.map((item) => (
                 <Link key={item.path} href={item.path}>
                   <div className={cn(
-                    "px-5 py-2 rounded-full text-[11px] font-bold uppercase tracking-widest transition-all",
+                    "px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all",
                     pathname === item.path 
                       ? "bg-white/10 text-white shadow-lg" 
                       : "text-muted-foreground hover:text-white"
                   )}>
-                    {pathname === item.path && <span className="mr-2 text-accent">●</span>}
+                    {pathname === item.path && <span className="mr-1.5 text-accent">●</span>}
                     {item.label}
                   </div>
                 </Link>
               ))}
             </nav>
 
-            <div className="flex items-center gap-6">
-              <div className="flex items-center gap-4 text-muted-foreground">
-                <Search className="size-5 cursor-pointer hover:text-white transition-colors" />
+            <div className="flex items-center gap-5">
+              <div className="flex items-center gap-3 text-muted-foreground">
+                <Search className="size-4 cursor-pointer hover:text-white transition-colors" />
                 <div className="relative">
-                  <Bell className="size-5 cursor-pointer hover:text-white transition-colors" />
-                  <span className="absolute -top-1 -right-1 size-2 bg-accent rounded-full" />
+                  <Bell className="size-4 cursor-pointer hover:text-white transition-colors" />
+                  <span className="absolute -top-0.5 -right-0.5 size-1.5 bg-accent rounded-full" />
                 </div>
               </div>
               
-              <div className="h-8 w-px bg-white/[0.1]" />
+              <div className="h-6 w-px bg-white/[0.1]" />
               
-              <div className="flex items-center gap-3 cursor-pointer group">
-                <div className="size-10 rounded-full overflow-hidden border-2 border-accent/20 group-hover:border-accent transition-all">
+              <div className="flex items-center gap-2.5 cursor-pointer group">
+                <div className="size-8 rounded-full overflow-hidden border border-accent/20 group-hover:border-accent transition-all">
                   <img src="https://picsum.photos/seed/user/100/100" alt="Avatar" className="w-full h-full object-cover" />
                 </div>
                 <div className="hidden sm:flex flex-col items-start">
-                  <span className="text-xs font-bold text-white leading-none">James Sterling</span>
-                  <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-tighter mt-1">Growth Executive</span>
+                  <span className="text-[11px] font-bold text-white leading-none">James Sterling</span>
+                  <span className="text-[8px] font-bold text-muted-foreground uppercase tracking-tighter mt-1">Growth Executive</span>
                 </div>
-                <ChevronDown className="size-4 text-muted-foreground group-hover:text-white" />
+                <ChevronDown className="size-3 text-muted-foreground group-hover:text-white" />
               </div>
             </div>
           </header>
 
           {/* Page Content */}
-          <main className="flex-1 overflow-y-auto p-8 lg:p-12 custom-scrollbar">
+          <main className="flex-1 overflow-y-auto p-6 lg:p-10 custom-scrollbar">
             {children}
           </main>
         </SidebarInset>
