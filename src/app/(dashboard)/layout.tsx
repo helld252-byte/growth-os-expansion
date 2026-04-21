@@ -29,12 +29,12 @@ export default function DashboardLayout({
         <SidebarInset className="flex flex-col overflow-hidden bg-transparent">
           <header className="h-14 flex items-center justify-between px-6 bg-background/20 backdrop-blur-xl sticky top-0 z-40 border-b border-white/[0.02]">
             <div className="flex items-center gap-5">
-              <SidebarTrigger className="text-muted-foreground/60 hover:text-foreground transition-colors" />
+              <SidebarTrigger className="text-tertiary hover:text-primary transition-colors" />
               <div className="h-4 w-px bg-white/5 hidden sm:block" />
               <div className="flex items-center gap-3">
-                <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground/40">Unit-01</span>
-                <span className="text-white/5 text-xs">/</span>
-                <span className="text-[11px] font-medium uppercase tracking-[0.15em] text-foreground/80">
+                <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-tertiary">Unit-01</span>
+                <span className="text-tertiary/20 text-xs">/</span>
+                <span className="text-[11px] font-medium uppercase tracking-[0.15em] text-primary">
                   {getSectionLabel(pathname)}
                 </span>
               </div>
@@ -43,11 +43,11 @@ export default function DashboardLayout({
             <div className="flex items-center gap-5">
               <div className="flex items-center gap-4">
                 <div className="hidden sm:flex items-center bg-white/[0.01] border border-white/[0.03] rounded-lg px-3 py-1.5 gap-3 cursor-pointer hover:bg-white/[0.03] transition-colors group">
-                  <Search className="size-3.5 text-muted-foreground/40 group-hover:text-primary transition-colors" />
-                  <span className="text-[11px] font-medium tracking-tight text-muted-foreground/60 pr-6">Search Strategic Assets</span>
-                  <span className="text-[9px] font-bold text-muted-foreground/20 tracking-widest">⌘K</span>
+                  <Search className="size-3.5 text-tertiary/60 group-hover:text-primary transition-colors" />
+                  <span className="text-[11px] font-medium tracking-tight text-secondary pr-6">Search Strategic Assets</span>
+                  <span className="text-[9px] font-medium text-tertiary/30 tracking-widest">⌘K</span>
                 </div>
-                <div className="relative cursor-pointer text-muted-foreground/40 hover:text-foreground transition-colors p-1.5">
+                <div className="relative cursor-pointer text-tertiary hover:text-primary transition-colors p-1.5">
                   <Bell className="size-4" />
                   <span className="absolute top-1.5 right-1.5 size-1.5 bg-accent rounded-full shadow-[0_0_8px_hsl(var(--accent)/0.5)]" />
                 </div>
@@ -59,7 +59,7 @@ export default function DashboardLayout({
                 <div className="size-7 rounded-full overflow-hidden border border-white/[0.05] group-hover:border-accent/40 transition-all opacity-90 group-hover:opacity-100">
                   <img src="https://picsum.photos/seed/user/100/100" alt="Avatar" className="w-full h-full object-cover" />
                 </div>
-                <ChevronDown className="size-3 text-muted-foreground/30 group-hover:text-foreground transition-colors" />
+                <ChevronDown className="size-3 text-tertiary group-hover:text-primary transition-colors" />
               </div>
             </div>
           </header>
