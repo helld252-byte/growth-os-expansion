@@ -11,7 +11,8 @@ import {
   ShieldAlert,
   Zap,
   LayoutGrid,
-  Filter
+  Filter,
+  Star
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -112,16 +113,16 @@ export default function ExpansionOperationsPage() {
           <div className="flex flex-col gap-2">
             <h3 className="text-[9px] font-medium uppercase tracking-[0.2em] text-tertiary/40 px-3 mb-1">Strategic Intel</h3>
             <nav className="flex flex-col gap-1">
-              <Button variant="ghost" className="h-10 justify-start gap-3 px-3 rounded-lg hover:bg-white/[0.02] text-tertiary font-medium group transition-colors">
+              <Button variant="ghost" className="h-10 justify-start gap-3 px-3 rounded-lg hover:bg-white/[0.02] group transition-colors">
                 <Globe className="size-4 text-tertiary/60 group-hover:text-primary" />
-                <span className="text-[12px] tracking-tight text-secondary">Expansion Profile</span>
+                <span className="text-[12px] tracking-tight text-secondary font-medium">Expansion Profile</span>
               </Button>
             </nav>
           </div>
         </div>
 
         <div className="mt-auto">
-          <Button className="w-full bg-white/[0.03] hover:bg-primary text-foreground font-medium text-[11px] uppercase tracking-wider h-11 rounded-xl transition-all shadow-lg active-glow border border-white/[0.05]">
+          <Button className="w-full bg-white/[0.03] hover:bg-primary text-primary font-medium text-[11px] uppercase tracking-wider h-11 rounded-xl transition-all shadow-lg active-glow border border-white/[0.05]">
             <Plus className="size-4 mr-2" /> Add Platform
           </Button>
         </div>
@@ -245,8 +246,8 @@ function PlatformListItem({ platform }: { platform: any }) {
               <span className={cn("size-1.5 rounded-full", platform.currentStage === 'Live' ? "bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.4)]" : "bg-current")} />
               {platform.currentStage}
             </Badge>
-            <div className="flex items-center gap-2 text-tertiary">
-              <Zap className={cn("size-3.5", platform.priority === 'High' ? "text-accent" : "text-tertiary/20")} />
+            <div className="flex items-center gap-2">
+              <Zap className={cn("size-3.5", platform.priority === 'High' ? "text-accent" : "text-tertiary/30")} />
               <span className="text-[11px] font-medium tracking-tight text-secondary">{platform.priority} Priority</span>
             </div>
           </div>
