@@ -13,7 +13,7 @@ import {
   ShieldAlert,
   Zap,
   LayoutGrid,
-  ChevronDown
+  Filter
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -125,7 +125,7 @@ export default function ExpansionOperationsPage() {
 
         <div className="mt-auto">
           <Button className="w-full bg-white/[0.03] hover:bg-primary/20 border border-white/5 hover:border-primary/50 text-white font-black text-[10px] uppercase tracking-[0.15em] h-12 rounded-xl transition-all shadow-lg active-glow">
-            <Plus className="size-4 mr-2" /> Deploy Platform
+            <Plus className="size-4 mr-2" /> Add Platform
           </Button>
         </div>
       </aside>
@@ -140,14 +140,19 @@ export default function ExpansionOperationsPage() {
             </p>
           </div>
           
-          <div className="relative group w-80">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
-            <Input 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search missions..." 
-              className="pl-11 h-11 bg-white/[0.03] border-white/10 rounded-xl font-medium text-xs focus-visible:ring-primary/30" 
-            />
+          <div className="flex items-center gap-3">
+            <div className="relative group w-80">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+              <Input 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search missions..." 
+                className="pl-11 h-11 bg-white/[0.03] border-white/10 rounded-xl font-medium text-xs focus-visible:ring-primary/30" 
+              />
+            </div>
+            <Button variant="ghost" className="h-11 w-11 p-0 bg-white/[0.03] border border-white/10 rounded-xl text-muted-foreground hover:text-white transition-all">
+              <Filter className="size-4" />
+            </Button>
           </div>
         </header>
 
@@ -194,6 +199,27 @@ function FilterButton({ icon: Icon, label, count, active, onClick, glow }: any) 
 }
 
 function PlatformListItem({ platform }: { platform: any }) {
+  const getStageStyles = (stage: string) => {
+    switch (stage) {
+      case 'Live':
+        return "bg-green-500/10 text-green-400 border-green-500/30";
+      case 'In Review':
+        return "bg-amber-500/10 text-amber-400 border-amber-500/30";
+      case 'Approved':
+        return "bg-primary/20 text-primary border-primary/30";
+      case 'Applied':
+        return "bg-blue-500/10 text-blue-400 border-blue-500/30";
+      case 'Research':
+        return "bg-white/5 text-muted-foreground border-white/10";
+      case 'Rejected':
+        return "bg-red-500/10 text-red-400 border-red-500/30";
+      case 'Onboarding':
+        return "bg-cyan-500/10 text-cyan-400 border-cyan-500/30";
+      default:
+        return "bg-white/5 text-muted-foreground border-white/10";
+    }
+  };
+
   return (
     <div className="premium-panel p-6 rounded-2xl flex items-center justify-between group hover:border-primary/30 cursor-pointer transition-all active:scale-[0.99]">
       <div className="flex items-center gap-6">
@@ -204,16 +230,22 @@ function PlatformListItem({ platform }: { platform: any }) {
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center gap-3">
             <h3 className="text-lg font-black tracking-tight group-hover:text-primary transition-colors">{platform.name}</h3>
-            <Badge variant="outline" className="bg-white/5 border-none text-[8px] font-black uppercase tracking-widest px-2 py-0.5 text-muted-foreground/60">
+            <Badge variant="outline" className="bg-white/10 border-white/20 text-[8px] font-black uppercase tracking-widest px-2 py-0.5 text-white/80">
               {platform.type}
             </Badge>
           </div>
           
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1.5 text-muted-foreground/60">
-              <LayoutGrid className="size-3" />
-              <span className="text-[10px] font-bold uppercase tracking-tighter">{platform.currentStage}</span>
-            </div>
+            <Badge 
+              variant="outline" 
+              className={cn(
+                "border px-2 py-0 h-5 text-[9px] font-black uppercase tracking-widest rounded-md flex items-center gap-1.5 transition-all",
+                getStageStyles(platform.currentStage)
+              )}
+            >
+              <span className="size-1 rounded-full bg-current" />
+              {platform.currentStage}
+            </Badge>
             <div className="flex items-center gap-1.5 text-muted-foreground/60">
               <Zap className={cn("size-3", platform.priority === 'High' ? "text-accent" : "")} />
               <span className="text-[10px] font-bold uppercase tracking-tighter">{platform.priority} Priority</span>
