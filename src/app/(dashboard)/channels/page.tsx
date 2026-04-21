@@ -115,7 +115,7 @@ export default function ExpansionOperationsPage() {
             <nav className="flex flex-col gap-1">
               <Button variant="ghost" className="h-10 justify-start gap-3 px-3 rounded-lg hover:bg-white/[0.02] text-muted-foreground font-medium group transition-colors">
                 <Globe className="size-4 text-muted-foreground/30 group-hover:text-primary" />
-                <span className="text-[12px] tracking-tight">Expansion Profile</span>
+                <span className="text-[12px] tracking-tight text-secondary">Expansion Profile</span>
               </Button>
             </nav>
           </div>
@@ -208,7 +208,7 @@ function PlatformListItem({ platform }: { platform: any }) {
       case 'Applied':
         return "bg-blue-500/15 text-blue-400 border-blue-500/20";
       case 'Research':
-        return "bg-slate-500/15 text-slate-300 border-slate-500/20";
+        return "bg-slate-500/20 text-slate-200 border-slate-500/30";
       case 'Rejected':
         return "bg-rose-500/15 text-rose-400 border-rose-500/20";
       case 'Onboarding':
@@ -230,7 +230,7 @@ function PlatformListItem({ platform }: { platform: any }) {
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center gap-3">
             <h3 className="text-base font-semibold tracking-tight text-foreground group-hover:text-primary transition-colors">{platform.name}</h3>
-            <span className="text-[10px] font-medium uppercase tracking-[0.1em] text-muted-foreground/60 px-2 py-0.5 border border-white/[0.05] rounded-md bg-white/[0.02]">
+            <span className="text-[10px] font-medium uppercase tracking-[0.1em] text-secondary px-2 py-0.5 border border-white/[0.05] rounded-md bg-white/[0.02]">
               {platform.type}
             </span>
           </div>
@@ -239,7 +239,7 @@ function PlatformListItem({ platform }: { platform: any }) {
             <Badge 
               variant="outline" 
               className={cn(
-                "border px-2.5 py-0.5 h-auto text-[10px] font-bold uppercase tracking-[0.1em] rounded-lg flex items-center gap-2 transition-all",
+                "border px-2.5 py-0.5 h-auto text-[10px] font-medium uppercase tracking-[0.1em] rounded-lg flex items-center gap-2 transition-all",
                 getStageStyles(platform.currentStage)
               )}
             >
@@ -248,7 +248,7 @@ function PlatformListItem({ platform }: { platform: any }) {
             </Badge>
             <div className="flex items-center gap-2 text-muted-foreground/60">
               <Zap className={cn("size-3.5", platform.priority === 'High' ? "text-accent" : "text-muted-foreground/20")} />
-              <span className="text-[11px] font-medium tracking-tight">{platform.priority} Priority</span>
+              <span className="text-[11px] font-medium tracking-tight text-secondary">{platform.priority} Priority</span>
             </div>
           </div>
         </div>

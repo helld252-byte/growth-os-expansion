@@ -11,9 +11,7 @@ import {
   ResponsiveContainer, 
   PieChart, 
   Pie, 
-  Cell,
-  BarChart,
-  Bar
+  Cell
 } from "recharts";
 import { 
   CheckCircle2, 
@@ -173,9 +171,9 @@ export default function ReportsPage() {
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-2">
                 <h4 className="text-base font-semibold tracking-tight text-white">Expansion Acceleration Detected</h4>
-                <Badge variant="outline" className="bg-accent/10 text-accent/80 border-accent/20 font-semibold text-[8px] uppercase tracking-widest px-2 py-0">AI Insight</Badge>
+                <Badge variant="outline" className="bg-accent/10 text-accent/80 border-accent/20 font-medium text-[8px] uppercase tracking-widest px-2 py-0">AI Insight</Badge>
               </div>
-              <p className="text-muted-foreground/60 text-[12px] leading-relaxed max-w-2xl">
+              <p className="text-secondary text-[12px] leading-relaxed max-w-2xl">
                 Market velocity in the <span className="text-white font-medium">EU Strategic Zone</span> has increased by 18.4% this quarter. Current onboarding cycles are 4 days faster than previous performance benchmarks.
               </p>
             </div>

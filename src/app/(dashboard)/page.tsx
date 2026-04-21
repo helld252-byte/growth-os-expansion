@@ -39,7 +39,7 @@ export default function CommandCenter() {
       case 'Applied':
         return "bg-blue-500/15 text-blue-400 border-blue-500/20";
       case 'Research':
-        return "bg-slate-500/15 text-slate-300 border-slate-500/20";
+        return "bg-slate-500/20 text-slate-200 border-slate-500/30";
       case 'Rejected':
         return "bg-rose-500/15 text-rose-400 border-rose-500/20";
       case 'Onboarding':
@@ -147,7 +147,7 @@ export default function CommandCenter() {
                 <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.15em]">Mission ID</span>
                 <span className="text-[15px] font-semibold text-foreground mt-1 tracking-tight">#17986-WAY</span>
               </div>
-              <Badge variant="outline" className="bg-emerald-500/15 text-emerald-400 border-emerald-500/20 text-[10px] font-bold tracking-widest uppercase px-2.5 py-0.5 rounded-lg shadow-sm">In Review</Badge>
+              <Badge variant="outline" className="bg-emerald-500/15 text-emerald-400 border-emerald-500/20 text-[10px] font-medium tracking-widest uppercase px-2.5 py-0.5 rounded-lg shadow-sm">In Review</Badge>
             </div>
 
             <div className="space-y-5">
@@ -221,7 +221,7 @@ export default function CommandCenter() {
                     <Badge 
                       variant="outline" 
                       className={cn(
-                        "font-bold uppercase tracking-[0.1em] text-[9px] px-2.5 py-0.5 rounded-full border transition-all flex items-center gap-1.5 w-fit",
+                        "font-medium uppercase tracking-[0.1em] text-[9px] px-2.5 py-0.5 rounded-full border transition-all flex items-center gap-1.5 w-fit",
                         getStageStyles(p.currentStage)
                       )}
                     >

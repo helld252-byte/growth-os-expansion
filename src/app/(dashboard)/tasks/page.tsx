@@ -53,7 +53,7 @@ export default function TasksPage() {
               <CalendarIcon className="size-3.5 text-primary" /> Today
               <span className="ml-auto bg-primary/20 text-primary text-[8px] font-semibold px-1.5 py-0.5 rounded">2</span>
             </Button>
-            <Button variant="ghost" className="justify-start gap-3 h-9 px-3 hover:bg-white/[0.02] rounded-lg font-medium text-muted-foreground/60 text-[12px] group">
+            <Button variant="ghost" className="justify-start gap-3 h-9 px-3 hover:bg-white/[0.02] rounded-lg font-medium text-secondary text-[12px] group">
               <Layers className="size-3.5 text-muted-foreground/20 group-hover:text-primary" /> Upcoming
             </Button>
             <Button variant="ghost" className="justify-start gap-3 h-9 px-3 hover:bg-white/[0.02] rounded-lg font-medium text-red-500/60 text-[12px] group">
@@ -96,7 +96,7 @@ export default function TasksPage() {
                       <Badge 
                         variant="outline"
                         className={cn(
-                          "font-semibold px-2 py-0 h-5 text-[8px] uppercase tracking-wider rounded border transition-all",
+                          "font-medium px-2 py-0 h-5 text-[8px] uppercase tracking-wider rounded border transition-all",
                           task.status === "Overdue" ? "bg-red-500/5 text-red-500/80 border-red-500/20" : "bg-white/[0.02] text-muted-foreground/40 border-white/[0.04]"
                         )}
                       >
@@ -109,7 +109,7 @@ export default function TasksPage() {
                         <div className="size-4 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-[7px] font-bold text-primary">
                           {task.owner.charAt(0)}
                         </div>
-                        <span className="text-[10px] font-medium text-muted-foreground/40">{task.owner}</span>
+                        <span className="text-[10px] font-medium text-secondary">{task.owner}</span>
                       </div>
                       <div className="flex items-center gap-1.5 text-muted-foreground/20">
                         <CalendarIcon className="size-3" />
