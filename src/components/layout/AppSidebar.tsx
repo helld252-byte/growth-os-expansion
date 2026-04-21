@@ -39,37 +39,37 @@ export function AppSidebar() {
 
   return (
     <Sidebar variant="inset" className="border-r border-white/[0.02] bg-sidebar/40 backdrop-blur-2xl">
-      <SidebarHeader className="py-8 px-6">
+      <SidebarHeader className="py-10 px-6">
         <div className="flex items-center gap-4">
-          <div className="size-9 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg ring-1 ring-white/5">
-            <Zap className="size-4 text-white fill-white" />
+          <div className="size-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg ring-1 ring-white/10">
+            <Zap className="size-5 text-white fill-white" />
           </div>
           <div className="flex flex-col">
-            <span className="font-headline font-bold text-lg leading-none tracking-tight text-foreground">Growth OS</span>
-            <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-[0.12em] mt-1.5">Ops Unit-01</span>
+            <span className="font-headline font-bold text-xl leading-none tracking-tight text-tier-1">Growth OS</span>
+            <span className="text-[10px] text-tier-3 font-semibold uppercase tracking-[0.15em] mt-2">Ops Unit-01</span>
           </div>
         </div>
       </SidebarHeader>
 
-      <SidebarContent className="px-4">
+      <SidebarContent className="px-5">
         <SidebarGroup>
-          <SidebarGroupLabel className="px-3 text-[9px] uppercase font-semibold tracking-[0.15em] text-muted-foreground mb-2">Nav Command</SidebarGroupLabel>
-          <SidebarMenu className="gap-1">
+          <SidebarGroupLabel className="px-3 text-[10px] uppercase font-bold tracking-[0.2em] text-tier-4 mb-3">Nav Command</SidebarGroupLabel>
+          <SidebarMenu className="gap-1.5">
             {navItems.map((item) => (
               <SidebarMenuItem key={item.path}>
                 <SidebarMenuButton 
                   asChild 
                   isActive={pathname === item.path}
                   className={cn(
-                    "h-10 rounded-lg transition-all duration-300 px-3",
+                    "h-11 rounded-xl transition-all duration-300 px-3.5",
                     pathname === item.path 
-                      ? "bg-primary/10 text-foreground shadow-[0_0_15px_rgba(139,92,246,0.1)] font-semibold" 
-                      : "text-sidebar-foreground hover:bg-white/[0.02] hover:text-foreground font-medium"
+                      ? "bg-primary/10 text-tier-1 shadow-[0_0_20px_rgba(168,85,247,0.15)] font-semibold" 
+                      : "text-tier-2 hover:bg-white/[0.03] hover:text-tier-1 font-medium"
                   )}
                 >
                   <Link href={item.path}>
-                    <item.icon className={cn("size-4", pathname === item.path ? "text-primary" : "text-muted-foreground/50")} />
-                    <span className="tracking-tight ml-3 text-[13px]">{item.label}</span>
+                    <item.icon className={cn("size-4.5", pathname === item.path ? "text-primary" : "text-tier-3/60")} />
+                    <span className="tracking-tight ml-3.5 text-[14px]">{item.label}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -77,43 +77,43 @@ export function AppSidebar() {
           </SidebarMenu>
         </SidebarGroup>
 
-        <SidebarGroup className="mt-6">
-          <SidebarGroupLabel className="px-3 text-[9px] uppercase font-semibold tracking-[0.15em] text-muted-foreground mb-2">Strategic</SidebarGroupLabel>
-          <SidebarMenu className="gap-1">
+        <SidebarGroup className="mt-8">
+          <SidebarGroupLabel className="px-3 text-[10px] uppercase font-bold tracking-[0.2em] text-tier-4 mb-3">Strategic</SidebarGroupLabel>
+          <SidebarMenu className="gap-1.5">
             <SidebarMenuItem>
-              <SidebarMenuButton className="h-10 rounded-lg text-sidebar-foreground hover:bg-white/[0.02] hover:text-foreground px-3 font-medium">
-                <Briefcase className="size-4 text-muted-foreground/40" />
-                <span className="tracking-tight ml-3 text-[13px]">Market Intel</span>
+              <SidebarMenuButton className="h-11 rounded-xl text-tier-2 hover:bg-white/[0.03] hover:text-tier-1 px-3.5 font-medium">
+                <Briefcase className="size-4.5 text-tier-3/40" />
+                <span className="tracking-tight ml-3.5 text-[14px]">Market Intel</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton className="h-10 rounded-lg text-sidebar-foreground hover:bg-white/[0.02] hover:text-foreground px-3 font-medium">
-                <ShieldCheck className="size-4 text-muted-foreground/40" />
-                <span className="tracking-tight ml-3 text-[13px]">Compliance</span>
+              <SidebarMenuButton className="h-11 rounded-xl text-tier-2 hover:bg-white/[0.03] hover:text-tier-1 px-3.5 font-medium">
+                <ShieldCheck className="size-4.5 text-tier-3/40" />
+                <span className="tracking-tight ml-3.5 text-[14px]">Compliance</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="p-6">
+      <SidebarFooter className="p-7">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild className="h-10 rounded-lg hover:bg-white/[0.02] transition-colors px-3 group">
+            <SidebarMenuButton asChild className="h-11 rounded-xl hover:bg-white/[0.03] transition-colors px-3.5 group">
               <Link href="/settings">
-                <Settings className="size-4 text-muted-foreground/40 group-hover:text-foreground transition-transform duration-500 group-hover:rotate-45" />
-                <span className="font-medium tracking-tight ml-3 text-[13px] text-sidebar-foreground group-hover:text-foreground">System Config</span>
+                <Settings className="size-4.5 text-tier-3/40 group-hover:text-tier-1 transition-transform duration-700 group-hover:rotate-90" />
+                <span className="font-medium tracking-tight ml-3.5 text-[14px] text-tier-2 group-hover:text-tier-1">System Config</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
         
-        <div className="mt-5 flex flex-col gap-2 px-3">
-          <div className="flex items-center justify-between text-[8px] font-semibold uppercase tracking-[0.2em] text-muted-foreground/40">
+        <div className="mt-6 flex flex-col gap-2.5 px-3.5">
+          <div className="flex items-center justify-between text-[9px] font-bold uppercase tracking-[0.25em] text-tier-4">
             <span>Version</span>
             <span>2.5.0-A</span>
           </div>
-          <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
+          <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
             <div className="w-3/4 h-full bg-primary/40 rounded-full" />
           </div>
         </div>
