@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -162,7 +163,9 @@ export default function ExpansionOperationsPage() {
             </div>
           ) : (
             filteredPlatforms.map((p) => (
-              <PlatformListItem key={p.id} platform={p} />
+              <Link key={p.id} href={`/channels/${p.id}`}>
+                <PlatformListItem platform={p} />
+              </Link>
             ))
           )}
         </div>
@@ -232,7 +235,7 @@ function PlatformListItem({ platform }: { platform: any }) {
             <h3 className="text-base font-semibold tracking-tight text-primary group-hover:text-tier-1 transition-colors">
               {platform.name}
             </h3>
-            <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-tier-2 px-2.5 py-0.5 border border-white/[0.08] rounded-md bg-white/[0.03]">
+            <span className="text-[10px] font-medium uppercase tracking-[0.12em] text-tier-2 px-2.5 py-0.5 border border-white/[0.08] rounded-md bg-white/[0.03]">
               {platform.type}
             </span>
           </div>
