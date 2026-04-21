@@ -29,28 +29,28 @@ const analyticsData = [
 
 export default function CommandCenter() {
   return (
-    <div className="max-w-[1400px] mx-auto flex flex-col gap-10 animate-in fade-in duration-700">
+    <div className="max-w-[1400px] mx-auto flex flex-col gap-12 animate-in fade-in duration-700">
       
       {/* Dashboard Headline & Top Metrics */}
-      <div className="flex flex-col xl:flex-row justify-between gap-10">
+      <div className="flex flex-col xl:flex-row justify-between items-start gap-10">
         <div className="flex flex-col gap-6">
-          <h1 className="text-5xl font-bold tracking-tighter leading-[1.1] text-white">
+          <h1 className="text-5xl md:text-6xl font-bold tracking-tighter leading-[1.05] text-foreground">
             Growth <br /> Operations <br /> Command
           </h1>
           
-          <div className="flex items-center gap-4 bg-white/[0.02] border border-white/[0.04] rounded-xl p-4 max-w-fit">
-            <div className="size-9 rounded-lg bg-accent/10 flex items-center justify-center">
-              <Globe className="size-4 text-accent" />
+          <div className="flex items-center gap-4 bg-white/[0.02] border border-white/[0.05] rounded-2xl p-4 pr-6 max-w-fit shadow-xl backdrop-blur-md">
+            <div className="size-11 rounded-xl bg-accent/10 flex items-center justify-center">
+              <Globe className="size-5 text-accent" />
             </div>
             <div className="flex flex-col">
-              <span className="text-[13px] font-medium text-white/90 leading-tight">Global Market Engine</span>
-              <span className="text-[9px] font-semibold text-muted-foreground uppercase tracking-widest mt-1">March 25, 2024</span>
+              <span className="text-[14px] font-semibold text-foreground leading-tight tracking-tight">Global Market Engine</span>
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.15em] mt-1.5">Mission Active • Mar 2024</span>
             </div>
           </div>
         </div>
 
         {/* Top Metric Boxes */}
-        <div className="flex flex-wrap gap-4">
+        <div className="flex flex-wrap gap-4 lg:justify-end w-full lg:w-auto">
           <MetricBox label="Leads" value="789" trend="+5.45% ↗" trendUp={true} icon={Layers} />
           <MetricBox label="Pipeline" value="120" trend="-0.45% ↘" trendUp={false} icon={Navigation} />
           <MetricBox label="Onboarded" value="98" trend="+5.45% ↗" trendUp={true} icon={Box} />
@@ -58,15 +58,15 @@ export default function CommandCenter() {
       </div>
 
       {/* Action Bar */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 py-4 border-y border-white/[0.03]">
-        <div className="flex items-center gap-2 text-accent font-medium text-[11px] uppercase tracking-wider">
-          <Zap className="size-3.5" /> 5 tactical actions pending
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 py-6 border-y border-white/[0.03]">
+        <div className="flex items-center gap-2.5 text-accent font-semibold text-[12px] uppercase tracking-widest">
+          <Zap className="size-4 animate-pulse" /> 5 tactical actions pending
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="ghost" className="h-9 font-medium border border-white/5 bg-white/[0.02] rounded-lg px-4 text-[11px] text-muted-foreground/80 hover:text-white">
-            <Filter className="size-3.5 mr-2" /> Filters
+          <Button variant="ghost" className="h-10 font-medium border border-white/[0.05] bg-white/[0.01] rounded-xl px-5 text-[12px] text-muted-foreground hover:text-foreground transition-all">
+            <Filter className="size-4 mr-2.5 text-muted-foreground/40" /> Filters
           </Button>
-          <Button className="h-9 font-semibold bg-accent hover:bg-accent/80 text-accent-foreground rounded-full px-6 text-[11px] uppercase tracking-widest transition-all hover:scale-105 active:scale-95">
+          <Button className="h-10 font-bold bg-accent hover:bg-accent/90 text-accent-foreground rounded-full px-8 text-[11px] uppercase tracking-[0.15em] transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-accent/10">
             Create Initiative
           </Button>
         </div>
@@ -76,37 +76,37 @@ export default function CommandCenter() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
         {/* Analytics */}
-        <div className="lg:col-span-5 premium-panel rounded-2xl p-7 flex flex-col gap-7">
+        <div className="lg:col-span-5 premium-panel rounded-2xl p-8 flex flex-col gap-8">
           <div className="flex items-center justify-between">
-            <h3 className="font-semibold text-[11px] uppercase tracking-widest text-muted-foreground/50">Market Velocity</h3>
-            <div className="flex items-center gap-4 text-[9px] font-semibold uppercase tracking-widest text-muted-foreground/30">
-              <span className="text-white">Week</span>
-              <span className="hover:text-white/60 cursor-pointer">Month</span>
+            <h3 className="font-bold text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Market Velocity</h3>
+            <div className="flex items-center gap-5 text-[10px] font-bold uppercase tracking-widest">
+              <span className="text-foreground border-b border-primary pb-1">Week</span>
+              <span className="text-muted-foreground hover:text-foreground/60 cursor-pointer transition-colors">Month</span>
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-5">
+          <div className="grid grid-cols-3 gap-6">
             <div className="flex flex-col">
-              <span className="text-2xl font-bold text-white">97 <span className="text-[10px] text-green-500 font-medium">↗</span></span>
-              <span className="text-[9px] font-semibold text-muted-foreground/40 uppercase tracking-widest mt-1.5">Daily Cap</span>
+              <span className="text-3xl font-bold text-foreground tracking-tight">97 <span className="text-[12px] text-green-500 font-bold">↗</span></span>
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.15em] mt-2">Daily Cap</span>
             </div>
             <div className="flex flex-col">
-              <span className="text-2xl font-bold text-white">120 <span className="text-[10px] text-green-500 font-medium">↗</span></span>
-              <span className="text-[9px] font-semibold text-muted-foreground/40 uppercase tracking-widest mt-1.5">Avg Flow</span>
+              <span className="text-3xl font-bold text-foreground tracking-tight">120 <span className="text-[12px] text-green-500 font-bold">↗</span></span>
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.15em] mt-2">Avg Flow</span>
             </div>
             <div className="flex flex-col">
-              <span className="text-2xl font-bold text-white">259 <span className="text-[10px] text-green-500 font-medium">↗</span></span>
-              <span className="text-[9px] font-semibold text-muted-foreground/40 uppercase tracking-widest mt-1.5">Peak</span>
+              <span className="text-3xl font-bold text-foreground tracking-tight">259 <span className="text-[12px] text-green-500 font-bold">↗</span></span>
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.15em] mt-2">Peak</span>
             </div>
           </div>
 
-          <div className="h-40 w-full">
+          <div className="h-44 w-full mt-2">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={analyticsData}>
-                <Bar dataKey="value" fill="hsl(var(--accent))" radius={[2, 2, 2, 2]} barSize={28} opacity={0.6} />
+                <Bar dataKey="value" fill="hsl(var(--accent))" radius={[3, 3, 3, 3]} barSize={32} opacity={0.6} />
                 <Tooltip 
-                  cursor={{ fill: 'white', opacity: 0.02 }}
-                  contentStyle={{ backgroundColor: 'rgba(0,0,0,0.8)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '8px', fontSize: '10px', backdropFilter: 'blur(4px)' }}
+                  cursor={{ fill: 'white', opacity: 0.03 }}
+                  contentStyle={{ backgroundColor: 'rgba(0,0,0,0.9)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '12px', fontSize: '11px', fontWeight: 600, backdropFilter: 'blur(8px)', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }}
                 />
               </BarChart>
             </ResponsiveContainer>
@@ -114,40 +114,40 @@ export default function CommandCenter() {
         </div>
 
         {/* Critical Path */}
-        <div className="lg:col-span-4 premium-panel rounded-2xl p-7 flex flex-col gap-6">
+        <div className="lg:col-span-4 premium-panel rounded-2xl p-8 flex flex-col gap-8">
           <div className="flex items-center justify-between">
-            <h3 className="font-semibold text-[11px] uppercase tracking-widest text-muted-foreground/50">Critical Path</h3>
-            <Button variant="ghost" size="icon" className="size-8 rounded-lg border border-white/[0.03] text-muted-foreground/40 hover:text-white"><MoreHorizontal className="size-3.5" /></Button>
+            <h3 className="font-bold text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Critical Path</h3>
+            <Button variant="ghost" size="icon" className="size-9 rounded-xl border border-white/[0.03] text-muted-foreground/30 hover:text-foreground transition-colors"><MoreHorizontal className="size-4" /></Button>
           </div>
 
-          <div className="flex flex-col gap-5">
+          <div className="flex flex-col gap-6">
             <div className="flex items-center justify-between">
               <div className="flex flex-col">
-                <span className="text-[9px] font-semibold text-muted-foreground/30 uppercase tracking-[0.12em]">Active Mission ID</span>
-                <span className="text-[13px] font-semibold text-white mt-1">#17986-WAY</span>
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.15em]">Mission ID</span>
+                <span className="text-[15px] font-semibold text-foreground mt-1 tracking-tight">#17986-WAY</span>
               </div>
-              <Badge variant="outline" className="bg-accent/5 text-accent border-accent/20 text-[8px] font-semibold tracking-widest uppercase px-2 py-0.5 rounded-md">In Review</Badge>
+              <Badge variant="outline" className="bg-accent/5 text-accent border-accent/20 text-[10px] font-bold tracking-widest uppercase px-2.5 py-0.5 rounded-lg shadow-sm">In Review</Badge>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-5">
               <TimelineItem status="complete" label="Initial Research" time="Mar 10" />
               <TimelineItem status="active" label="Compliance" time="Mar 22" />
               <TimelineItem status="pending" label="Catalog" time="Est. Mar 28" />
             </div>
 
-            <div className="mt-2 p-3.5 bg-white/[0.015] border border-white/[0.03] rounded-xl flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="size-8 rounded-full overflow-hidden ring-1 ring-white/5 shadow-inner">
-                  <img src="https://picsum.photos/seed/sarah/100/100" alt="Owner" className="opacity-80" />
+            <div className="mt-2 p-4 bg-white/[0.015] border border-white/[0.04] rounded-2xl flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="size-10 rounded-full overflow-hidden ring-1 ring-white/10 shadow-lg">
+                  <img src="https://picsum.photos/seed/sarah/100/100" alt="Owner" className="opacity-90" />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[8px] font-semibold text-muted-foreground/40 uppercase">Operational Lead</span>
-                  <span className="text-[11px] font-medium text-white/90">Sarah Chen</span>
+                  <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-[0.12em]">Operational Lead</span>
+                  <span className="text-[13px] font-semibold text-foreground tracking-tight">Sarah Chen</span>
                 </div>
               </div>
-              <div className="flex gap-1.5">
-                <Button variant="ghost" size="icon" className="size-7 rounded-lg bg-white/[0.02] text-muted-foreground/30 hover:text-white"><Globe className="size-3" /></Button>
-                <Button variant="ghost" size="icon" className="size-7 rounded-lg bg-white/[0.02] text-muted-foreground/30 hover:text-white"><Star className="size-3" /></Button>
+              <div className="flex gap-2">
+                <Button variant="ghost" size="icon" className="size-8 rounded-lg bg-white/[0.02] text-muted-foreground/30 hover:text-foreground transition-all"><Globe className="size-4" /></Button>
+                <Button variant="ghost" size="icon" className="size-8 rounded-lg bg-white/[0.02] text-muted-foreground/30 hover:text-foreground transition-all"><Star className="size-4" /></Button>
               </div>
             </div>
           </div>
@@ -155,58 +155,58 @@ export default function CommandCenter() {
 
         {/* Visualizer */}
         <div className="lg:col-span-3 premium-panel rounded-2xl p-0 overflow-hidden relative group">
-          <div className="absolute top-5 left-5 z-10 p-3 bg-background/60 backdrop-blur-xl rounded-xl border border-white/5">
-            <h4 className="text-[9px] font-semibold uppercase tracking-widest text-accent/80">Deployment Map</h4>
-            <p className="text-[11px] font-medium mt-1 text-white">EU Strategic Zone</p>
+          <div className="absolute top-6 left-6 z-10 p-4 bg-background/60 backdrop-blur-xl rounded-2xl border border-white/[0.05] shadow-2xl">
+            <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-accent/90">Deployment Map</h4>
+            <p className="text-[14px] font-semibold mt-1.5 text-foreground tracking-tight">EU Strategic Zone</p>
           </div>
-          <img src="https://picsum.photos/seed/map/800/800" className="w-full h-full object-cover opacity-40 grayscale group-hover:grayscale-0 group-hover:opacity-60 transition-all duration-1000" alt="Map" />
-          <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-transparent" />
-          <Button variant="ghost" size="icon" className="absolute bottom-5 right-5 size-9 rounded-full bg-accent text-accent-foreground shadow-lg hover:scale-110 active:scale-95 transition-all">
-            <ChevronRight className="size-4" />
+          <img src="https://picsum.photos/seed/map/800/800" className="w-full h-full object-cover opacity-30 grayscale group-hover:grayscale-0 group-hover:opacity-60 transition-all duration-1000" alt="Map" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background/95 via-transparent to-transparent" />
+          <Button variant="ghost" size="icon" className="absolute bottom-6 right-6 size-10 rounded-full bg-accent text-accent-foreground shadow-xl hover:scale-110 active:scale-95 transition-all shadow-accent/20">
+            <ChevronRight className="size-5" />
           </Button>
         </div>
       </div>
 
       {/* Expansion Registry */}
-      <div className="flex flex-col gap-5">
-        <h2 className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground/30">Expansion Registry</h2>
-        <div className="premium-panel rounded-2xl overflow-hidden border border-white/[0.04]">
+      <div className="flex flex-col gap-6">
+        <h2 className="text-[11px] font-bold uppercase tracking-[0.25em] text-muted-foreground/30">Expansion Registry</h2>
+        <div className="premium-panel rounded-2xl overflow-hidden border border-white/[0.05] shadow-2xl">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-white/[0.015] border-b border-white/[0.04]">
-                <th className="p-4 text-[9px] font-semibold uppercase tracking-widest text-muted-foreground/30">Target Lead</th>
-                <th className="p-4 text-[9px] font-semibold uppercase tracking-widest text-muted-foreground/30">Category</th>
-                <th className="p-4 text-[9px] font-semibold uppercase tracking-widest text-muted-foreground/30">Est. Value</th>
-                <th className="p-4 text-[9px] font-semibold uppercase tracking-widest text-muted-foreground/30">Stage</th>
-                <th className="p-4 text-[9px] font-semibold uppercase tracking-widest text-muted-foreground/30">Status</th>
-                <th className="p-4"></th>
+                <th className="p-5 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Target Lead</th>
+                <th className="p-5 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Category</th>
+                <th className="p-5 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Est. Value</th>
+                <th className="p-5 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Stage</th>
+                <th className="p-5 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Status</th>
+                <th className="p-5"></th>
               </tr>
             </thead>
             <tbody>
               {platforms.map((p) => (
-                <tr key={p.id} className="border-b border-white/[0.02] hover:bg-white/[0.01] transition-colors group">
-                  <td className="p-4">
-                    <div className="flex items-center gap-3.5">
-                      <div className="size-8 rounded-lg bg-white/[0.02] border border-white/[0.05] flex items-center justify-center font-medium text-xs text-primary/60 group-hover:text-primary transition-colors">
+                <tr key={p.id} className="border-b border-white/[0.02] hover:bg-white/[0.015] transition-colors group">
+                  <td className="p-5">
+                    <div className="flex items-center gap-4">
+                      <div className="size-9 rounded-xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-center font-bold text-sm text-primary group-hover:bg-primary/5 transition-all">
                         {p.name.charAt(0)}
                       </div>
-                      <span className="font-semibold tracking-tight text-[13px] text-white/90 group-hover:text-primary transition-colors">{p.name}</span>
+                      <span className="font-semibold tracking-tight text-[14px] text-foreground group-hover:text-primary transition-colors">{p.name}</span>
                     </div>
                   </td>
-                  <td className="p-4 text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">{p.type}</td>
-                  <td className="p-4 text-[13px] font-bold text-white/80">${(p.estimatedValue / 1000).toFixed(0)}k</td>
-                  <td className="p-4 text-[10px] font-medium text-muted-foreground/80 uppercase tracking-widest">{p.currentStage}</td>
-                  <td className="p-4">
+                  <td className="p-5 text-[11px] font-medium text-secondary uppercase tracking-widest">{p.type}</td>
+                  <td className="p-5 text-[14px] font-bold text-foreground/90">${(p.estimatedValue / 1000).toFixed(0)}k</td>
+                  <td className="p-5 text-[11px] font-medium text-muted-foreground uppercase tracking-widest">{p.currentStage}</td>
+                  <td className="p-5">
                     <div className={cn(
-                      "inline-flex items-center gap-1.5 text-[9px] font-semibold uppercase tracking-widest px-2 py-0.5 rounded-full",
-                      p.currentStage === "Live" ? "text-green-500/80" : "text-accent/80"
+                      "inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.15em] px-3 py-1 rounded-full border border-white/[0.04] bg-white/[0.01]",
+                      p.currentStage === "Live" ? "text-green-500" : "text-accent"
                     )}>
-                      <span className={cn("size-1 rounded-full", p.currentStage === "Live" ? "bg-green-500 shadow-[0_0_6px_rgba(34,197,94,0.4)]" : "bg-accent shadow-[0_0_6px_rgba(255,0,255,0.4)]")} />
+                      <span className={cn("size-1.5 rounded-full", p.currentStage === "Live" ? "bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.4)]" : "bg-accent shadow-[0_0_8px_rgba(255,0,255,0.4)]")} />
                       {p.currentStage === "Live" ? "Active" : "Processing"}
                     </div>
                   </td>
-                  <td className="p-4 text-right">
-                    <Button variant="ghost" size="icon" className="size-7 rounded-lg opacity-0 group-hover:opacity-40 hover:opacity-100 transition-all text-muted-foreground"><MoreHorizontal className="size-3.5" /></Button>
+                  <td className="p-5 text-right">
+                    <Button variant="ghost" size="icon" className="size-8 rounded-xl opacity-0 group-hover:opacity-60 hover:opacity-100 transition-all text-muted-foreground hover:text-foreground"><MoreHorizontal className="size-4" /></Button>
                   </td>
                 </tr>
               ))}
@@ -220,15 +220,15 @@ export default function CommandCenter() {
 
 function MetricBox({ label, value, trend, trendUp, icon: Icon }: any) {
   return (
-    <div className="premium-panel rounded-2xl p-5 flex items-center gap-5 min-w-[240px] group hover:border-accent/20 transition-all cursor-pointer">
-      <div className="size-12 rounded-xl bg-white/[0.02] border border-white/[0.05] flex items-center justify-center group-hover:bg-accent/10 transition-all">
-        <Icon className="size-5 text-muted-foreground/40 group-hover:text-accent transition-colors" />
+    <div className="premium-panel rounded-2xl p-6 flex items-center gap-6 min-w-[260px] group hover:border-accent/20 transition-all cursor-pointer shadow-lg active-glow">
+      <div className="size-13 rounded-2xl bg-white/[0.02] border border-white/[0.05] flex items-center justify-center group-hover:bg-accent/10 transition-all p-3">
+        <Icon className="size-6 text-muted-foreground/30 group-hover:text-accent transition-colors" />
       </div>
       <div className="flex flex-col">
-        <span className="text-[9px] font-semibold uppercase tracking-[0.12em] text-muted-foreground/30">{label}</span>
-        <div className="flex items-baseline gap-2.5 mt-1">
-          <span className="text-2xl font-bold leading-none text-white">{value}</span>
-          <span className={cn("text-[9px] font-semibold tracking-tighter", trendUp ? "text-green-500/80" : "text-red-500/80")}>
+        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/50">{label}</span>
+        <div className="flex items-baseline gap-3 mt-1.5">
+          <span className="text-3xl font-bold leading-none text-foreground tracking-tight">{value}</span>
+          <span className={cn("text-[10px] font-bold tracking-tight", trendUp ? "text-green-500" : "text-red-500")}>
             {trend}
           </span>
         </div>
@@ -239,15 +239,15 @@ function MetricBox({ label, value, trend, trendUp, icon: Icon }: any) {
 
 function TimelineItem({ label, time, status }: any) {
   return (
-    <div className="flex items-start gap-4">
+    <div className="flex items-start gap-5">
       <div className={cn(
-        "mt-1.5 size-1.5 rounded-full",
-        status === 'complete' ? "bg-green-500 shadow-[0_0_6px_rgba(34,197,94,0.3)]" : 
-        status === 'active' ? "bg-accent animate-pulse shadow-[0_0_8px_rgba(255,0,255,0.3)]" : "bg-white/10"
+        "mt-2 size-2 rounded-full",
+        status === 'complete' ? "bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.4)]" : 
+        status === 'active' ? "bg-accent animate-pulse shadow-[0_0_10px_rgba(255,0,255,0.4)]" : "bg-white/10"
       )} />
       <div className="flex flex-col">
-        <span className={cn("text-[11px] font-medium tracking-tight", status === 'pending' ? "text-muted-foreground/40" : "text-white/90")}>{label}</span>
-        <span className="text-[9px] font-semibold text-muted-foreground/30 uppercase tracking-widest mt-1">{time}</span>
+        <span className={cn("text-[13px] font-semibold tracking-tight transition-colors", status === 'pending' ? "text-muted-foreground/40" : "text-foreground")}>{label}</span>
+        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-1.5 opacity-60">{time}</span>
       </div>
     </div>
   );
