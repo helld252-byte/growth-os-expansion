@@ -1,43 +1,51 @@
 
 "use client";
 
-import { use, useMemo } from "react";
+import { use } from "react";
 import { 
   ArrowLeft, 
   ExternalLink, 
   Edit3, 
   Clock, 
-  ShieldCheck, 
-  CheckCircle2, 
-  Circle,
-  MessageSquare,
-  Zap,
-  Star,
   Globe,
   Calendar,
   User,
   Activity,
   AlertTriangle,
-  Plus
+  Plus,
+  Zap,
+  Star,
+  Loader2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
-import { platforms, tasks } from "@/lib/mock-data";
+import { useDoc, useMemoFirebase } from "@/firebase";
+import { doc, getFirestore } from "firebase/firestore";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
 export default function PlatformDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const platform = useMemo(() => platforms.find(p => p.id === id), [id]);
+  const firestore = getFirestore();
+
+  const docRef = useMemoFirebase(() => doc(firestore, 'growth_opportunities', id), [firestore, id]);
+  const { data: platform, isLoading } = useDoc(docRef);
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[60vh] gap-4">
+        <Loader2 className="size-10 text-primary animate-spin" />
+        <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-tier-3">Retrieving Intel...</span>
+      </div>
+    );
+  }
 
   if (!platform) {
     return notFound();
   }
-
-  const platformTasks = tasks.filter(t => t.linkedPlatformId === id);
 
   const getStageStyles = (stage: string) => {
     switch (stage) {
@@ -51,7 +59,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
 
   return (
     <div className="max-w-[1200px] mx-auto flex flex-col gap-8 animate-in fade-in duration-500">
-      {/* SECTION 1 — HEADER */}
+      {/* HEADER */}
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-2">
         <div className="flex flex-col gap-6">
           <Link 
@@ -85,9 +93,13 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
           <Button variant="ghost" className="h-10 px-4 rounded-xl border border-white/[0.05] text-tier-2 hover:text-tier-1 text-[12px] font-semibold uppercase tracking-wider">
             <Edit3 className="size-4 mr-2" /> Edit
           </Button>
-          <Button className="h-10 px-6 rounded-xl bg-primary hover:bg-primary/90 text-white text-[12px] font-semibold uppercase tracking-wider shadow-lg shadow-primary/20">
-            <ExternalLink className="size-4 mr-2" /> Visit Site
-          </Button>
+          {platform.website && (
+            <Button asChild className="h-10 px-6 rounded-xl bg-primary hover:bg-primary/90 text-white text-[12px] font-semibold uppercase tracking-wider shadow-lg shadow-primary/20">
+              <a href={platform.website.startsWith('http') ? platform.website : `https://${platform.website}`} target="_blank" rel="noopener noreferrer">
+                <ExternalLink className="size-4 mr-2" /> Visit Site
+              </a>
+            </Button>
+          )}
         </div>
       </header>
 
@@ -95,7 +107,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
         {/* MAIN COLUMN */}
         <div className="lg:col-span-8 flex flex-col gap-8">
           
-          {/* SECTION 2 — CURRENT FOCUS */}
+          {/* CURRENT FOCUS */}
           <div className="premium-panel p-8 rounded-3xl border-primary/20 bg-gradient-to-br from-primary/5 via-transparent to-transparent shadow-2xl relative overflow-hidden group">
             <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
               <Zap className="size-16 text-primary" />
@@ -110,36 +122,32 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
                   <span className="text-[10px] font-semibold uppercase tracking-widest text-tier-4">Target Date</span>
                   <div className="flex items-center gap-2 text-accent font-semibold">
                     <Calendar className="size-4" />
-                    <span>{platform.dueDate}</span>
+                    <span>{platform.dueDate || 'No Date Set'}</span>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* SECTION 3 — SNAPSHOT ROW */}
+          {/* SNAPSHOT ROW */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <SnapshotCard label="Stage" value={platform.currentStage} icon={Activity} />
             <SnapshotCard label="Strategic Fit" value={`${platform.fitScore}/10`} icon={Star} />
             <SnapshotCard label="Risk Level" value={platform.riskLevel} icon={AlertTriangle} />
-            <SnapshotCard label="Value Prop" value={`$${(platform.estimatedValue / 1000).toFixed(0)}k`} icon={Zap} />
+            <SnapshotCard label="Value Prop" value={`$${((platform.estimatedValue || 0) / 1000).toFixed(0)}k`} icon={Zap} />
           </div>
 
-          {/* SECTION 4 — REQUIREMENTS */}
+          {/* REQUIREMENTS */}
           <section className="premium-panel p-8 rounded-3xl flex flex-col gap-6">
             <h3 className="text-[11px] font-bold uppercase tracking-[0.25em] text-tier-4">Onboarding Requirements</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-12">
-              {(platform.requirements || ['Logistics Setup', 'Catalog Audit', 'Compliance Verify']).map((req, i) => (
+              {(platform.requirements || ['Logistics Setup', 'Catalog Audit', 'Compliance Verify']).map((req: string, i: number) => (
                 <div key={req} className="flex items-center gap-4 group cursor-pointer">
                   <Checkbox 
                     id={`req-${i}`} 
-                    checked={i === 0} 
                     className="size-5 rounded-md border-white/10 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                   />
-                  <label htmlFor={`req-${i}`} className={cn(
-                    "text-[14px] font-medium tracking-tight transition-colors cursor-pointer",
-                    i === 0 ? "text-tier-3 line-through" : "text-tier-2 group-hover:text-tier-1"
-                  )}>
+                  <label htmlFor={`req-${i}`} className="text-[14px] font-medium tracking-tight text-tier-2 group-hover:text-tier-1 transition-colors cursor-pointer">
                     {req}
                   </label>
                 </div>
@@ -147,7 +155,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
             </div>
           </section>
 
-          {/* SECTION 5 — NOTES / COMMUNICATION */}
+          {/* MISSION JOURNAL */}
           <section className="premium-panel p-8 rounded-3xl flex flex-col gap-8">
             <div className="flex items-center justify-between">
               <h3 className="text-[11px] font-bold uppercase tracking-[0.25em] text-tier-4">Mission Journal</h3>
@@ -158,14 +166,9 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
             
             <div className="flex flex-col gap-8 relative before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-px before:bg-white/[0.05]">
               <TimelineEntry 
-                date="Mar 24, 2024" 
-                user="James Sterling" 
-                content="Initial application submitted via portal. Awaiting internal compliance review. Estimated turnaround: 5 business days." 
-              />
-              <TimelineEntry 
-                date="Mar 20, 2024" 
+                date={platform.lastUpdate ? new Date(platform.lastUpdate).toLocaleDateString() : 'Recent'} 
                 user="System" 
-                content="Strategic fit confirmed by Unit-01. Opportunity promoted from Research to Applied." 
+                content={platform.notes || "Operational history synchronized. Initiating growth protocols for this platform."} 
               />
             </div>
           </section>
@@ -174,59 +177,21 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
 
         {/* SIDEBAR COLUMN */}
         <div className="lg:col-span-4 flex flex-col gap-8">
-          
-          {/* SECTION 6 — NEXT ACTIONS */}
-          <section className="premium-panel p-8 rounded-3xl flex flex-col gap-6">
-            <h3 className="text-[11px] font-bold uppercase tracking-[0.25em] text-tier-4">Immediate Tasks</h3>
-            <div className="flex flex-col gap-5">
-              {platformTasks.length > 0 ? platformTasks.map(task => (
-                <div key={task.id} className="flex flex-col gap-2 p-4 rounded-2xl bg-white/[0.02] border border-white/[0.04] hover:border-primary/30 transition-all cursor-pointer group">
-                  <div className="flex items-start justify-between">
-                    <span className="text-[14px] font-semibold text-tier-2 group-hover:text-tier-1 transition-colors leading-tight">
-                      {task.title}
-                    </span>
-                    <Badge className={cn(
-                      "text-[8px] uppercase tracking-wider px-1.5",
-                      task.status === 'Overdue' ? "bg-rose-500/10 text-rose-400" : "bg-white/5 text-tier-4"
-                    )}>
-                      {task.status}
-                    </Badge>
-                  </div>
-                  <div className="flex items-center justify-between mt-1">
-                    <span className="text-[11px] text-tier-3 font-medium flex items-center gap-1.5">
-                      <Clock className="size-3" /> {task.dueDate}
-                    </span>
-                    <div className="size-5 rounded-full bg-primary/10 flex items-center justify-center text-[9px] font-bold text-primary">
-                      {task.owner.charAt(0)}
-                    </div>
-                  </div>
-                </div>
-              )) : (
-                <p className="text-[12px] text-tier-3 font-medium italic">No active tactical tasks assigned.</p>
-              )}
-              <Button className="w-full h-10 rounded-xl bg-white/[0.03] border border-white/[0.06] text-tier-2 hover:bg-white/[0.06] hover:text-tier-1 text-[11px] uppercase tracking-wider font-bold">
-                Assign Task
-              </Button>
-            </div>
-          </section>
-
-          {/* SECTION 7 — OPPORTUNITY INFO */}
           <section className="premium-panel p-8 rounded-3xl flex flex-col gap-6">
             <h3 className="text-[11px] font-bold uppercase tracking-[0.25em] text-tier-4">Metadata Intel</h3>
             <div className="flex flex-col gap-6">
-              <InfoRow label="Owner" value={platform.owner} icon={User} />
+              <InfoRow label="Market" value={platform.market} icon={Globe} />
               <InfoRow label="Created" value={platform.dateStarted} icon={Calendar} />
-              <InfoRow label="Last Update" value={platform.lastUpdate} icon={Clock} />
-              <InfoRow label="Value" value={`$${platform.estimatedValue.toLocaleString()}`} icon={Zap} />
+              <InfoRow label="Last Update" value={platform.lastUpdate ? new Date(platform.lastUpdate).toLocaleDateString() : 'N/A'} icon={Clock} />
+              <InfoRow label="Value" value={`$${(platform.estimatedValue || 0).toLocaleString()}`} icon={Zap} />
               <Separator className="bg-white/[0.05]" />
               <div className="flex flex-col gap-2">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-tier-4">Contact Intelligence</span>
                 <span className="text-[14px] font-semibold text-tier-1">{platform.contactPerson || 'N/A'}</span>
-                <span className="text-[12px] text-tier-3 font-medium truncate">{platform.email || 'No email recorded'}</span>
+                <span className="text-[12px] text-tier-3 font-medium truncate">{platform.contactEmail || 'No email recorded'}</span>
               </div>
             </div>
           </section>
-
         </div>
       </div>
     </div>

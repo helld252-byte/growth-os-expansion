@@ -13,41 +13,114 @@ import {
   Zap,
   LayoutGrid,
   Filter,
-  Star
+  Star,
+  Loader2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { platforms } from "@/lib/mock-data";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogTrigger,
+  DialogFooter
+} from "@/components/ui/dialog";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { useCollection, useMemoFirebase, useUser, addDocumentNonBlocking } from "@/firebase";
+import { collection, getFirestore, serverTimestamp } from "firebase/firestore";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { useToast } from "@/hooks/use-toast";
 
 type FilterStatus = 'needs-action' | 'waiting' | 'blocked' | 'high-priority' | 'live' | 'all';
 
 export default function ExpansionOperationsPage() {
+  const { toast } = useToast();
+  const { user } = useUser();
+  const firestore = getFirestore();
   const [activeFilter, setActiveFilter] = useState<FilterStatus>('all');
   const [searchQuery, setSearchQuery] = useState("");
+  const [isAddOpen, setIsAddOpen] = useState(false);
 
-  const filteredPlatforms = platforms.filter(p => {
+  // Firestore Collection
+  const opportunitiesRef = useMemoFirebase(() => collection(firestore, 'growth_opportunities'), [firestore]);
+  const { data: opportunities, isLoading } = useCollection(opportunitiesRef);
+
+  // New Opportunity State
+  const [newOp, setNewOp] = useState({
+    name: "",
+    type: "Wholesale",
+    market: "Global",
+    priority: "Medium",
+    currentStage: "Not Started",
+    nextStep: "Initial Outreach"
+  });
+
+  const handleAddPlatform = () => {
+    if (!user) return;
+    
+    const docData = {
+      ...newOp,
+      ownerId: user.uid,
+      dateStarted: new Date().toISOString().split('T')[0],
+      lastUpdate: new Date().toISOString(),
+      productsUploaded: false,
+      salesStarted: false,
+      blockers: [],
+      contactPerson: "N/A",
+      contactEmail: "N/A",
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+      estimatedValue: 0,
+      fitScore: 5,
+      riskLevel: "Medium"
+    };
+
+    addDocumentNonBlocking(opportunitiesRef, docData);
+    setIsAddOpen(false);
+    setNewOp({
+      name: "",
+      type: "Wholesale",
+      market: "Global",
+      priority: "Medium",
+      currentStage: "Not Started",
+      nextStep: "Initial Outreach"
+    });
+    toast({
+      title: "Initiative Launched",
+      description: `${docData.name} has been added to the expansion pipeline.`,
+    });
+  };
+
+  const filteredPlatforms = (opportunities || []).filter(p => {
     const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase());
     if (!matchesSearch) return false;
 
     if (activeFilter === 'all') return true;
     if (activeFilter === 'live') return p.currentStage === 'Live';
     if (activeFilter === 'high-priority') return p.priority === 'High';
-    if (activeFilter === 'blocked') return !!p.blockers;
-    if (activeFilter === 'needs-action') return p.currentStage !== 'Live' && !p.blockers;
+    if (activeFilter === 'blocked') return p.blockers && p.blockers.length > 0;
+    if (activeFilter === 'needs-action') return p.currentStage !== 'Live' && (!p.blockers || p.blockers.length === 0);
     if (activeFilter === 'waiting') return p.currentStage === 'In Review';
     return true;
   });
 
   const counts = {
-    'needs-action': platforms.filter(p => p.currentStage !== 'Live' && !p.blockers).length,
-    'waiting': platforms.filter(p => p.currentStage === 'In Review').length,
-    'blocked': platforms.filter(p => !!p.blockers).length,
-    'high-priority': platforms.filter(p => p.priority === 'High').length,
-    'live': platforms.filter(p => p.currentStage === 'Live').length,
-    'all': platforms.length
+    'needs-action': (opportunities || []).filter(p => p.currentStage !== 'Live' && (!p.blockers || p.blockers.length === 0)).length,
+    'waiting': (opportunities || []).filter(p => p.currentStage === 'In Review').length,
+    'blocked': (opportunities || []).filter(p => p.blockers && p.blockers.length > 0).length,
+    'high-priority': (opportunities || []).filter(p => p.priority === 'High').length,
+    'live': (opportunities || []).filter(p => p.currentStage === 'Live').length,
+    'all': (opportunities || []).length
   };
 
   return (
@@ -110,22 +183,66 @@ export default function ExpansionOperationsPage() {
               />
             </nav>
           </div>
-
-          <div className="flex flex-col gap-3">
-            <h3 className="text-[9px] font-semibold uppercase tracking-[0.25em] text-tier-4 px-3 mb-1">Strategic Intel</h3>
-            <nav className="flex flex-col gap-1.5">
-              <Button variant="ghost" className="h-10 justify-start gap-3.5 px-3 rounded-lg hover:bg-white/[0.03] group transition-colors">
-                <Globe className="size-4 text-tier-3 group-hover:text-primary" />
-                <span className="text-[13px] tracking-tight text-tier-2 font-medium">Expansion Profile</span>
-              </Button>
-            </nav>
-          </div>
         </div>
 
         <div className="mt-auto">
-          <Button className="w-full bg-primary/20 hover:bg-primary text-tier-1 font-semibold text-[11px] uppercase tracking-wider h-11 rounded-xl transition-all shadow-lg active-glow border border-primary/20">
-            <Plus className="size-4 mr-2" /> Add Platform
-          </Button>
+          <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
+            <DialogTrigger asChild>
+              <Button className="w-full bg-primary/20 hover:bg-primary text-tier-1 font-semibold text-[11px] uppercase tracking-wider h-11 rounded-xl transition-all shadow-lg active-glow border border-primary/20">
+                <Plus className="size-4 mr-2" /> Add Platform
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="bg-background/95 backdrop-blur-2xl border-white/[0.1] rounded-2xl sm:max-w-[500px]">
+              <DialogHeader>
+                <DialogTitle className="text-xl font-bold tracking-tight text-tier-1">New Strategic Platform</DialogTitle>
+              </DialogHeader>
+              <div className="grid gap-6 py-4">
+                <div className="grid gap-2">
+                  <Label className="text-[10px] uppercase tracking-widest text-tier-3">Platform Name</Label>
+                  <Input 
+                    value={newOp.name}
+                    onChange={(e) => setNewOp({...newOp, name: e.target.value})}
+                    placeholder="e.g. Amazon Europe" 
+                    className="bg-white/[0.03] border-white/[0.08] h-12 rounded-xl text-tier-1"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label className="text-[10px] uppercase tracking-widest text-tier-3">Type</Label>
+                    <Select value={newOp.type} onValueChange={(v) => setNewOp({...newOp, type: v})}>
+                      <SelectTrigger className="bg-white/[0.03] border-white/[0.08] h-12 rounded-xl text-tier-1">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-popover/95 backdrop-blur-xl border-white/[0.1]">
+                        <SelectItem value="Wholesale">Wholesale</SelectItem>
+                        <SelectItem value="Dropshipping">Dropshipping</SelectItem>
+                        <SelectItem value="Marketplace">Marketplace</SelectItem>
+                        <SelectItem value="Partnership">Partnership</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="grid gap-2">
+                    <Label className="text-[10px] uppercase tracking-widest text-tier-3">Market</Label>
+                    <Input 
+                      value={newOp.market}
+                      onChange={(e) => setNewOp({...newOp, market: e.target.value})}
+                      placeholder="e.g. EU, US" 
+                      className="bg-white/[0.03] border-white/[0.08] h-12 rounded-xl text-tier-1"
+                    />
+                  </div>
+                </div>
+              </div>
+              <DialogFooter>
+                <Button 
+                  onClick={handleAddPlatform}
+                  disabled={!newOp.name}
+                  className="w-full bg-primary text-white h-12 rounded-xl font-bold uppercase tracking-widest"
+                >
+                  Initialize Platform
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
       </aside>
 
@@ -134,7 +251,7 @@ export default function ExpansionOperationsPage() {
         <header className="flex items-center justify-between">
           <div className="flex flex-col gap-2.5">
             <h1 className="text-3xl font-semibold tracking-tight text-tier-1">Expansion Operations</h1>
-            <p className="text-tier-1 text-[14px] font-medium leading-relaxed max-w-2xl opacity-80">
+            <p className="text-tier-2 text-[14px] font-medium leading-relaxed max-w-2xl">
               Manage wholesale, retail, and global digital channel scaling across tactical operational zones.
             </p>
           </div>
@@ -149,14 +266,16 @@ export default function ExpansionOperationsPage() {
                 className="pl-11 h-11 bg-white/[0.02] border-white/[0.05] rounded-xl font-medium text-[13px] focus-visible:ring-primary/20 placeholder:text-tier-3 transition-all text-tier-1" 
               />
             </div>
-            <Button variant="ghost" className="h-11 w-11 p-0 bg-white/[0.02] border border-white/[0.05] rounded-xl text-tier-3 hover:text-tier-1 hover:border-white/10 transition-all">
-              <Filter className="size-4" />
-            </Button>
           </div>
         </header>
 
         <div className="flex flex-col gap-4">
-          {filteredPlatforms.length === 0 ? (
+          {isLoading ? (
+            <div className="h-72 flex flex-col items-center justify-center gap-4 opacity-50">
+              <Loader2 className="size-8 text-primary animate-spin" />
+              <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-3">Syncing Cloud Database</span>
+            </div>
+          ) : filteredPlatforms.length === 0 ? (
             <div className="h-72 border border-dashed border-white/5 rounded-2xl flex flex-col items-center justify-center gap-4 opacity-30">
               <LayoutGrid className="size-12 text-tier-3" />
               <span className="text-[11px] font-medium uppercase tracking-[0.25em] text-tier-3">No active units found</span>
