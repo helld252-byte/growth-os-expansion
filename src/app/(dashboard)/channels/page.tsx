@@ -134,7 +134,7 @@ export default function ExpansionOperationsPage() {
         <header className="flex items-center justify-between">
           <div className="flex flex-col gap-2.5">
             <h1 className="text-3xl font-semibold tracking-tight text-tier-1">Expansion Operations</h1>
-            <p className="text-tier-2 text-[14px] font-medium leading-relaxed max-w-2xl">
+            <p className="text-tier-1 text-[14px] font-medium leading-relaxed max-w-2xl opacity-80">
               Manage wholesale, retail, and global digital channel scaling across tactical operational zones.
             </p>
           </div>
@@ -190,7 +190,7 @@ function FilterButton({ icon: Icon, label, count, active, onClick }: any) {
       <span className={cn("text-[13px] tracking-tight font-medium")}>{label}</span>
       <span className={cn(
         "ml-auto text-[10px] font-semibold tracking-tighter",
-        active ? "text-primary" : "text-tier-3"
+        active ? "text-primary" : "text-tier-2"
       )}>
         {count}
       </span>
@@ -211,15 +211,15 @@ function PlatformListItem({ platform }: { platform: any }) {
       case 'Applied':
         return "bg-blue-500/10 text-blue-400 border-blue-500/20";
       case 'Research':
-        return "bg-slate-500/20 text-slate-300 border-slate-500/30";
+        return "bg-slate-500/20 text-slate-100 border-slate-500/40";
       case 'Rejected':
         return "bg-rose-500/10 text-rose-400 border-rose-500/20";
       case 'Onboarding':
         return "bg-cyan-500/10 text-cyan-400 border-cyan-500/20";
       case 'Not Started':
-        return "bg-zinc-500/10 text-zinc-300 border-zinc-500/20";
+        return "bg-zinc-500/10 text-zinc-100 border-zinc-500/30";
       default:
-        return "bg-slate-500/10 text-slate-300 border-slate-500/20";
+        return "bg-slate-500/10 text-slate-100 border-slate-500/20";
     }
   };
 
@@ -235,7 +235,7 @@ function PlatformListItem({ platform }: { platform: any }) {
             <h3 className="text-base font-semibold tracking-tight text-primary group-hover:text-tier-1 transition-colors">
               {platform.name}
             </h3>
-            <span className="text-[10px] font-medium uppercase tracking-[0.12em] text-tier-2 px-2.5 py-0.5 border border-white/[0.08] rounded-md bg-white/[0.03]">
+            <span className="text-[10px] font-medium uppercase tracking-[0.12em] text-tier-1 px-2.5 py-0.5 border border-white/[0.1] rounded-md bg-white/[0.05]">
               {platform.type}
             </span>
           </div>
@@ -253,7 +253,7 @@ function PlatformListItem({ platform }: { platform: any }) {
             </Badge>
             <div className="flex items-center gap-2">
               <Zap className={cn("size-4", platform.priority === 'High' ? "text-accent" : "text-tier-3")} />
-              <span className="text-[12px] font-medium tracking-tight text-tier-2">{platform.priority} Priority</span>
+              <span className="text-[12px] font-medium tracking-tight text-tier-1 opacity-90">{platform.priority} Priority</span>
             </div>
           </div>
         </div>
@@ -264,7 +264,7 @@ function PlatformListItem({ platform }: { platform: any }) {
           <span className="text-[9px] font-semibold uppercase tracking-[0.25em] text-tier-4 mb-1.5">Target Action</span>
           <span className={cn(
             "text-[14px] font-medium tracking-tight",
-            platform.currentStage !== 'Live' ? "text-accent/90" : "text-tier-3"
+            platform.currentStage !== 'Live' ? "text-accent/90" : "text-tier-2"
           )}>
             {platform.nextStep}
           </span>
