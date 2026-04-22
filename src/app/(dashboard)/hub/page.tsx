@@ -15,7 +15,13 @@ import {
   Clock,
   Briefcase,
   Loader2,
-  Trash2
+  Trash2,
+  Building2,
+  Phone,
+  Hash,
+  MapPin,
+  Link as LinkIcon,
+  X
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,10 +49,12 @@ import { collection, getFirestore, serverTimestamp, doc } from "firebase/firesto
 import { cn } from "@/lib/utils";
 
 const categoryOptions = [
+  { label: "Company Profile", icon: Building2 },
   { label: "Brand", icon: Briefcase },
   { label: "Product", icon: Tag },
   { label: "Legal", icon: ShieldCheck },
   { label: "FAQs", icon: MessageCircle },
+  { label: "External Assets", icon: LinkIcon },
 ];
 
 export default function HubPage() {
@@ -61,11 +69,34 @@ export default function HubPage() {
   const [newResource, setNewResource] = useState({
     title: "",
     category: "Brand",
-    content: ""
+    content: "",
+    address: "",
+    phone: "",
+    taxId: "",
+    links: [] as { label: string; url: string }[]
   });
+
+  const [linkInput, setLinkInput] = useState({ label: "", url: "" });
 
   const resourcesRef = useMemoFirebase(() => collection(firestore, 'company_resources'), [firestore]);
   const { data: resources, isLoading } = useCollection(resourcesRef);
+
+  const handleAddLink = () => {
+    if (linkInput.label && linkInput.url) {
+      setNewResource({
+        ...newResource,
+        links: [...newResource.links, { ...linkInput }]
+      });
+      setLinkInput({ label: "", url: "" });
+    }
+  };
+
+  const removeLink = (index: number) => {
+    setNewResource({
+      ...newResource,
+      links: newResource.links.filter((_, i) => i !== index)
+    });
+  };
 
   const handleAddResource = () => {
     if (!user || !newResource.title || !newResource.content) return;
@@ -79,12 +110,25 @@ export default function HubPage() {
 
     addDocumentNonBlocking(resourcesRef, docData);
     setIsAddOpen(false);
-    setNewResource({ title: "", category: "Brand", content: "" });
+    resetForm();
     
     toast({
       title: "Asset Recorded",
       description: `"${docData.title}" has been synchronized with the Intelligence Hub.`,
     });
+  };
+
+  const resetForm = () => {
+    setNewResource({ 
+      title: "", 
+      category: "Brand", 
+      content: "",
+      address: "",
+      phone: "",
+      taxId: "",
+      links: []
+    });
+    setLinkInput({ label: "", url: "" });
   };
 
   const handleDeleteResource = (resourceId: string, title: string) => {
@@ -121,52 +165,123 @@ export default function HubPage() {
           <div className="flex flex-col gap-1">
             <h1 className="text-2xl font-semibold tracking-tight text-tier-1">Intelligence Hub</h1>
             <p className="text-[11px] text-tier-2 font-medium uppercase tracking-[0.15em]">
-              Strategic library for brand expansion, legal documents, and sales materials.
+              Strategic library for company profile, brand expansion, and sales materials.
             </p>
           </div>
         </div>
 
-        <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
+        <Dialog open={isAddOpen} onOpenChange={(open) => { setIsAddOpen(open); if (!open) resetForm(); }}>
           <DialogTrigger asChild>
             <Button className="bg-primary hover:bg-primary/90 text-white font-semibold gap-1.5 h-10 px-6 rounded-xl text-[11px] uppercase tracking-wider transition-all shadow-lg shadow-primary/20">
               <Plus className="size-4" /> New Resource
             </Button>
           </DialogTrigger>
-          <DialogContent className="bg-background/95 backdrop-blur-2xl border-white/[0.1] rounded-2xl sm:max-w-[550px]">
+          <DialogContent className="bg-background/95 backdrop-blur-2xl border-white/[0.1] rounded-2xl sm:max-w-[650px] max-h-[90vh] overflow-y-auto custom-scrollbar">
             <DialogHeader>
               <DialogTitle className="text-xl font-bold tracking-tight text-tier-1">Record Strategic Asset</DialogTitle>
             </DialogHeader>
             <div className="grid gap-6 py-4">
-              <div className="grid gap-2">
-                <Label className="text-[10px] uppercase tracking-widest text-tier-3">Asset Title</Label>
-                <Input 
-                  value={newResource.title}
-                  onChange={(e) => setNewResource({...newResource, title: e.target.value})}
-                  placeholder="e.g. Q4 Growth Strategy" 
-                  className="bg-white/[0.03] border-white/[0.08] h-12 rounded-xl text-tier-1"
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label className="text-[10px] uppercase tracking-widest text-tier-3">Asset Title</Label>
+                  <Input 
+                    value={newResource.title}
+                    onChange={(e) => setNewResource({...newResource, title: e.target.value})}
+                    placeholder="e.g. Master Company Identity" 
+                    className="bg-white/[0.03] border-white/[0.08] h-12 rounded-xl text-tier-1"
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label className="text-[10px] uppercase tracking-widest text-tier-3">Category</Label>
+                  <Select value={newResource.category} onValueChange={(v) => setNewResource({...newResource, category: v})}>
+                    <SelectTrigger className="bg-white/[0.03] border-white/[0.08] h-12 rounded-xl text-tier-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-popover/95 backdrop-blur-xl border-white/[0.1]">
+                      {categoryOptions.map(opt => (
+                        <SelectItem key={opt.label} value={opt.label}>{opt.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
+
+              {newResource.category === "Company Profile" && (
+                <div className="grid grid-cols-2 gap-4 p-4 border border-white/[0.05] rounded-xl bg-white/[0.01]">
+                  <div className="grid gap-2">
+                    <Label className="text-[10px] uppercase tracking-widest text-tier-3">Address</Label>
+                    <Input 
+                      value={newResource.address}
+                      onChange={(e) => setNewResource({...newResource, address: e.target.value})}
+                      placeholder="Street, City, Country" 
+                      className="bg-white/[0.03] border-white/[0.08] h-10 rounded-xl text-tier-1 text-sm"
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label className="text-[10px] uppercase tracking-widest text-tier-3">Phone</Label>
+                    <Input 
+                      value={newResource.phone}
+                      onChange={(e) => setNewResource({...newResource, phone: e.target.value})}
+                      placeholder="+1 (555) 000-0000" 
+                      className="bg-white/[0.03] border-white/[0.08] h-10 rounded-xl text-tier-1 text-sm"
+                    />
+                  </div>
+                  <div className="grid gap-2 col-span-2">
+                    <Label className="text-[10px] uppercase tracking-widest text-tier-3">Tax ID / Registration</Label>
+                    <Input 
+                      value={newResource.taxId}
+                      onChange={(e) => setNewResource({...newResource, taxId: e.target.value})}
+                      placeholder="VAT / EIN / Company Number" 
+                      className="bg-white/[0.03] border-white/[0.08] h-10 rounded-xl text-tier-1 text-sm"
+                    />
+                  </div>
+                </div>
+              )}
+
               <div className="grid gap-2">
-                <Label className="text-[10px] uppercase tracking-widest text-tier-3">Category</Label>
-                <Select value={newResource.category} onValueChange={(v) => setNewResource({...newResource, category: v})}>
-                  <SelectTrigger className="bg-white/[0.03] border-white/[0.08] h-12 rounded-xl text-tier-1">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-popover/95 backdrop-blur-xl border-white/[0.1]">
-                    {categoryOptions.map(opt => (
-                      <SelectItem key={opt.label} value={opt.label}>{opt.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="grid gap-2">
-                <Label className="text-[10px] uppercase tracking-widest text-tier-3">Asset Content</Label>
+                <Label className="text-[10px] uppercase tracking-widest text-tier-3">Asset Content / Description</Label>
                 <Textarea 
                   value={newResource.content}
                   onChange={(e) => setNewResource({...newResource, content: e.target.value})}
-                  placeholder="Enter strategic content, mission statements, or FAQs..." 
-                  className="bg-white/[0.03] border-white/[0.08] min-h-[150px] rounded-xl text-tier-1 p-4"
+                  placeholder="Enter strategic content, mission statements, or detailed info..." 
+                  className="bg-white/[0.03] border-white/[0.08] min-h-[120px] rounded-xl text-tier-1 p-4"
                 />
+              </div>
+
+              <div className="grid gap-3">
+                <Label className="text-[10px] uppercase tracking-widest text-tier-3">Strategic Links & Files</Label>
+                <div className="flex gap-2">
+                  <Input 
+                    placeholder="Link Label (e.g. Sales Deck)" 
+                    value={linkInput.label}
+                    onChange={(e) => setLinkInput({...linkInput, label: e.target.value})}
+                    className="bg-white/[0.03] border-white/[0.08] h-10 rounded-xl text-xs"
+                  />
+                  <Input 
+                    placeholder="URL (https://...)" 
+                    value={linkInput.url}
+                    onChange={(e) => setLinkInput({...linkInput, url: e.target.value})}
+                    className="bg-white/[0.03] border-white/[0.08] h-10 rounded-xl text-xs"
+                  />
+                  <Button variant="secondary" onClick={handleAddLink} className="h-10 px-4 rounded-xl text-[10px] uppercase font-bold">Add</Button>
+                </div>
+                {newResource.links.length > 0 && (
+                  <div className="flex flex-wrap gap-2 pt-2">
+                    {newResource.links.map((link, idx) => (
+                      <Badge key={idx} variant="secondary" className="pl-3 pr-1 py-1 gap-2 rounded-lg bg-white/5 border-white/10 group">
+                        <span className="text-[10px]">{link.label}</span>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="size-4 rounded-full hover:bg-rose-500/20 hover:text-rose-400"
+                          onClick={() => removeLink(idx)}
+                        >
+                          <X className="size-2.5" />
+                        </Button>
+                      </Badge>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
             <DialogFooter>
@@ -241,9 +356,15 @@ export default function HubPage() {
             </div>
           ) : (
             filteredResources.map((section) => (
-              <div key={section.id} className="premium-panel p-6 rounded-2xl flex flex-col gap-5 group hover:border-primary/30 transition-all">
+              <div key={section.id} className={cn(
+                "premium-panel p-6 rounded-2xl flex flex-col gap-5 group transition-all",
+                section.category === "Company Profile" ? "border-primary/40 bg-primary/5 shadow-primary/10" : "hover:border-primary/30"
+              )}>
                 <div className="flex items-center justify-between">
-                  <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 font-medium uppercase text-[9px] tracking-wider px-2.5 py-0.5 rounded-lg">
+                  <Badge variant="outline" className={cn(
+                    "font-medium uppercase text-[9px] tracking-wider px-2.5 py-0.5 rounded-lg",
+                    section.category === "Company Profile" ? "bg-primary text-white border-primary" : "bg-primary/10 text-primary border-primary/20"
+                  )}>
                     {section.category}
                   </Badge>
                   <div className="flex items-center gap-4">
@@ -261,13 +382,60 @@ export default function HubPage() {
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-2.5">
-                  <h3 className="text-base font-semibold text-tier-1 group-hover:text-primary transition-colors tracking-tight">
-                    {section.title}
-                  </h3>
-                  <p className="text-[14px] text-tier-2 leading-relaxed line-clamp-4 font-medium h-[84px] overflow-hidden">
-                    {section.content}
-                  </p>
+                <div className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-1">
+                    <h3 className="text-lg font-semibold text-tier-1 tracking-tight">
+                      {section.title}
+                    </h3>
+                    <p className="text-[14px] text-tier-2 leading-relaxed font-medium">
+                      {section.content}
+                    </p>
+                  </div>
+
+                  {section.category === "Company Profile" && (
+                    <div className="flex flex-col gap-3 p-4 bg-white/[0.03] border border-white/[0.05] rounded-xl">
+                      {section.address && (
+                        <div className="flex items-start gap-3 text-[12px]">
+                          <MapPin className="size-3.5 text-primary shrink-0 mt-0.5" />
+                          <span className="text-tier-2">{section.address}</span>
+                        </div>
+                      )}
+                      {section.phone && (
+                        <div className="flex items-center gap-3 text-[12px]">
+                          <Phone className="size-3.5 text-primary shrink-0" />
+                          <span className="text-tier-2">{section.phone}</span>
+                        </div>
+                      )}
+                      {section.taxId && (
+                        <div className="flex items-center gap-3 text-[12px]">
+                          <Hash className="size-3.5 text-primary shrink-0" />
+                          <span className="text-tier-2">Tax ID: {section.taxId}</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {section.links && section.links.length > 0 && (
+                    <div className="flex flex-col gap-2">
+                      <span className="text-[9px] font-bold uppercase tracking-widest text-tier-4">Strategic Assets & Files</span>
+                      <div className="flex flex-wrap gap-2">
+                        {section.links.map((link: any, idx: number) => (
+                          <Button 
+                            key={idx} 
+                            variant="outline" 
+                            size="sm" 
+                            asChild
+                            className="h-8 rounded-lg border-white/[0.08] bg-white/[0.02] hover:bg-primary/10 hover:border-primary/30 transition-all px-3"
+                          >
+                            <a href={link.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
+                              <ExternalLink className="size-3 text-primary" />
+                              <span className="text-[10px] font-semibold">{link.label}</span>
+                            </a>
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex items-center gap-3 mt-auto pt-5 border-t border-white/[0.04]">
@@ -277,21 +445,14 @@ export default function HubPage() {
                     className="rounded-xl h-10 font-semibold gap-2.5 bg-white/[0.02] border border-white/[0.05] hover:border-primary/30 hover:bg-primary/10 hover:text-primary transition-all flex-1 text-[11px] uppercase tracking-wider"
                     onClick={() => copyToClipboard(section.content)}
                   >
-                    <Copy className="size-4" /> Copy Content
-                  </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="rounded-xl h-10 w-10 border border-white/[0.05] bg-white/[0.02] text-tier-3 hover:text-tier-1 hover:border-white/10"
-                  >
-                    <ExternalLink className="size-4.5" />
+                    <Copy className="size-4" /> Copy Description
                   </Button>
                 </div>
               </div>
             )
           ))}
 
-          {/* Featured Strategy Section (Dynamic if resources exist, else fallback) */}
+          {/* Featured Strategy Section */}
           <div className="premium-panel p-8 rounded-2xl flex flex-col gap-5 border-primary/20 bg-gradient-to-br from-primary/10 via-transparent to-transparent col-span-1 md:col-span-2 shadow-2xl group">
             <div className="flex items-center justify-between">
               <Badge className="bg-primary text-white font-semibold uppercase text-[10px] tracking-[0.15em] px-3 py-0.5 rounded-lg shadow-lg shadow-primary/20">Featured Strategic Asset</Badge>

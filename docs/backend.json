@@ -142,6 +142,19 @@
         "title": { "type": "string" },
         "category": { "type": "string" },
         "content": { "type": "string" },
+        "address": { "type": "string" },
+        "phone": { "type": "string" },
+        "taxId": { "type": "string" },
+        "links": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "label": { "type": "string" },
+              "url": { "type": "string", "format": "uri" }
+            }
+          }
+        },
         "lastUpdatedByUserId": { "type": "string" },
         "lastUpdatedAt": { "type": "string", "format": "date-time" }
       },

@@ -1,3 +1,4 @@
+
 export type PlatformStage = 
   | 'Not Started'
   | 'Research'
@@ -16,7 +17,7 @@ export interface Platform {
   type: string;
   market: string;
   website?: string;
-  owner: string;
+  ownerId: string;
   priority: Priority;
   estimatedValue: number;
   fitScore: number;
@@ -31,7 +32,7 @@ export interface Platform {
   dueDate: string;
   blockers?: string;
   contactPerson?: string;
-  email?: string;
+  contactEmail?: string;
   notes?: string;
   requirements?: string[];
   rejectionReason?: string;
@@ -42,20 +43,29 @@ export type TaskStatus = 'Open' | 'In Progress' | 'Completed' | 'Overdue';
 export interface Task {
   id: string;
   title: string;
-  linkedPlatformId?: string;
-  linkedPlatformName?: string;
-  owner: string;
+  ownerId: string;
   priority: Priority;
   dueDate: string;
   status: TaskStatus;
+  growthOpportunityId?: string;
+}
+
+export interface HubLink {
+  label: string;
+  url: string;
 }
 
 export interface HubSection {
   id: string;
   title: string;
-  category: 'Brand' | 'Product' | 'Legal' | 'Assets' | 'FAQs';
+  category: string;
   content: string;
-  lastUpdated: string;
+  address?: string;
+  phone?: string;
+  taxId?: string;
+  links?: HubLink[];
+  lastUpdatedAt: string;
+  lastUpdatedByUserId: string;
 }
 
 export type CampaignStatus = 'Draft' | 'Scheduled' | 'Active' | 'Paused' | 'Completed';
@@ -70,7 +80,7 @@ export interface Campaign {
   spend: number;
   reach: number;
   conversions: number;
-  owner: string;
+  ownerId: string;
   startDate: string;
   endDate: string;
 }
@@ -85,7 +95,7 @@ export interface Partner {
   status: PartnerStatus;
   contact: string;
   impactScore: number; // 1-10
-  owner: string;
+  ownerId: string;
   lastContact: string;
   notes: string;
 }
