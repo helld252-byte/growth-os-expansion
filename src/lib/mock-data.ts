@@ -148,6 +148,26 @@ export const tasks: Task[] = [
     priority: 'High',
     dueDate: '2024-03-28',
     status: 'In Progress',
+  },
+  {
+    id: 't5',
+    title: 'Initial catalog audit',
+    linkedPlatformId: '2',
+    linkedPlatformName: 'Faire Wholesale',
+    owner: 'Alex Rivera',
+    priority: 'Low',
+    dueDate: '2024-03-20',
+    status: 'Completed',
+  },
+  {
+    id: 't6',
+    title: 'Verify EIN validation',
+    linkedPlatformId: '1',
+    linkedPlatformName: 'Amazon Europe',
+    owner: 'Sarah Chen',
+    priority: 'Medium',
+    dueDate: '2024-03-15',
+    status: 'Completed',
   }
 ];
 
