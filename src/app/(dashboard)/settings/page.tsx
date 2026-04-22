@@ -18,7 +18,9 @@ import {
   ShieldAlert,
   MoreHorizontal,
   Trash2,
-  UserPlus
+  UserPlus,
+  Edit3,
+  Settings2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,6 +30,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
 import { 
   useUser, 
@@ -45,6 +53,7 @@ export default function SettingsPage() {
   const { user: currentUser, isUserLoading } = useUser();
   const firestore = getFirestore();
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
 
   const [profile, setProfile] = useState({
     name: "",
@@ -89,6 +98,7 @@ export default function SettingsPage() {
     setIsUpdating(true);
     setTimeout(() => {
       setIsUpdating(false);
+      setIsEditingProfile(false);
       toast({
         title: "Protocol Updated",
         description: "Strategic profile identity has been synchronized across Unit-01.",
@@ -99,7 +109,6 @@ export default function SettingsPage() {
   const toggleAdminRole = (userId: string, currentIsAdmin: boolean) => {
     const roleRef = doc(firestore, 'roles_admin', userId);
     if (currentIsAdmin) {
-      // Don't allow self-demotion to prevent lockouts in MVP
       if (userId === currentUser?.uid) {
         toast({
           variant: "destructive",
@@ -160,167 +169,192 @@ export default function SettingsPage() {
 
         <TabsContent value="profile" className="mt-0 space-y-8 animate-in slide-in-from-bottom-2 duration-500">
           <div className="premium-panel p-8 rounded-2xl flex flex-col gap-8">
-            <div className="flex items-center gap-6">
-              <div className="relative group">
-                <Avatar className="size-24 border-2 border-white/[0.08] group-hover:border-primary/50 transition-all shadow-2xl">
-                  <AvatarImage src={currentUser?.photoURL || "https://picsum.photos/seed/user/200/200"} />
-                  <AvatarFallback className="bg-primary/10 text-primary text-2xl font-bold">
-                    {profile.name ? profile.name.split(' ').map(n => n[0]).join('') : "U"}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 rounded-full cursor-pointer transition-opacity">
-                  <Cloud className="size-6 text-white" />
-                </div>
-              </div>
-              <div className="flex flex-col gap-2">
-                <h3 className="text-xl font-semibold text-tier-1">{profile.name || "Unknown Identity"}</h3>
-                <p className="text-tier-3 text-[14px]">{profile.role} • Unit-01</p>
-                <div className="flex gap-2 mt-1">
-                  {isAdmin && (
-                    <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 text-[10px] px-3 py-0.5 uppercase tracking-wider font-medium">Administrator</Badge>
-                  )}
-                  <Badge variant="outline" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-[10px] px-3 py-0.5 uppercase tracking-wider font-medium">Verified Account</Badge>
-                </div>
-              </div>
-            </div>
-
-            <Separator className="bg-white/[0.04]" />
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="flex flex-col gap-3">
-                <Label className="text-[11px] uppercase tracking-[0.2em] text-tier-4 font-bold ml-1">Full Identity</Label>
-                <Input 
-                  value={profile.name} 
-                  onChange={(e) => setProfile({...profile, name: e.target.value})}
-                  className="bg-white/[0.02] border-white/[0.06] h-12 px-5 text-tier-1 font-medium rounded-xl focus-visible:ring-primary/20" 
-                />
-              </div>
-              <div className="flex flex-col gap-3">
-                <Label className="text-[11px] uppercase tracking-[0.2em] text-tier-4 font-bold ml-1">Secure Email</Label>
-                <Input 
-                  value={profile.email}
-                  onChange={(e) => setProfile({...profile, email: e.target.value})}
-                  className="bg-white/[0.02] border-white/[0.06] h-12 px-5 text-tier-1 font-medium rounded-xl focus-visible:ring-primary/20" 
-                />
-              </div>
-              <div className="flex flex-col gap-3">
-                <Label className="text-[11px] uppercase tracking-[0.2em] text-tier-4 font-bold ml-1">System Role</Label>
-                <Input 
-                  value={isAdmin ? "System Administrator" : profile.role} 
-                  disabled
-                  className="bg-white/[0.02] border-white/[0.06] h-12 px-5 text-tier-1 font-medium rounded-xl focus-visible:ring-primary/20 opacity-50 cursor-not-allowed" 
-                />
-              </div>
-              <div className="flex flex-col gap-3">
-                <Label className="text-[11px] uppercase tracking-[0.2em] text-tier-4 font-bold ml-1">Market Zone</Label>
-                <Input 
-                  value={profile.zone}
-                  onChange={(e) => setProfile({...profile, zone: e.target.value})}
-                  className="bg-white/[0.02] border-white/[0.06] h-12 px-5 text-tier-1 font-medium rounded-xl focus-visible:ring-primary/20" 
-                />
-              </div>
-            </div>
-
-            <div className="flex justify-end pt-4">
-              <Button 
-                onClick={handleUpdateProfile}
-                disabled={isUpdating}
-                className="bg-primary hover:bg-primary/90 text-white font-bold h-11 px-8 rounded-xl transition-all shadow-xl shadow-primary/10 min-w-[160px]"
-              >
-                {isUpdating ? "Synchronizing..." : "Update Profile"}
-              </Button>
-            </div>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="team" className="mt-0 space-y-8 animate-in slide-in-from-bottom-2 duration-500">
-          <div className="premium-panel p-8 rounded-2xl flex flex-col gap-8">
             <div className="flex items-center justify-between">
-              <div className="flex flex-col gap-2">
-                <h3 className="text-xl font-semibold text-tier-1">Command Team</h3>
-                <p className="text-tier-2 text-[14px]">Manage user profiles and strategic access levels within Unit-01.</p>
+              <div className="flex items-center gap-6">
+                <div className="relative group">
+                  <Avatar className="size-24 border-2 border-white/[0.08] group-hover:border-primary/50 transition-all shadow-2xl">
+                    <AvatarImage src={currentUser?.photoURL || "https://picsum.photos/seed/user/200/200"} />
+                    <AvatarFallback className="bg-primary/10 text-primary text-2xl font-bold">
+                      {profile.name ? profile.name.split(' ').map(n => n[0]).join('') : "U"}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 rounded-full cursor-pointer transition-opacity">
+                    <Cloud className="size-6 text-white" />
+                  </div>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <h3 className="text-xl font-semibold text-tier-1">{profile.name || "Unknown Identity"}</h3>
+                  <p className="text-tier-3 text-[14px]">{isAdmin ? "System Administrator" : profile.role} • Unit-01</p>
+                  <div className="flex gap-2 mt-1">
+                    {isAdmin && (
+                      <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 text-[10px] px-3 py-0.5 uppercase tracking-wider font-medium">Administrator</Badge>
+                    )}
+                    <Badge variant="outline" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-[10px] px-3 py-0.5 uppercase tracking-wider font-medium">Verified Account</Badge>
+                  </div>
+                </div>
               </div>
-              <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 px-3 py-1 font-bold text-[10px] uppercase tracking-widest">
-                {allUsers?.length || 0} Registered Units
-              </Badge>
+              
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="size-10 rounded-xl border border-white/[0.05] text-tier-3 hover:text-primary transition-all">
+                    <MoreHorizontal className="size-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56 bg-background/95 backdrop-blur-xl border-white/[0.08] rounded-xl">
+                  <DropdownMenuItem onClick={() => setIsEditingProfile(!isEditingProfile)} className="flex items-center gap-2.5 py-2.5 cursor-pointer">
+                    <Edit3 className="size-4 text-primary" />
+                    <span className="text-[12px] font-semibold text-tier-2">{isEditingProfile ? "Cancel Editing" : "Edit Strategic Profile"}</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="flex items-center gap-2.5 py-2.5 cursor-pointer">
+                    <Settings2 className="size-4 text-tier-3" />
+                    <span className="text-[12px] font-semibold text-tier-2">System Preferences</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
 
-            <div className="flex flex-col gap-4">
-              {isUsersLoading ? (
-                <div className="p-12 flex flex-col items-center justify-center gap-4 opacity-40">
-                  <Zap className="size-8 text-primary animate-pulse" />
-                  <span className="text-[11px] font-bold uppercase tracking-[0.25em]">Scanning Database...</span>
+            {isEditingProfile && (
+              <div className="animate-in fade-in slide-in-from-top-4 duration-500 space-y-8">
+                <Separator className="bg-white/[0.04]" />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="flex flex-col gap-3">
+                    <Label className="text-[11px] uppercase tracking-[0.2em] text-tier-4 font-bold ml-1">Full Identity</Label>
+                    <Input 
+                      value={profile.name} 
+                      onChange={(e) => setProfile({...profile, name: e.target.value})}
+                      className="bg-white/[0.02] border-white/[0.06] h-12 px-5 text-tier-1 font-medium rounded-xl focus-visible:ring-primary/20" 
+                    />
+                  </div>
+                  <div className="flex flex-col gap-3">
+                    <Label className="text-[11px] uppercase tracking-[0.2em] text-tier-4 font-bold ml-1">Secure Email</Label>
+                    <Input 
+                      value={profile.email}
+                      onChange={(e) => setProfile({...profile, email: e.target.value})}
+                      className="bg-white/[0.02] border-white/[0.06] h-12 px-5 text-tier-1 font-medium rounded-xl focus-visible:ring-primary/20" 
+                    />
+                  </div>
+                  <div className="flex flex-col gap-3">
+                    <Label className="text-[11px] uppercase tracking-[0.2em] text-tier-4 font-bold ml-1">System Role</Label>
+                    <Input 
+                      value={isAdmin ? "System Administrator" : profile.role} 
+                      disabled
+                      className="bg-white/[0.02] border-white/[0.06] h-12 px-5 text-tier-1 font-medium rounded-xl focus-visible:ring-primary/20 opacity-50 cursor-not-allowed" 
+                    />
+                  </div>
+                  <div className="flex flex-col gap-3">
+                    <Label className="text-[11px] uppercase tracking-[0.2em] text-tier-4 font-bold ml-1">Market Zone</Label>
+                    <Input 
+                      value={profile.zone}
+                      onChange={(e) => setProfile({...profile, zone: e.target.value})}
+                      className="bg-white/[0.02] border-white/[0.06] h-12 px-5 text-tier-1 font-medium rounded-xl focus-visible:ring-primary/20" 
+                    />
+                  </div>
                 </div>
-              ) : (
-                <div className="border border-white/[0.05] rounded-xl overflow-hidden">
-                  <table className="w-full text-left">
-                    <thead className="bg-white/[0.02] border-b border-white/[0.05]">
-                      <tr>
-                        <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-tier-4">Identity</th>
-                        <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-tier-4">Status</th>
-                        <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-tier-4">Strategic Role</th>
-                        <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-tier-4 text-right">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-white/[0.03]">
-                      {allUsers?.map((u) => {
-                        const isUserAdmin = adminList?.some(a => a.id === u.id);
-                        return (
-                          <tr key={u.id} className="hover:bg-white/[0.01] transition-colors group">
-                            <td className="px-6 py-5">
-                              <div className="flex items-center gap-4">
-                                <Avatar className="size-9 border border-white/[0.1]">
-                                  <AvatarImage src={u.photoURL} />
-                                  <AvatarFallback className="bg-white/5 text-[12px] font-bold">
-                                    {u.displayName?.charAt(0) || u.email?.charAt(0)}
-                                  </AvatarFallback>
-                                </Avatar>
-                                <div className="flex flex-col">
-                                  <span className="text-[14px] font-semibold text-tier-1">{u.displayName || "Unknown Unit"}</span>
-                                  <span className="text-[11px] text-tier-3">{u.email}</span>
-                                </div>
-                              </div>
-                            </td>
-                            <td className="px-6 py-5">
-                              <Badge variant="outline" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-[9px] uppercase tracking-wider font-bold">
-                                Active
-                              </Badge>
-                            </td>
-                            <td className="px-6 py-5">
-                              {isUserAdmin ? (
-                                <div className="flex items-center gap-2 text-primary">
-                                  <ShieldAlert className="size-3.5" />
-                                  <span className="text-[11px] font-bold uppercase tracking-widest">Administrator</span>
-                                </div>
-                              ) : (
-                                <span className="text-[11px] text-tier-3 font-medium uppercase tracking-widest">Operator</span>
-                              )}
-                            </td>
-                            <td className="px-6 py-5 text-right">
-                              <Button 
-                                variant="ghost" 
-                                size="sm"
-                                onClick={() => toggleAdminRole(u.id, !!isUserAdmin)}
-                                className={cn(
-                                  "h-8 px-3 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all",
-                                  isUserAdmin 
-                                    ? "text-rose-400 hover:bg-rose-500/10 hover:text-rose-300" 
-                                    : "text-primary hover:bg-primary/10"
-                                )}
-                              >
-                                {isUserAdmin ? "Revoke Admin" : "Grant Admin"}
-                              </Button>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
+
+                <div className="flex justify-end pt-4">
+                  <Button 
+                    onClick={handleUpdateProfile}
+                    disabled={isUpdating}
+                    className="bg-primary hover:bg-primary/90 text-white font-bold h-11 px-8 rounded-xl transition-all shadow-xl shadow-primary/10 min-w-[160px]"
+                  >
+                    {isUpdating ? "Synchronizing..." : "Update Profile"}
+                  </Button>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </TabsContent>
+
+        {isAdmin && (
+          <TabsContent value="team" className="mt-0 space-y-8 animate-in slide-in-from-bottom-2 duration-500">
+            <div className="premium-panel p-8 rounded-2xl flex flex-col gap-8">
+              <div className="flex items-center justify-between">
+                <div className="flex flex-col gap-2">
+                  <h3 className="text-xl font-semibold text-tier-1">Command Team</h3>
+                  <p className="text-tier-2 text-[14px]">Manage user profiles and strategic access levels within Unit-01.</p>
+                </div>
+                <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 px-3 py-1 font-bold text-[10px] uppercase tracking-widest">
+                  {allUsers?.length || 0} Registered Units
+                </Badge>
+              </div>
+
+              <div className="flex flex-col gap-4">
+                {isUsersLoading ? (
+                  <div className="p-12 flex flex-col items-center justify-center gap-4 opacity-40">
+                    <Zap className="size-8 text-primary animate-pulse" />
+                    <span className="text-[11px] font-bold uppercase tracking-[0.25em]">Scanning Database...</span>
+                  </div>
+                ) : (
+                  <div className="border border-white/[0.05] rounded-xl overflow-hidden">
+                    <table className="w-full text-left">
+                      <thead className="bg-white/[0.02] border-b border-white/[0.05]">
+                        <tr>
+                          <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-tier-4">Identity</th>
+                          <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-tier-4">Status</th>
+                          <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-tier-4">Strategic Role</th>
+                          <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-tier-4 text-right">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-white/[0.03]">
+                        {allUsers?.map((u) => {
+                          const isUserAdmin = adminList?.some(a => a.id === u.id);
+                          return (
+                            <tr key={u.id} className="hover:bg-white/[0.01] transition-colors group">
+                              <td className="px-6 py-5">
+                                <div className="flex items-center gap-4">
+                                  <Avatar className="size-9 border border-white/[0.1]">
+                                    <AvatarImage src={u.photoURL} />
+                                    <AvatarFallback className="bg-white/5 text-[12px] font-bold">
+                                      {u.displayName?.charAt(0) || u.email?.charAt(0)}
+                                    </AvatarFallback>
+                                  </Avatar>
+                                  <div className="flex flex-col">
+                                    <span className="text-[14px] font-semibold text-tier-1">{u.displayName || "Unknown Unit"}</span>
+                                    <span className="text-[11px] text-tier-3">{u.email}</span>
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="px-6 py-5">
+                                <Badge variant="outline" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-[9px] uppercase tracking-wider font-bold">
+                                  Active
+                                </Badge>
+                              </td>
+                              <td className="px-6 py-5">
+                                {isUserAdmin ? (
+                                  <div className="flex items-center gap-2 text-primary">
+                                    <ShieldAlert className="size-3.5" />
+                                    <span className="text-[11px] font-bold uppercase tracking-widest">Administrator</span>
+                                  </div>
+                                ) : (
+                                  <span className="text-[11px] text-tier-3 font-medium uppercase tracking-widest">Operator</span>
+                                )}
+                              </td>
+                              <td className="px-6 py-5 text-right">
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm"
+                                  onClick={() => toggleAdminRole(u.id, !!isUserAdmin)}
+                                  className={cn(
+                                    "h-8 px-3 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all",
+                                    isUserAdmin 
+                                      ? "text-rose-400 hover:bg-rose-500/10 hover:text-rose-300" 
+                                      : "text-primary hover:bg-primary/10"
+                                  )}
+                                >
+                                  {isUserAdmin ? "Revoke Admin" : "Grant Admin"}
+                                </Button>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </div>
+          </TabsContent>
+        )}
 
         <TabsContent value="workspace" className="mt-0 space-y-8 animate-in slide-in-from-bottom-2 duration-500">
           <div className="premium-panel p-8 rounded-2xl flex flex-col gap-8">
