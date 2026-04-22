@@ -14,7 +14,9 @@ import {
   ShieldCheck,
   Briefcase,
   Megaphone,
-  Handshake
+  Handshake,
+  Compass,
+  Activity
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { 
@@ -29,13 +31,22 @@ import {
   SidebarFooter
 } from "@/components/ui/sidebar";
 
-const navItems = [
+const commandItems = [
   { icon: LayoutDashboard, label: "Command Center", path: "/" },
+];
+
+const growthItems = [
   { icon: Layers, label: "Expansion Pipeline", path: "/channels" },
   { icon: Megaphone, label: "Campaign Engine", path: "/campaigns" },
   { icon: Handshake, label: "Strategic Partnerships", path: "/partnerships" },
+];
+
+const operationsItems = [
   { icon: CheckSquare, label: "Operational Tasks", path: "/tasks" },
   { icon: Library, label: "Intelligence Hub", path: "/hub" },
+];
+
+const analyticsItems = [
   { icon: BarChart3, label: "Performance Intel", path: "/reports" },
 ];
 
@@ -57,10 +68,11 @@ export function AppSidebar() {
       </SidebarHeader>
 
       <SidebarContent className="px-5">
+        {/* Command Section */}
         <SidebarGroup>
-          <SidebarGroupLabel className="px-3 text-[10px] uppercase font-bold tracking-[0.2em] text-tier-4 mb-3">Nav Command</SidebarGroupLabel>
+          <SidebarGroupLabel className="px-3 text-[10px] uppercase font-bold tracking-[0.2em] text-tier-4 mb-3">Main Command</SidebarGroupLabel>
           <SidebarMenu className="gap-1.5">
-            {navItems.map((item) => (
+            {commandItems.map((item) => (
               <SidebarMenuItem key={item.path}>
                 <SidebarMenuButton 
                   asChild 
@@ -82,7 +94,86 @@ export function AppSidebar() {
           </SidebarMenu>
         </SidebarGroup>
 
-        <SidebarGroup className="mt-8">
+        {/* Growth Section */}
+        <SidebarGroup className="mt-4">
+          <SidebarGroupLabel className="px-3 text-[10px] uppercase font-bold tracking-[0.2em] text-tier-4 mb-3">Growth Units</SidebarGroupLabel>
+          <SidebarMenu className="gap-1.5">
+            {growthItems.map((item) => (
+              <SidebarMenuItem key={item.path}>
+                <SidebarMenuButton 
+                  asChild 
+                  isActive={pathname === item.path}
+                  className={cn(
+                    "h-11 rounded-xl transition-all duration-300 px-3.5",
+                    pathname === item.path 
+                      ? "bg-primary/10 text-tier-1 shadow-[0_0_20px_rgba(168,85,247,0.15)] font-semibold" 
+                      : "text-tier-2 hover:bg-white/[0.03] hover:text-tier-1 font-medium"
+                  )}
+                >
+                  <Link href={item.path}>
+                    <item.icon className={cn("size-4.5", pathname === item.path ? "text-primary" : "text-tier-3/60")} />
+                    <span className="tracking-tight ml-3.5 text-[14px]">{item.label}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </SidebarGroup>
+
+        {/* Operations Section */}
+        <SidebarGroup className="mt-4">
+          <SidebarGroupLabel className="px-3 text-[10px] uppercase font-bold tracking-[0.2em] text-tier-4 mb-3">Operations</SidebarGroupLabel>
+          <SidebarMenu className="gap-1.5">
+            {operationsItems.map((item) => (
+              <SidebarMenuItem key={item.path}>
+                <SidebarMenuButton 
+                  asChild 
+                  isActive={pathname === item.path}
+                  className={cn(
+                    "h-11 rounded-xl transition-all duration-300 px-3.5",
+                    pathname === item.path 
+                      ? "bg-primary/10 text-tier-1 shadow-[0_0_20px_rgba(168,85,247,0.15)] font-semibold" 
+                      : "text-tier-2 hover:bg-white/[0.03] hover:text-tier-1 font-medium"
+                  )}
+                >
+                  <Link href={item.path}>
+                    <item.icon className={cn("size-4.5", pathname === item.path ? "text-primary" : "text-tier-3/60")} />
+                    <span className="tracking-tight ml-3.5 text-[14px]">{item.label}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </SidebarGroup>
+
+        {/* Intelligence Section */}
+        <SidebarGroup className="mt-4">
+          <SidebarGroupLabel className="px-3 text-[10px] uppercase font-bold tracking-[0.2em] text-tier-4 mb-3">Analysis</SidebarGroupLabel>
+          <SidebarMenu className="gap-1.5">
+            {analyticsItems.map((item) => (
+              <SidebarMenuItem key={item.path}>
+                <SidebarMenuButton 
+                  asChild 
+                  isActive={pathname === item.path}
+                  className={cn(
+                    "h-11 rounded-xl transition-all duration-300 px-3.5",
+                    pathname === item.path 
+                      ? "bg-primary/10 text-tier-1 shadow-[0_0_20px_rgba(168,85,247,0.15)] font-semibold" 
+                      : "text-tier-2 hover:bg-white/[0.03] hover:text-tier-1 font-medium"
+                  )}
+                >
+                  <Link href={item.path}>
+                    <item.icon className={cn("size-4.5", pathname === item.path ? "text-primary" : "text-tier-3/60")} />
+                    <span className="tracking-tight ml-3.5 text-[14px]">{item.label}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </SidebarGroup>
+
+        {/* Strategic Placeholders */}
+        <SidebarGroup className="mt-4">
           <SidebarGroupLabel className="px-3 text-[10px] uppercase font-bold tracking-[0.2em] text-tier-4 mb-3">Strategic</SidebarGroupLabel>
           <SidebarMenu className="gap-1.5">
             <SidebarMenuItem>
