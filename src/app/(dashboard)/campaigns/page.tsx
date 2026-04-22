@@ -5,41 +5,47 @@ import { useState } from "react";
 import { 
   Plus, 
   Search, 
-  Zap, 
-  Target, 
-  BarChart3, 
-  Calendar,
-  Users,
   Megaphone,
   Filter,
   ArrowUpRight,
-  TrendingUp
+  TrendingUp,
+  Target,
+  Users,
+  Calendar,
+  Loader2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { campaigns } from "@/lib/mock-data";
+import { useCollection, useMemoFirebase, useUser, addDocumentNonBlocking } from "@/firebase";
+import { collection, getFirestore, serverTimestamp } from "firebase/firestore";
 import { cn } from "@/lib/utils";
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from "recharts";
 
 const performanceData = [
-  { name: 'W1', reach: 120000, conv: 200 },
-  { name: 'W2', reach: 250000, conv: 450 },
-  { name: 'W3', reach: 380000, conv: 680 },
-  { name: 'W4', reach: 450000, conv: 890 },
+  { name: 'W1', reach: 120000 },
+  { name: 'W2', reach: 250000 },
+  { name: 'W3', reach: 380000 },
+  { name: 'W4', reach: 450000 },
 ];
 
 export default function CampaignEnginePage() {
   const [searchQuery, setSearchQuery] = useState("");
+  const firestore = getFirestore();
+  const { user } = useUser();
+  const campaignsRef = useMemoFirebase(() => collection(firestore, 'campaigns'), [firestore]);
+  const { data: campaigns, isLoading } = useCollection(campaignsRef);
 
-  const filteredCampaigns = campaigns.filter(c => 
+  const filteredCampaigns = (campaigns || []).filter(c => 
     c.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const totalBudget = filteredCampaigns.reduce((acc, c) => acc + (c.budget || 0), 0);
+  const totalReach = filteredCampaigns.reduce((acc, c) => acc + (c.reach || 0), 0);
+
   return (
     <div className="max-w-[1400px] mx-auto flex flex-col gap-10 animate-in fade-in duration-700">
-      {/* Header Unit */}
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-8 pb-6 border-b border-white/[0.03]">
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-4">
@@ -72,7 +78,6 @@ export default function CampaignEnginePage() {
         </div>
       </header>
 
-      {/* Analytics Snapshot */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <div className="lg:col-span-8 premium-panel p-8 rounded-3xl flex flex-col gap-8">
           <div className="flex items-center justify-between">
@@ -80,13 +85,7 @@ export default function CampaignEnginePage() {
               <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] text-tier-4">Aggregated Reach Performance</h3>
               <span className="text-[14px] text-tier-2 font-medium">Monthly trajectory across all active initiatives</span>
             </div>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <div className="size-2 rounded-full bg-primary" />
-                <span className="text-[11px] font-bold text-tier-3 uppercase tracking-wider">Reach</span>
-              </div>
-              <TrendingUp className="size-4 text-emerald-500" />
-            </div>
+            <TrendingUp className="size-4 text-emerald-500" />
           </div>
           <div className="h-48 w-full">
             <ResponsiveContainer width="100%" height="100%">
@@ -105,13 +104,12 @@ export default function CampaignEnginePage() {
         </div>
 
         <div className="lg:col-span-4 grid grid-cols-1 gap-4">
-          <StatBox label="Active Budget" value="$90k" trend="+12%" icon={Target} />
-          <StatBox label="Total Reach" value="1.6M" trend="+5.4%" icon={Users} />
+          <StatBox label="Active Budget" value={`$${(totalBudget / 1000).toFixed(1)}k`} trend="+12%" icon={Target} />
+          <StatBox label="Total Reach" value={`${(totalReach / 1000000).toFixed(1)}M`} trend="+5.4%" icon={Users} />
           <StatBox label="Avg ROAS" value="4.2x" trend="+0.8x" icon={TrendingUp} />
         </div>
       </div>
 
-      {/* Campaign Registry */}
       <div className="flex flex-col gap-6">
         <div className="flex items-center justify-between px-2">
           <h2 className="text-[11px] font-bold uppercase tracking-[0.3em] text-tier-4">Active Registry</h2>
@@ -120,55 +118,65 @@ export default function CampaignEnginePage() {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredCampaigns.map((campaign) => (
-            <div key={campaign.id} className="premium-panel p-6 rounded-2xl flex flex-col gap-6 group hover:border-primary/40 transition-all cursor-pointer">
-              <div className="flex items-start justify-between">
-                <div className="flex flex-col gap-1.5">
-                  <h3 className="text-base font-bold text-tier-1 group-hover:text-primary transition-colors leading-tight">
-                    {campaign.name}
-                  </h3>
-                  <Badge variant="outline" className="w-fit bg-white/[0.03] border-white/[0.08] text-[9px] font-bold uppercase tracking-wider text-tier-3">
-                    {campaign.type}
-                  </Badge>
+        {isLoading ? (
+          <div className="h-48 flex items-center justify-center">
+            <Loader2 className="size-8 text-primary animate-spin" />
+          </div>
+        ) : filteredCampaigns.length === 0 ? (
+          <div className="h-48 border border-dashed border-white/5 rounded-2xl flex items-center justify-center text-tier-4 text-[11px] font-bold uppercase tracking-widest">
+            No Active Campaigns
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredCampaigns.map((campaign) => (
+              <div key={campaign.id} className="premium-panel p-6 rounded-2xl flex flex-col gap-6 group hover:border-primary/40 transition-all cursor-pointer">
+                <div className="flex items-start justify-between">
+                  <div className="flex flex-col gap-1.5">
+                    <h3 className="text-base font-bold text-tier-1 group-hover:text-primary transition-colors leading-tight">
+                      {campaign.name}
+                    </h3>
+                    <Badge variant="outline" className="w-fit bg-white/[0.03] border-white/[0.08] text-[9px] font-bold uppercase tracking-wider text-tier-3">
+                      {campaign.type}
+                    </Badge>
+                  </div>
+                  <div className={cn(
+                    "px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase tracking-widest border",
+                    campaign.status === 'Active' ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                  )}>
+                    {campaign.status}
+                  </div>
                 </div>
-                <div className={cn(
-                  "px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase tracking-widest border",
-                  campaign.status === 'Active' ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-amber-500/10 text-amber-400 border-amber-500/20"
-                )}>
-                  {campaign.status}
-                </div>
-              </div>
 
-              <div className="flex flex-col gap-3 mt-1">
-                <div className="flex justify-between text-[11px] font-bold uppercase tracking-widest text-tier-4">
-                  <span>Budget Allocation</span>
-                  <span className="text-tier-2">${(campaign.spend/1000).toFixed(1)}k / ${(campaign.budget/1000).toFixed(1)}k</span>
+                <div className="flex flex-col gap-3 mt-1">
+                  <div className="flex justify-between text-[11px] font-bold uppercase tracking-widest text-tier-4">
+                    <span>Budget Allocation</span>
+                    <span className="text-tier-2">${(campaign.spend/1000).toFixed(1)}k / ${(campaign.budget/1000).toFixed(1)}k</span>
+                  </div>
+                  <Progress value={(campaign.spend / campaign.budget) * 100} className="h-1.5 bg-white/5" />
                 </div>
-                <Progress value={(campaign.spend / campaign.budget) * 100} className="h-1.5 bg-white/5" />
-              </div>
 
-              <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/[0.03]">
-                <div className="flex flex-col gap-1">
-                  <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-tier-4">Reach</span>
-                  <span className="text-[14px] font-semibold text-tier-1">{(campaign.reach/1000).toFixed(0)}k</span>
+                <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/[0.03]">
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-tier-4">Reach</span>
+                    <span className="text-[14px] font-semibold text-tier-1">{(campaign.reach/1000).toFixed(0)}k</span>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-tier-4">Conversions</span>
+                    <span className="text-[14px] font-semibold text-tier-1">{campaign.conversions}</span>
+                  </div>
                 </div>
-                <div className="flex flex-col gap-1">
-                  <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-tier-4">Conversions</span>
-                  <span className="text-[14px] font-semibold text-tier-1">{campaign.conversions}</span>
-                </div>
-              </div>
 
-              <div className="flex items-center justify-between mt-1">
-                <div className="flex items-center gap-2">
-                  <Calendar className="size-3.5 text-tier-3" />
-                  <span className="text-[11px] font-medium text-tier-3">{campaign.startDate}</span>
+                <div className="flex items-center justify-between mt-1">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="size-3.5 text-tier-3" />
+                    <span className="text-[11px] font-medium text-tier-3">{campaign.startDate}</span>
+                  </div>
+                  <ArrowUpRight className="size-4 text-tier-4 group-hover:text-primary transition-all group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                 </div>
-                <ArrowUpRight className="size-4 text-tier-4 group-hover:text-primary transition-all group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

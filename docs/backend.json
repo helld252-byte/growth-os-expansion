@@ -1,10 +1,11 @@
+
 {
   "entities": {
     "User": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "User",
       "type": "object",
-      "description": "Represents a user within the Growth OS application, including their profile information and assigned role. Authentication is handled by an external system.",
+      "description": "Represents a user within the Growth OS application, including their profile information and assigned role.",
       "properties": {
         "id": {
           "type": "string",
@@ -12,369 +13,144 @@
         },
         "email": {
           "type": "string",
-          "description": "The user's email address, used for identification and communication.",
+          "description": "The user's email address.",
           "format": "email"
         },
         "displayName": {
           "type": "string",
-          "description": "The name of the user as it should be displayed in the application."
+          "description": "The name of the user."
+        },
+        "photoURL": {
+          "type": "string",
+          "description": "URL to the user's profile picture."
         },
         "role": {
           "type": "string",
-          "description": "The role assigned to the user, defining their permissions within the application.",
-          "format": "enum",
-          "items": {
-            "type": "string"
-          }
+          "description": "The role assigned to the user."
         },
         "createdAt": {
           "type": "string",
-          "description": "Timestamp indicating when the user account was created.",
           "format": "date-time"
         },
         "updatedAt": {
           "type": "string",
-          "description": "Timestamp indicating when the user's profile was last updated.",
           "format": "date-time"
         }
       },
       "required": [
         "id",
-        "email",
-        "displayName",
-        "role",
-        "createdAt",
-        "updatedAt"
+        "email"
       ]
     },
     "GrowthOpportunity": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "GrowthOpportunity",
       "type": "object",
-      "description": "Represents a single growth opportunity, channel, or platform being tracked in Growth OS.",
+      "description": "Represents a single growth opportunity, channel, or platform.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the GrowthOpportunity entity."
-        },
-        "name": {
-          "type": "string",
-          "description": "The official name of the growth opportunity or platform."
-        },
-        "type": {
-          "type": "string",
-          "description": "The category or type of the growth opportunity (e.g., Dropshipping Platform, Wholesale Marketplace)."
-        },
-        "market": {
-          "type": "string",
-          "description": "The target market or geographical region for this opportunity."
-        },
-        "website": {
-          "type": "string",
-          "description": "The website or URL associated with the growth opportunity.",
-          "format": "uri"
-        },
-        "ownerId": {
-          "type": "string",
-          "description": "Reference to the User who is responsible for this growth opportunity. (Relationship: User 1:N GrowthOpportunity)"
-        },
-        "priority": {
-          "type": "string",
-          "description": "The strategic priority level assigned to this opportunity (e.g., High, Medium, Low)."
-        },
-        "estimatedValue": {
-          "type": "number",
-          "description": "The estimated monetary value or impact of this opportunity."
-        },
-        "fitScore": {
-          "type": "number",
-          "description": "A score indicating how well this opportunity aligns with company goals or resources (e.g., 1-10)."
-        },
-        "riskLevel": {
-          "type": "string",
-          "description": "The assessed risk level associated with pursuing this opportunity (e.g., High, Medium, Low)."
-        },
-        "currentStage": {
-          "type": "string",
-          "description": "The current stage in the growth pipeline for this opportunity (e.g., Not Started, Approved, Live)."
-        },
-        "dateStarted": {
-          "type": "string",
-          "description": "The date when tracking or engagement with this opportunity officially began.",
-          "format": "date"
-        },
-        "lastUpdate": {
-          "type": "string",
-          "description": "Timestamp of the most recent significant update or activity on this opportunity.",
-          "format": "date-time"
-        },
-        "productsUploaded": {
-          "type": "boolean",
-          "description": "Indicates whether products have been uploaded to this platform/channel."
-        },
-        "salesStarted": {
-          "type": "boolean",
-          "description": "Indicates whether sales have commenced on this platform/channel."
-        },
-        "firstOrderDate": {
-          "type": "string",
-          "description": "The date of the first order or sale recorded for this opportunity.",
-          "format": "date"
-        },
-        "nextStep": {
-          "type": "string",
-          "description": "A description of the immediate next action required for this opportunity."
-        },
-        "nextStepDueDate": {
-          "type": "string",
-          "description": "The target completion date for the identified next step.",
-          "format": "date"
-        },
-        "blockers": {
-          "type": "array",
-          "description": "A list of challenges or obstacles currently preventing progress for this opportunity.",
-          "items": {
-            "type": "string"
-          }
-        },
-        "contactPerson": {
-          "type": "string",
-          "description": "The name of the primary contact person for this opportunity."
-        },
-        "contactEmail": {
-          "type": "string",
-          "description": "The email address of the primary contact person for this opportunity.",
-          "format": "email"
-        },
-        "notes": {
-          "type": "string",
-          "description": "General notes or observations related to the opportunity."
-        },
-        "feedback": {
-          "type": "string",
-          "description": "Feedback received during the process, especially from the channel partner."
-        },
-        "rejectionReason": {
-          "type": "string",
-          "description": "The reason provided if the opportunity was rejected or declined."
-        },
-        "certifications": {
-          "type": "array",
-          "description": "A list of required or obtained certifications for this opportunity.",
-          "items": {
-            "type": "string"
-          }
-        },
-        "moq": {
-          "type": "string",
-          "description": "Minimum Order Quantity requirements for wholesale or distributor partnerships."
-        },
-        "warehouseLogisticsNeeds": {
-          "type": "string",
-          "description": "Specific warehouse or logistics requirements for this channel."
-        },
-        "documentsRequired": {
-          "type": "array",
-          "description": "A list of documents or files required for application or onboarding.",
-          "items": {
-            "type": "string"
-          }
-        },
-        "tagIds": {
-          "type": "array",
-          "description": "References to Tags that categorize this growth opportunity. (Relationship: GrowthOpportunity N:N Tag)",
-          "items": {
-            "type": "string"
-          }
-        },
-        "createdAt": {
-          "type": "string",
-          "description": "Timestamp indicating when the growth opportunity record was created.",
-          "format": "date-time"
-        },
-        "updatedAt": {
-          "type": "string",
-          "description": "Timestamp indicating when the growth opportunity record was last updated.",
-          "format": "date-time"
-        }
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "type": { "type": "string" },
+        "market": { "type": "string" },
+        "website": { "type": "string", "format": "uri" },
+        "ownerId": { "type": "string" },
+        "priority": { "type": "string", "enum": ["High", "Medium", "Low"] },
+        "estimatedValue": { "type": "number" },
+        "fitScore": { "type": "number" },
+        "riskLevel": { "type": "string", "enum": ["High", "Medium", "Low"] },
+        "currentStage": { "type": "string" },
+        "dateStarted": { "type": "string", "format": "date" },
+        "lastUpdate": { "type": "string", "format": "date-time" },
+        "productsUploaded": { "type": "boolean" },
+        "salesStarted": { "type": "boolean" },
+        "nextStep": { "type": "string" },
+        "contactPerson": { "type": "string" },
+        "contactEmail": { "type": "string", "format": "email" },
+        "notes": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
       },
       "required": [
-        "id",
         "name",
         "type",
-        "market",
         "ownerId",
-        "priority",
-        "currentStage",
-        "dateStarted",
-        "lastUpdate",
-        "productsUploaded",
-        "salesStarted",
-        "nextStep",
-        "blockers",
-        "contactPerson",
-        "contactEmail",
-        "createdAt",
-        "updatedAt"
+        "currentStage"
       ]
+    },
+    "Campaign": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Campaign",
+      "type": "object",
+      "description": "Represents a marketing campaign or promotion.",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "type": { "type": "string" },
+        "status": { "type": "string" },
+        "budget": { "type": "number" },
+        "spend": { "type": "number" },
+        "reach": { "type": "number" },
+        "conversions": { "type": "number" },
+        "ownerId": { "type": "string" },
+        "startDate": { "type": "string", "format": "date" },
+        "endDate": { "type": "string", "format": "date" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "type", "status", "ownerId"]
+    },
+    "Partner": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Partner",
+      "type": "object",
+      "description": "Represents a strategic partner or influencer.",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "type": { "type": "string" },
+        "status": { "type": "string" },
+        "contact": { "type": "string" },
+        "impactScore": { "type": "number" },
+        "ownerId": { "type": "string" },
+        "lastContact": { "type": "string", "format": "date" },
+        "notes": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "type", "status", "ownerId"]
     },
     "Task": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Task",
       "type": "object",
-      "description": "Represents an operational task within the Growth OS, which can be linked to a specific growth opportunity.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the Task entity."
-        },
-        "title": {
-          "type": "string",
-          "description": "A concise title or summary of the task."
-        },
-        "description": {
-          "type": "string",
-          "description": "A detailed description of the task, outlining its purpose and requirements."
-        },
-        "growthOpportunityId": {
-          "type": "string",
-          "description": "Reference to the GrowthOpportunity this task is associated with. (Relationship: GrowthOpportunity 1:N Task)"
-        },
-        "ownerId": {
-          "type": "string",
-          "description": "Reference to the User assigned to complete this task. (Relationship: User 1:N Task)"
-        },
-        "priority": {
-          "type": "string",
-          "description": "The priority level of the task (e.g., High, Medium, Low)."
-        },
-        "dueDate": {
-          "type": "string",
-          "description": "The target completion date for the task.",
-          "format": "date-time"
-        },
-        "status": {
-          "type": "string",
-          "description": "The current status of the task (e.g., To Do, In Progress, Completed, Blocked, Overdue)."
-        },
-        "createdAt": {
-          "type": "string",
-          "description": "Timestamp indicating when the task was created.",
-          "format": "date-time"
-        },
-        "completedAt": {
-          "type": "string",
-          "description": "Timestamp indicating when the task was marked as completed.",
-          "format": "date-time"
-        }
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "ownerId": { "type": "string" },
+        "priority": { "type": "string" },
+        "dueDate": { "type": "string", "format": "date-time" },
+        "status": { "type": "string" },
+        "growthOpportunityId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": [
-        "id",
-        "title",
-        "ownerId",
-        "priority",
-        "dueDate",
-        "status",
-        "createdAt"
-      ]
+      "required": ["title", "ownerId", "status"]
     },
     "CompanyResource": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "CompanyResource",
       "type": "object",
-      "description": "Stores reusable company information to reduce repetitive work and serve as a central knowledge hub.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the CompanyResource entity."
-        },
-        "title": {
-          "type": "string",
-          "description": "The title or name of the company resource (e.g., 'Brand Description', 'W9')."
-        },
-        "category": {
-          "type": "string",
-          "description": "The category of the resource for easier organization (e.g., 'Legal Document', 'Media Asset', 'FAQ')."
-        },
-        "content": {
-          "type": "string",
-          "description": "The actual content of the resource, which can be text, a URL to a document, or a file path."
-        },
-        "description": {
-          "type": "string",
-          "description": "A brief description explaining the purpose or content of the resource."
-        },
-        "lastUpdatedByUserId": {
-          "type": "string",
-          "description": "Reference to the User who last updated this company resource. (Relationship: User 1:N CompanyResource)"
-        },
-        "lastUpdatedAt": {
-          "type": "string",
-          "description": "Timestamp indicating when the company resource was last updated.",
-          "format": "date-time"
-        },
-        "createdAt": {
-          "type": "string",
-          "description": "Timestamp indicating when the company resource was created.",
-          "format": "date-time"
-        }
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "category": { "type": "string" },
+        "content": { "type": "string" },
+        "lastUpdatedByUserId": { "type": "string" },
+        "lastUpdatedAt": { "type": "string", "format": "date-time" }
       },
-      "required": [
-        "id",
-        "title",
-        "category",
-        "content",
-        "lastUpdatedByUserId",
-        "lastUpdatedAt",
-        "createdAt"
-      ]
-    },
-    "Tag": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Tag",
-      "type": "object",
-      "description": "A generic tag entity used for flexible categorization and filtering of various items, such as Growth Opportunities.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the Tag entity."
-        },
-        "name": {
-          "type": "string",
-          "description": "The name of the tag (e.g., 'Q4 Focus', 'Dropshipping')."
-        },
-        "description": {
-          "type": "string",
-          "description": "A brief explanation of what the tag represents."
-        },
-        "color": {
-          "type": "string",
-          "description": "An optional color code (e.g., hex) for visual representation of the tag in the UI."
-        },
-        "createdAt": {
-          "type": "string",
-          "description": "Timestamp indicating when the tag was created.",
-          "format": "date-time"
-        },
-        "updatedAt": {
-          "type": "string",
-          "description": "Timestamp indicating when the tag was last updated.",
-          "format": "date-time"
-        }
-      },
-      "required": [
-        "id",
-        "name",
-        "description",
-        "createdAt",
-        "updatedAt"
-      ]
+      "required": ["title", "category", "content"]
     }
   },
   "auth": {
     "providers": [
-      "password",
-      "anonymous"
+      "google.com"
     ]
   },
   "firestore": {
@@ -383,147 +159,58 @@
         "path": "/users/{userId}",
         "definition": {
           "entityName": "User",
-          "schema": {
-            "$ref": "#/backend/entities/User"
-          },
-          "description": "Stores user profile data. Each user can read/write their own profile. Admins have full access. Authorization relies on `request.auth.uid == userId` for self-management and global role checks for admin privileges.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique ID of the user, matching `request.auth.uid`."
-            }
-          ]
+          "schema": { "$ref": "#/backend/entities/User" },
+          "description": "User profiles."
         }
       },
       {
         "path": "/roles_admin/{userId}",
         "definition": {
           "entityName": "User",
-          "schema": {
-            "$ref": "#/backend/entities/User"
-          },
-          "description": "Dedicated collection for identifying users with the 'Admin' role for DBAC. Authorization relies on the existence of a document for `request.auth.uid` in this collection, avoiding hierarchical dependencies for role checks.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique ID of the user who possesses the 'Admin' role."
-            }
-          ]
+          "schema": { "$ref": "#/backend/entities/User" },
+          "description": "Admin role markers."
         }
       },
       {
-        "path": "/roles_manager/{userId}",
-        "definition": {
-          "entityName": "User",
-          "schema": {
-            "$ref": "#/backend/entities/User"
-          },
-          "description": "Dedicated collection for identifying users with the 'Manager' role for DBAC. Authorization relies on the existence of a document for `request.auth.uid` in this collection.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique ID of the user who possesses the 'Manager' role."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/roles_operator/{userId}",
-        "definition": {
-          "entityName": "User",
-          "schema": {
-            "$ref": "#/backend/entities/User"
-          },
-          "description": "Dedicated collection for identifying users with the 'Operator' role for DBAC. Authorization relies on the existence of a document for `request.auth.uid` in this collection.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique ID of the user who possesses the 'Operator' role."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/roles_viewer/{userId}",
-        "definition": {
-          "entityName": "User",
-          "schema": {
-            "$ref": "#/backend/entities/User"
-          },
-          "description": "Dedicated collection for identifying users with the 'Viewer' role for DBAC. Authorization relies on the existence of a document for `request.auth.uid` in this collection.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique ID of the user who possesses the 'Viewer' role."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/growth_opportunities/{growthOpportunityId}",
+        "path": "/growth_opportunities/{id}",
         "definition": {
           "entityName": "GrowthOpportunity",
-          "schema": {
-            "$ref": "#/backend/entities/GrowthOpportunity"
-          },
-          "description": "Centralized collection for all growth opportunities. Includes denormalized 'ownerId' for clear ownership. Access is role-based: Admins and Operators have full read/write, Managers and Viewers have read-only access. Supports QAPs by allowing broad list queries for authorized roles.",
-          "params": [
-            {
-              "name": "growthOpportunityId",
-              "description": "The unique ID of the growth opportunity."
-            }
-          ]
+          "schema": { "$ref": "#/backend/entities/GrowthOpportunity" },
+          "description": "Market expansion platforms."
         }
       },
       {
-        "path": "/tasks/{taskId}",
+        "path": "/campaigns/{id}",
+        "definition": {
+          "entityName": "Campaign",
+          "schema": { "$ref": "#/backend/entities/Campaign" },
+          "description": "Marketing campaigns."
+        }
+      },
+      {
+        "path": "/partners/{id}",
+        "definition": {
+          "entityName": "Partner",
+          "schema": { "$ref": "#/backend/entities/Partner" },
+          "description": "Strategic partnerships."
+        }
+      },
+      {
+        "path": "/tasks/{id}",
         "definition": {
           "entityName": "Task",
-          "schema": {
-            "$ref": "#/backend/entities/Task"
-          },
-          "description": "Centralized collection for all operational tasks. Includes denormalized 'ownerId' (assigned user) and 'growthOpportunityId' (linked platform). Access is role-based: Admins and Operators have full read/write, Managers and Viewers have read-only access. Supports QAPs by allowing broad list queries for authorized roles.",
-          "params": [
-            {
-              "name": "taskId",
-              "description": "The unique ID of the task."
-            }
-          ]
+          "schema": { "$ref": "#/backend/entities/Task" },
+          "description": "Operational tasks."
         }
       },
       {
-        "path": "/company_resources/{companyResourceId}",
+        "path": "/company_resources/{id}",
         "definition": {
           "entityName": "CompanyResource",
-          "schema": {
-            "$ref": "#/backend/entities/CompanyResource"
-          },
-          "description": "Central hub for reusable company information. Includes denormalized 'lastUpdatedByUserId'. Read access is granted to all authenticated users. Write access is restricted to Admins (or potentially Managers/Operators for specific resource types, configurable via rules). Supports QAPs by allowing broad list queries for all authenticated users.",
-          "params": [
-            {
-              "name": "companyResourceId",
-              "description": "The unique ID of the company resource."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/tags/{tagId}",
-        "definition": {
-          "entityName": "Tag",
-          "schema": {
-            "$ref": "#/backend/entities/Tag"
-          },
-          "description": "Global collection for managing categorization tags. Read access is granted to all authenticated users. Write access is restricted to Admins. Supports QAPs by allowing broad list queries for all authenticated users.",
-          "params": [
-            {
-              "name": "tagId",
-              "description": "The unique ID of the tag."
-            }
-          ]
+          "schema": { "$ref": "#/backend/entities/CompanyResource" },
+          "description": "Intelligence Hub assets."
         }
       }
-    ],
-    "reasoning": "The recommended Firestore structure for Growth OS prioritizes security, scalability, and debuggability by adhering strictly to the core design principles and strategy mandates. The overarching theme is to minimize complexity in security rules by pushing authorization logic into the data structure itself.\n\n**Authorization Independence (CRITICAL) & Denormalization Strategy:**\n\n1.  **Global Roles (DBAC):** Instead of custom claims or checking user roles embedded within application data documents (which would require a `get()` on a user profile that could become a dependency), user roles are denormalized into dedicated top-level collections (e.g., `/roles_admin/{userId}`, `/roles_operator/{userId}`). A user is an Admin if a document exists at `/roles_admin/{request.auth.uid}`. This strategy ensures authorization checks are atomic and independent of application data hierarchies. Rules can check `get(/databases/$(database)/documents/roles_admin/$(request.auth.uid)).exists()` without violating the spirit of avoiding hierarchical authorization dependencies, as these are global user properties, not application data dependencies.\n2.  **Entity Ownership/Responsibility:** For `GrowthOpportunity` and `Task` entities, the `ownerId` field is directly embedded within each document. This denormalizes the ownership information, allowing security rules to check `request.auth.uid == resource.data.ownerId` directly without needing a `get()` operation to a parent document or related user profile. This supports atomic writes and clear ownership.\n3.  **No Deep Hierarchical Dependencies:** Most core application data collections (`/growth_opportunities`, `/tasks`, `/company_resources`, `/tags`) are placed at the root level. This avoids situations where a subcollection's access relies on complex checks against its parent document's fields, which would necessitate `get()` calls and break atomic operations.\n\n**QAPs (Rules are not Filters) & Structural Segregation:**\n\n1.  **Homogeneous Security Posture:** Each collection (`/users`, `/growth_opportunities`, `/tasks`, `/company_resources`, `/tags`, and the role collections) contains documents that share the same security requirements. For example, all documents in `/growth_opportunities` are accessible (read-only or read-write) based on a user's global role (Admin, Manager, Operator, Viewer). This means security rules for a collection can be simple and applied uniformly across all documents within it.\n2.  **Broad List Permissions with Client-Side Filtering:** For collections like `/growth_opportunities` and `/tasks`, the security rules are designed to grant `list` access to all users who possess an appropriate role (e.g., Manager, Operator, Viewer for read access to all opportunities). This enables QAPs, as the security rules allow the client to retrieve a broad set of data, and then the client-side application applies specific filters (e.g., 'High Priority Opportunities', 'Overdue Tasks', 'By Owner') to display relevant subsets to the user. The rules ensure *access*, not *filtering*.\n3.  **Role-Based Access:** The explicit role collections (`/roles_admin`, `/roles_manager`, etc.) directly support a clear DBAC model. For instance, an 'Operator' has read/write access to all tasks and platforms, while a 'Manager' has read-only access. This is enforced by checking existence in these role collections, making the authorization intent explicit and debuggable.\n\nThis design effectively segregates data based on its security posture and ensures authorization contexts are denormalized or directly available within the `request` or `resource` objects, greatly simplifying Firestore security rules."
+    ]
   }
 }
