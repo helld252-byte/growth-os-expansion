@@ -1,0 +1,168 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * GROWTH OS SECURITY RULES
+     *
+     * Core Philosophy: 
+     * This ruleset implements a Role-Based Access Control (RBAC) model using specialized 
+     * collections to represent global permissions (Database Access Control - DBAC). This 
+     * allows for highly performant security checks without hierarchical data dependencies.
+     *
+     * Data Structure:
+     * - /users/{userId}: User profile data.
+     * - /roles_{roleName}/{userId}: Flag collections used to verify global roles (Admin, Manager, Operator, Viewer).
+     * - /growth_opportunities: Top-level collection for market platforms and channels.
+     * - /tasks: Top-level collection for operational tasks.
+     * - /company_resources: Centralized knowledge hub for all users.
+     * - /tags: Global categorization system.
+     *
+     * Key Security Decisions:
+     * - Structural Segregation: Role-based permissions are separated into dedicated collections 
+     *   (/roles_admin, etc.) to ensure that checking a user's role is an O(1) existence check.
+     * - Flexible Prototyping: While access is strictly controlled by identity and role, 
+     *   the specific shape of content data is not enforced to allow for rapid iteration.
+     * - Denormalization: Documents (Opportunities, Tasks) contain ownerId fields to ensure 
+     *   traceability and simplified rules.
+     */
+
+    // --- HELPER FUNCTIONS ---
+
+    /** @description Checks if the request is from an authenticated user. */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /** @description Checks if the user's UID matches the provided ID. */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /** @description Verifies a document exists and the user is the owner. Used for updates/deletes. */
+    function isExistingOwner(userId) {
+      return resource != null && isOwner(userId);
+    }
+
+    /** @description Checks if the user is registered in the Admin role collection. */
+    function isAdmin() {
+      return isSignedIn() && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
+    }
+
+    /** @description Checks if the user is registered in the Manager role collection. */
+    function isManager() {
+      return isSignedIn() && exists(/databases/$(database)/documents/roles_manager/$(request.auth.uid));
+    }
+
+    /** @description Checks if the user is registered in the Operator role collection. */
+    function isOperator() {
+      return isSignedIn() && exists(/databases/$(database)/documents/roles_operator/$(request.auth.uid));
+    }
+
+    /** @description Checks if the user is registered in the Viewer role collection. */
+    function isViewer() {
+      return isSignedIn() && exists(/databases/$(database)/documents/roles_viewer/$(request.auth.uid));
+    }
+
+    /** @description Generic check for any role that allows read access to core business data. */
+    function hasBusinessReadAccess() {
+      return isAdmin() || isManager() || isOperator() || isViewer();
+    }
+
+    /** @description Generic check for any role that allows write access to core business data. */
+    function hasBusinessWriteAccess() {
+      return isAdmin() || isOperator();
+    }
+
+    // --- COLLECTION RULES ---
+
+    /**
+     * @description Rules for the User collection. Users manage their own profiles; Admins have full control.
+     * @path /users/{userId}
+     * @allow (get) If user is the owner or an admin.
+     * @deny (update) If user tries to change another user's profile without Admin rights.
+     * @principle Ownership-based access with Admin override.
+     */
+    match /users/{userId} {
+      allow get: if isOwner(userId) || isAdmin();
+      allow list: if isAdmin();
+      allow create: if (isOwner(userId) && request.resource.data.id == userId) || isAdmin();
+      allow update: if (isExistingOwner(userId) && request.resource.data.id == resource.data.id) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    /**
+     * @description DBAC Collections for Role Management.
+     * @path /roles_admin/{userId}, /roles_manager/{userId}, etc.
+     * @allow (get) Users can check their own role status.
+     * @deny (write) Only Admins can modify role assignments.
+     * @principle DBAC (Database Access Control) pattern for global roles.
+     */
+    match /{roleCollection}/{userId} {
+      // Explicitly define the allowed role collections to prevent arbitrary collection creation
+      function isRoleCollection() {
+        return roleCollection == "roles_admin" || roleCollection == "roles_manager" || roleCollection == "roles_operator" || roleCollection == "roles_viewer";
+      }
+
+      allow get: if isOwner(userId) || isAdmin();
+      allow list: if isAdmin();
+      // Ensure only admins can write to designated role collections.
+      allow write: if isAdmin() && isRoleCollection();
+    }
+
+    /**
+     * @description Operational data for growth opportunities.
+     * @path /growth_opportunities/{opportunityId}
+     * @allow (list) All users with a business role.
+     * @deny (create) Users without Admin or Operator roles.
+     * @principle Role-based access control for business operations.
+     */
+    match /growth_opportunities/{opportunityId} {
+      allow get, list: if hasBusinessReadAccess();
+      allow create: if hasBusinessWriteAccess() && request.resource.data.ownerId == request.auth.uid;
+      allow update: if hasBusinessWriteAccess() && resource != null;
+      allow delete: if isAdmin() && resource != null;
+    }
+
+    /**
+     * @description Tasks associated with growth opportunities and users.
+     * @path /tasks/{taskId}
+     * @allow (get) Any authorized business user.
+     * @deny (update) Viewer or Manager roles attempting to modify tasks.
+     * @principle Enforces relational integrity (ownerId) on creation.
+     */
+    match /tasks/{taskId} {
+      allow get, list: if hasBusinessReadAccess();
+      allow create: if hasBusinessWriteAccess() && request.resource.data.ownerId == request.auth.uid;
+      allow update: if hasBusinessWriteAccess() && resource != null && request.resource.data.ownerId == resource.data.ownerId;
+      allow delete: if isAdmin() && resource != null;
+    }
+
+    /**
+     * @description Reusable company assets and information.
+     * @path /company_resources/{resourceId}
+     * @allow (read) All signed-in users.
+     * @deny (write) Non-admin users.
+     * @principle Public read for authenticated users with privileged write.
+     */
+    match /company_resources/{resourceId} {
+      allow get, list: if isSignedIn();
+      allow create: if isAdmin() && request.resource.data.lastUpdatedByUserId == request.auth.uid;
+      allow update: if isAdmin() && resource != null;
+      allow delete: if isAdmin() && resource != null;
+    }
+
+    /**
+     * @description Global tagging system for categorization.
+     * @path /tags/{tagId}
+     * @allow (read) All signed-in users.
+     * @deny (delete) Anyone who is not an Admin.
+     * @principle Global lookup table accessible to all authenticated users.
+     */
+    match /tags/{tagId} {
+      allow get, list: if isSignedIn();
+      allow create, update: if isAdmin();
+      allow delete: if isAdmin() && resource != null;
+    }
+  }
+}
