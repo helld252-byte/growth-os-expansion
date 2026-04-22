@@ -15,8 +15,7 @@ import {
   Briefcase,
   Megaphone,
   Handshake,
-  Compass,
-  Activity
+  ShieldAlert
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { 
@@ -50,7 +49,11 @@ const analyticsItems = [
   { icon: BarChart3, label: "Performance Intel", path: "/reports" },
 ];
 
-export function AppSidebar() {
+interface AppSidebarProps {
+  isAdmin?: boolean;
+}
+
+export function AppSidebar({ isAdmin }: AppSidebarProps) {
   const pathname = usePathname();
 
   return (
@@ -68,7 +71,6 @@ export function AppSidebar() {
       </SidebarHeader>
 
       <SidebarContent className="px-5">
-        {/* Command Section */}
         <SidebarGroup>
           <SidebarGroupLabel className="px-3 text-[10px] uppercase font-bold tracking-[0.2em] text-tier-4 mb-3">Main Command</SidebarGroupLabel>
           <SidebarMenu className="gap-1.5">
@@ -94,7 +96,6 @@ export function AppSidebar() {
           </SidebarMenu>
         </SidebarGroup>
 
-        {/* Growth Section */}
         <SidebarGroup className="mt-4">
           <SidebarGroupLabel className="px-3 text-[10px] uppercase font-bold tracking-[0.2em] text-tier-4 mb-3">Growth Units</SidebarGroupLabel>
           <SidebarMenu className="gap-1.5">
@@ -120,7 +121,6 @@ export function AppSidebar() {
           </SidebarMenu>
         </SidebarGroup>
 
-        {/* Operations Section */}
         <SidebarGroup className="mt-4">
           <SidebarGroupLabel className="px-3 text-[10px] uppercase font-bold tracking-[0.2em] text-tier-4 mb-3">Operations</SidebarGroupLabel>
           <SidebarMenu className="gap-1.5">
@@ -146,7 +146,20 @@ export function AppSidebar() {
           </SidebarMenu>
         </SidebarGroup>
 
-        {/* Intelligence Section */}
+        {isAdmin && (
+          <SidebarGroup className="mt-4">
+            <SidebarGroupLabel className="px-3 text-[10px] uppercase font-bold tracking-[0.2em] text-primary mb-3">System Control</SidebarGroupLabel>
+            <SidebarMenu className="gap-1.5">
+              <SidebarMenuItem>
+                <SidebarMenuButton className="h-11 rounded-xl text-primary/80 hover:bg-primary/10 hover:text-primary px-3.5 font-semibold border border-primary/10">
+                  <ShieldAlert className="size-4.5" />
+                  <span className="tracking-tight ml-3.5 text-[14px]">Admin Console</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroup>
+        )}
+
         <SidebarGroup className="mt-4">
           <SidebarGroupLabel className="px-3 text-[10px] uppercase font-bold tracking-[0.2em] text-tier-4 mb-3">Analysis</SidebarGroupLabel>
           <SidebarMenu className="gap-1.5">
@@ -169,25 +182,6 @@ export function AppSidebar() {
                 </SidebarMenuButton>
               </SidebarMenuItem>
             ))}
-          </SidebarMenu>
-        </SidebarGroup>
-
-        {/* Strategic Placeholders */}
-        <SidebarGroup className="mt-4">
-          <SidebarGroupLabel className="px-3 text-[10px] uppercase font-bold tracking-[0.2em] text-tier-4 mb-3">Strategic</SidebarGroupLabel>
-          <SidebarMenu className="gap-1.5">
-            <SidebarMenuItem>
-              <SidebarMenuButton className="h-11 rounded-xl text-tier-2 hover:bg-white/[0.03] hover:text-tier-1 px-3.5 font-medium">
-                <Briefcase className="size-4.5 text-tier-3/40" />
-                <span className="tracking-tight ml-3.5 text-[14px]">Market Intel</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton className="h-11 rounded-xl text-tier-2 hover:bg-white/[0.03] hover:text-tier-1 px-3.5 font-medium">
-                <ShieldCheck className="size-4.5 text-tier-3/40" />
-                <span className="tracking-tight ml-3.5 text-[14px]">Compliance</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>

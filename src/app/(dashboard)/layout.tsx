@@ -1,10 +1,10 @@
 
-"use client";
+'use client';
 
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/layout/AppSidebar";
-import { Search, Bell, ChevronDown, Command, Zap, ChevronRight } from "lucide-react";
-import { usePathname } from "next/navigation";
+import { Search, Bell, ChevronDown, Command, Zap, ChevronRight, LogOut } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { 
@@ -13,9 +13,20 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { platforms } from "@/lib/mock-data";
 import Link from "next/link";
+import { useUser, useAuth, useDoc, useMemoFirebase } from "@/firebase";
+import { doc } from "firebase/firestore";
+import { getFirestore } from "firebase/firestore";
 
 export default function DashboardLayout({
   children,
@@ -23,8 +34,27 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { user, isUserLoading } = useUser();
+  const auth = useAuth();
+  const firestore = getFirestore();
+  
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Check for Admin role
+  const adminRef = useMemoFirebase(() => {
+    if (!user) return null;
+    return doc(firestore, 'roles_admin', user.uid);
+  }, [user, firestore]);
+  const { data: adminDoc } = useDoc(adminRef);
+  const isAdmin = !!adminDoc;
+
+  useEffect(() => {
+    if (!isUserLoading && !user) {
+      router.push('/login');
+    }
+  }, [user, isUserLoading, router]);
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -36,6 +66,15 @@ export default function DashboardLayout({
     document.addEventListener("keydown", down);
     return () => document.removeEventListener("keydown", down);
   }, []);
+
+  const handleSignOut = async () => {
+    try {
+      await auth.signOut();
+      router.push('/login');
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
 
   const filteredResults = platforms.filter(p => 
     p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -55,10 +94,21 @@ export default function DashboardLayout({
     return "Operations";
   };
 
+  if (isUserLoading || !user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-pulse flex flex-col items-center gap-4">
+          <Zap className="size-12 text-primary fill-primary" />
+          <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-tier-4">Syncing Mission Profile</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-background text-foreground selection:bg-primary/20">
-        <AppSidebar />
+        <AppSidebar isAdmin={isAdmin} />
         <SidebarInset className="flex flex-col overflow-hidden bg-transparent">
           <header className="h-14 flex items-center justify-between px-6 bg-background/20 backdrop-blur-xl sticky top-0 z-40 border-b border-white/[0.02]">
             <div className="flex items-center gap-5">
@@ -70,12 +120,17 @@ export default function DashboardLayout({
                 <span className="text-[11px] font-medium uppercase tracking-[0.15em] text-primary">
                   {getSectionLabel(pathname)}
                 </span>
+                {isAdmin && (
+                  <>
+                    <span className="text-tier-3/20 text-xs">/</span>
+                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-primary/10 text-primary font-bold uppercase tracking-widest border border-primary/20">Admin</span>
+                  </>
+                )}
               </div>
             </div>
 
             <div className="flex items-center gap-5">
               <div className="flex items-center gap-4">
-                {/* Search Trigger */}
                 <div 
                   onClick={() => setIsSearchOpen(true)}
                   className="hidden sm:flex items-center bg-white/[0.03] border border-white/[0.08] rounded-lg px-3 py-1.5 gap-3 cursor-pointer hover:bg-white/[0.06] hover:border-white/20 transition-all group"
@@ -93,12 +148,31 @@ export default function DashboardLayout({
               
               <div className="h-4 w-px bg-white/[0.05]" />
               
-              <div className="flex items-center gap-3 cursor-pointer group">
-                <div className="size-7 rounded-full overflow-hidden border border-white/[0.05] group-hover:border-accent/40 transition-all opacity-90 group-hover:opacity-100">
-                  <img src="https://picsum.photos/seed/user/100/100" alt="Avatar" className="w-full h-full object-cover" />
-                </div>
-                <ChevronDown className="size-3 text-tier-3 group-hover:text-primary transition-colors" />
-              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger className="flex items-center gap-3 cursor-pointer group outline-none">
+                  <div className="size-7 rounded-full overflow-hidden border border-white/[0.05] group-hover:border-accent/40 transition-all opacity-90 group-hover:opacity-100">
+                    <img src={user.photoURL || "https://picsum.photos/seed/user/100/100"} alt="Avatar" className="w-full h-full object-cover" />
+                  </div>
+                  <ChevronDown className="size-3 text-tier-3 group-hover:text-primary transition-colors" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56 mt-2 bg-background/95 backdrop-blur-xl border-white/[0.08] rounded-xl shadow-2xl">
+                  <DropdownMenuLabel className="flex flex-col gap-0.5 py-3">
+                    <span className="text-[13px] font-bold text-tier-1">{user.displayName}</span>
+                    <span className="text-[10px] text-tier-3 font-medium truncate">{user.email}</span>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator className="bg-white/[0.05]" />
+                  <DropdownMenuItem asChild className="hover:bg-white/[0.05] cursor-pointer">
+                    <Link href="/settings" className="flex items-center gap-2">
+                      <Zap className="size-3.5 text-primary" />
+                      <span className="text-[12px] font-semibold text-tier-2">Profile Intel</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleSignOut} className="hover:bg-rose-500/10 text-rose-400 cursor-pointer focus:text-rose-400">
+                    <LogOut className="size-3.5 mr-2" />
+                    <span className="text-[12px] font-semibold">Terminate Session</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </header>
 
@@ -108,13 +182,10 @@ export default function DashboardLayout({
         </SidebarInset>
       </div>
 
-      {/* Global Search Dialog */}
       <Dialog open={isSearchOpen} onOpenChange={setIsSearchOpen}>
         <DialogContent className="sm:max-w-[550px] p-0 border-white/[0.1] bg-[#0A0A0B]/95 backdrop-blur-2xl rounded-2xl overflow-hidden shadow-[0_0_50px_-12px_rgba(0,0,0,0.8)]">
           <DialogTitle className="sr-only">Global Search</DialogTitle>
-          <DialogDescription className="sr-only">
-            Quickly find platforms, tasks, and strategic intelligence across the operations unit.
-          </DialogDescription>
+          <DialogDescription className="sr-only">Quickly find platforms, tasks, and strategic intelligence across the operations unit.</DialogDescription>
           <div className="flex flex-col">
             <div className="flex items-center gap-3 px-4 py-4 border-b border-white/[0.05]">
               <Search className="size-5 text-primary" />
