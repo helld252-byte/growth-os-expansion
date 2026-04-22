@@ -1,6 +1,7 @@
+
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   User, 
   Building2, 
@@ -23,16 +24,39 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
+import { useUser, useDoc, useMemoFirebase } from "@/firebase";
+import { doc, getFirestore } from "firebase/firestore";
 
 export default function SettingsPage() {
   const { toast } = useToast();
+  const { user, isUserLoading } = useUser();
+  const firestore = getFirestore();
   const [isUpdating, setIsUpdating] = useState(false);
+
   const [profile, setProfile] = useState({
-    name: "James Sterling",
-    email: "j.sterling@growth-os.com",
-    role: "Growth Operations Lead",
+    name: "",
+    email: "",
+    role: "Growth Operations Lead", // Default if not in metadata
     zone: "Global (EU/US/APAC)"
   });
+
+  // Check for Admin role to display status
+  const adminRef = useMemoFirebase(() => {
+    if (!user) return null;
+    return doc(firestore, 'roles_admin', user.uid);
+  }, [user, firestore]);
+  const { data: adminDoc } = useDoc(adminRef);
+  const isAdmin = !!adminDoc;
+
+  useEffect(() => {
+    if (user) {
+      setProfile(prev => ({
+        ...prev,
+        name: user.displayName || "",
+        email: user.email || "",
+      }));
+    }
+  }, [user]);
 
   const handleUpdateProfile = () => {
     setIsUpdating(true);
@@ -46,6 +70,15 @@ export default function SettingsPage() {
       });
     }, 1200);
   };
+
+  if (isUserLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[50vh] gap-4">
+        <Zap className="size-8 text-primary animate-pulse" />
+        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-tier-3">Syncing System Config...</span>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-[1000px] mx-auto flex flex-col gap-10 animate-in fade-in duration-700">
@@ -77,9 +110,9 @@ export default function SettingsPage() {
             <div className="flex items-center gap-6">
               <div className="relative group">
                 <Avatar className="size-24 border-2 border-white/[0.08] group-hover:border-primary/50 transition-all shadow-2xl">
-                  <AvatarImage src="https://picsum.photos/seed/user/200/200" />
+                  <AvatarImage src={user?.photoURL || "https://picsum.photos/seed/user/200/200"} />
                   <AvatarFallback className="bg-primary/10 text-primary text-2xl font-bold">
-                    {profile.name.split(' ').map(n => n[0]).join('')}
+                    {profile.name ? profile.name.split(' ').map(n => n[0]).join('') : "U"}
                   </AvatarFallback>
                 </Avatar>
                 <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 rounded-full cursor-pointer transition-opacity">
@@ -87,10 +120,12 @@ export default function SettingsPage() {
                 </div>
               </div>
               <div className="flex flex-col gap-2">
-                <h3 className="text-xl font-semibold text-tier-1">{profile.name}</h3>
+                <h3 className="text-xl font-semibold text-tier-1">{profile.name || "Unknown Identity"}</h3>
                 <p className="text-tier-3 text-[14px]">{profile.role} • Unit-01</p>
                 <div className="flex gap-2 mt-1">
-                  <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 text-[10px] px-3 py-0.5 uppercase tracking-wider font-medium">Administrator</Badge>
+                  {isAdmin && (
+                    <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 text-[10px] px-3 py-0.5 uppercase tracking-wider font-medium">Administrator</Badge>
+                  )}
                   <Badge variant="outline" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-[10px] px-3 py-0.5 uppercase tracking-wider font-medium">Verified Account</Badge>
                 </div>
               </div>
@@ -118,7 +153,7 @@ export default function SettingsPage() {
               <div className="flex flex-col gap-3">
                 <Label className="text-[11px] uppercase tracking-[0.2em] text-tier-4 font-bold ml-1">System Role</Label>
                 <Input 
-                  value={profile.role} 
+                  value={isAdmin ? "System Administrator" : profile.role} 
                   disabled
                   className="bg-white/[0.02] border-white/[0.06] h-12 px-5 text-tier-1 font-medium rounded-xl focus-visible:ring-primary/20 opacity-50 cursor-not-allowed" 
                 />
