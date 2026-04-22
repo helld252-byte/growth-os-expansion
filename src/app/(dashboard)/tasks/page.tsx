@@ -1,3 +1,4 @@
+
 "use client";
 
 import { 
@@ -9,25 +10,29 @@ import {
   MoreVertical,
   CheckCircle2,
   History,
-  Clock
+  Clock,
+  Loader2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { tasks } from "@/lib/mock-data";
+import { useCollection, useMemoFirebase } from "@/firebase";
+import { collection, getFirestore } from "firebase/firestore";
 import { cn } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useMemo, useState } from "react";
 
 export default function TasksPage() {
   const [searchQuery, setSearchQuery] = useState("");
+  const firestore = getFirestore();
+  const tasksRef = useMemoFirebase(() => collection(firestore, 'tasks'), [firestore]);
+  const { data: tasks, isLoading } = useCollection(tasksRef);
 
   const filteredTasks = useMemo(() => {
-    return tasks.filter(t => 
-      t.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      t.linkedPlatformName?.toLowerCase().includes(searchQuery.toLowerCase())
+    return (tasks || []).filter(t => 
+      t.title.toLowerCase().includes(searchQuery.toLowerCase())
     );
-  }, [searchQuery]);
+  }, [tasks, searchQuery]);
 
   const activeTasks = filteredTasks.filter(t => t.status !== 'Completed');
   const completedTasks = filteredTasks.filter(t => t.status === 'Completed');
@@ -103,9 +108,16 @@ export default function TasksPage() {
             </div>
             
             <div className="flex flex-col">
-              {activeTasks.length > 0 ? activeTasks.map((task) => (
-                <TaskRow key={task.id} task={task} getStatusStyles={getStatusStyles} />
-              )) : (
+              {isLoading ? (
+                <div className="p-12 flex flex-col items-center justify-center gap-4">
+                  <Loader2 className="size-6 text-primary animate-spin" />
+                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-tier-3">Syncing Backlog...</span>
+                </div>
+              ) : activeTasks.length > 0 ? (
+                activeTasks.map((task) => (
+                  <TaskRow key={task.id} task={task} getStatusStyles={getStatusStyles} />
+                ))
+              ) : (
                 <div className="p-12 text-center opacity-40">
                   <Layers className="size-8 mx-auto mb-3 text-tier-4" />
                   <span className="text-[11px] font-medium uppercase tracking-widest text-tier-4">No active missions found</span>
@@ -123,9 +135,11 @@ export default function TasksPage() {
             
             <div className="premium-panel rounded-2xl border border-white/[0.06] overflow-hidden shadow-xl opacity-80 hover:opacity-100 transition-opacity">
               <div className="flex flex-col">
-                {completedTasks.length > 0 ? completedTasks.map((task) => (
-                  <TaskRow key={task.id} task={task} getStatusStyles={getStatusStyles} />
-                )) : (
+                {!isLoading && completedTasks.length > 0 ? (
+                  completedTasks.map((task) => (
+                    <TaskRow key={task.id} task={task} getStatusStyles={getStatusStyles} />
+                  ))
+                ) : (
                   <div className="p-12 text-center opacity-30">
                     <span className="text-[11px] font-medium uppercase tracking-widest text-tier-4">No history recorded</span>
                   </div>
@@ -157,14 +171,6 @@ function TaskRow({ task, getStatusStyles }: { task: any, getStatusStyles: (s: st
             )}>
               {task.title}
             </h4>
-            {task.linkedPlatformName && (
-              <div className="flex items-center gap-2.5">
-                <Layers className="size-3.5 text-tier-3" />
-                <span className="text-[11px] text-tier-2 font-semibold uppercase tracking-wider hover:text-primary cursor-pointer transition-colors">
-                  {task.linkedPlatformName}
-                </span>
-              </div>
-            )}
           </div>
           <Badge 
             variant="outline"
@@ -178,19 +184,13 @@ function TaskRow({ task, getStatusStyles }: { task: any, getStatusStyles: (s: st
         </div>
 
         <div className="flex items-center gap-8">
-          <div className="flex items-center gap-3">
-            <div className="size-6 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-[10px] font-bold text-tier-2 group-hover:text-primary transition-colors">
-              {task.owner.charAt(0)}
-            </div>
-            <span className="text-[13px] font-medium text-tier-2">{task.owner}</span>
-          </div>
-          <div className="flex items-center gap-2.5 text-tier-3">
+          <div className="flex items-center gap-3 text-tier-3">
             <CalendarIcon className="size-4" />
             <span className={cn(
               "text-[12px] font-semibold tracking-tight",
               task.status === "Overdue" ? "text-rose-400" : ""
             )}>
-              {task.dueDate}
+              {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'No date'}
             </span>
           </div>
           <div className="flex items-center gap-2.5">

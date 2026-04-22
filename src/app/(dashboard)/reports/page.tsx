@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -20,12 +21,14 @@ import {
   Zap,
   Globe,
   ArrowUpRight,
-  BarChart3
+  BarChart3,
+  Loader2
 } from "lucide-react";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { platforms } from "@/lib/mock-data";
+import { useCollection, useMemoFirebase } from "@/firebase";
+import { collection, getFirestore } from "firebase/firestore";
 import { cn } from "@/lib/utils";
 
 const growthTrend = [
@@ -45,8 +48,21 @@ const marketShare = [
 
 export default function ReportsPage() {
   const [period, setPeriod] = useState("Quarterly");
-  const liveCount = platforms.filter(p => p.currentStage === "Live").length;
-  const totalValue = platforms.reduce((acc, curr) => acc + curr.estimatedValue, 0);
+  const firestore = getFirestore();
+  const opportunitiesRef = useMemoFirebase(() => collection(firestore, 'growth_opportunities'), [firestore]);
+  const { data: opportunities, isLoading } = useCollection(opportunitiesRef);
+
+  const liveCount = (opportunities || []).filter(p => p.currentStage === "Live").length;
+  const totalValue = (opportunities || []).reduce((acc, curr) => acc + (curr.estimatedValue || 0), 0);
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[60vh] gap-4">
+        <Loader2 className="size-10 text-primary animate-spin" />
+        <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-tier-3">Calculating Metrics...</span>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-[1400px] mx-auto flex flex-col gap-8 animate-in fade-in duration-700">
@@ -88,7 +104,7 @@ export default function ReportsPage() {
 
       {/* Metrics Rail */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label="Total Pipeline" value={`$${(totalValue / 1000000).toFixed(1)}M`} icon={TrendingUp} iconColor="text-primary/60" trend="+12.4%" trendUp={true} />
+        <StatCard label="Total Pipeline" value={`$${(totalValue / 1000).toFixed(1)}k`} icon={TrendingUp} iconColor="text-primary/60" trend="+12.4%" trendUp={true} />
         <StatCard label="Onboarding Velocity" value="24.5%" icon={Zap} iconColor="text-accent/60" trend="+5.2%" trendUp={true} />
         <StatCard label="Live Units" value={liveCount} icon={CheckCircle2} iconColor="text-green-500/60" trend="+2" trendUp={true} />
         <StatCard label="Market Saturation" value="68%" icon={Globe} iconColor="text-muted-foreground/40" trend="-1.2%" trendUp={false} />
@@ -144,8 +160,8 @@ export default function ReportsPage() {
               </PieChart>
             </ResponsiveContainer>
             <div className="absolute flex flex-col items-center justify-center">
-              <span className="text-xl font-bold text-white leading-none">4</span>
-              <span className="text-[8px] font-semibold uppercase tracking-wider text-muted-foreground/30 mt-1">Strategic Zones</span>
+              <span className="text-xl font-bold text-white leading-none">{liveCount}</span>
+              <span className="text-[8px] font-semibold uppercase tracking-wider text-muted-foreground/30 mt-1">Live Units</span>
             </div>
           </div>
 
@@ -170,11 +186,11 @@ export default function ReportsPage() {
             </div>
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-2">
-                <h4 className="text-base font-semibold tracking-tight text-white">Expansion Acceleration Detected</h4>
-                <Badge variant="outline" className="bg-accent/10 text-accent/80 border-accent/20 font-medium text-[8px] uppercase tracking-widest px-2 py-0">AI Insight</Badge>
+                <h4 className="text-base font-semibold tracking-tight text-white">Cloud Backend Synchronized</h4>
+                <Badge variant="outline" className="bg-accent/10 text-accent/80 border-accent/20 font-medium text-[8px] uppercase tracking-widest px-2 py-0">System Status</Badge>
               </div>
               <p className="text-secondary text-[12px] leading-relaxed max-w-2xl">
-                Market velocity in the <span className="text-white font-medium">EU Strategic Zone</span> has increased by 18.4% this quarter. Current onboarding cycles are 4 days faster than previous performance benchmarks.
+                Your performance metrics are now being served live from <span className="text-white font-medium">Firestore</span>. All growth initiatives and historical data are synchronized across the tactical cloud network.
               </p>
             </div>
           </div>
