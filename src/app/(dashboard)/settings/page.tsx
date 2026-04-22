@@ -62,22 +62,29 @@ export default function SettingsPage() {
     zone: "Global (EU/US/APAC)"
   });
 
-  // 1. Check if Current User is Admin
+  // Check for Admin role (Top level or Nested as shown in user screenshot)
   const adminCheckRef = useMemoFirebase(() => {
     if (!currentUser) return null;
     return doc(firestore, 'roles_admin', currentUser.uid);
   }, [currentUser, firestore]);
   const { data: adminDoc } = useDoc(adminCheckRef);
-  const isAdmin = !!adminDoc;
 
-  // 2. Fetch All Users (Admin Only)
+  const nestedAdminCheckRef = useMemoFirebase(() => {
+    if (!currentUser) return null;
+    return doc(firestore, 'users', currentUser.uid, 'roles_admin', currentUser.uid);
+  }, [currentUser, firestore]);
+  const { data: nestedAdminDoc } = useDoc(nestedAdminCheckRef);
+
+  const isAdmin = !!adminDoc || !!nestedAdminDoc;
+
+  // Fetch All Users (Admin Only)
   const usersQuery = useMemoFirebase(() => {
     if (!isAdmin) return null;
     return collection(firestore, 'users');
   }, [isAdmin, firestore]);
   const { data: allUsers, isLoading: isUsersLoading } = useCollection(usersQuery);
 
-  // 3. Fetch All Admins (Admin Only)
+  // Fetch All Admins (Admin Only) - This collection might be empty if they use the nested structure
   const adminsQuery = useMemoFirebase(() => {
     if (!isAdmin) return null;
     return collection(firestore, 'roles_admin');
@@ -107,6 +114,7 @@ export default function SettingsPage() {
   };
 
   const toggleAdminRole = (userId: string, currentIsAdmin: boolean) => {
+    // We prefer the top-level collection for consistency in role management
     const roleRef = doc(firestore, 'roles_admin', userId);
     if (currentIsAdmin) {
       if (userId === currentUser?.uid) {
@@ -118,6 +126,10 @@ export default function SettingsPage() {
         return;
       }
       deleteDocumentNonBlocking(roleRef);
+      // Also try to delete nested if it exists
+      const nestedRef = doc(firestore, 'users', userId, 'roles_admin', userId);
+      deleteDocumentNonBlocking(nestedRef);
+      
       toast({
         title: "Access Revoked",
         description: "User has been removed from the Admin collective.",

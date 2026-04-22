@@ -24,8 +24,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { platforms } from "@/lib/mock-data";
 import Link from "next/link";
-import { useUser, useAuth, useDoc, useMemoFirebase } from "@/firebase";
-import { doc } from "firebase/firestore";
+import { useUser, useAuth, useDoc, useMemoFirebase, useCollection } from "@/firebase";
+import { doc, collection } from "firebase/firestore";
 import { getFirestore } from "firebase/firestore";
 
 export default function DashboardLayout({
@@ -42,13 +42,20 @@ export default function DashboardLayout({
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Check for Admin role
+  // Check for Admin role (Top level or Nested)
   const adminRef = useMemoFirebase(() => {
     if (!user) return null;
     return doc(firestore, 'roles_admin', user.uid);
   }, [user, firestore]);
   const { data: adminDoc } = useDoc(adminRef);
-  const isAdmin = !!adminDoc;
+
+  const nestedAdminRef = useMemoFirebase(() => {
+    if (!user) return null;
+    return doc(firestore, 'users', user.uid, 'roles_admin', user.uid);
+  }, [user, firestore]);
+  const { data: nestedAdminDoc } = useDoc(nestedAdminRef);
+
+  const isAdmin = !!adminDoc || !!nestedAdminDoc;
 
   useEffect(() => {
     if (!isUserLoading && !user) {
@@ -184,8 +191,8 @@ export default function DashboardLayout({
 
       <Dialog open={isSearchOpen} onOpenChange={setIsSearchOpen}>
         <DialogContent className="sm:max-w-[550px] p-0 border-white/[0.1] bg-[#0A0A0B]/95 backdrop-blur-2xl rounded-2xl overflow-hidden shadow-[0_0_50px_-12px_rgba(0,0,0,0.8)]">
-          <DialogTitle className="sr-only">Global Search</DialogTitle>
-          <DialogDescription className="sr-only">Quickly find platforms, tasks, and strategic intelligence across the operations unit.</DialogDescription>
+          <DialogTitle className="px-4 pt-4 text-[10px] font-bold uppercase tracking-[0.25em] text-primary">Global Tactical Search</DialogTitle>
+          <DialogDescription className="px-4 pb-2 text-[11px] text-tier-3">Quickly locate channels, campaigns, and strategic intelligence.</DialogDescription>
           <div className="flex flex-col">
             <div className="flex items-center gap-3 px-4 py-4 border-b border-white/[0.05]">
               <Search className="size-5 text-primary" />

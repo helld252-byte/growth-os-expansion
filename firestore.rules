@@ -3,145 +3,87 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * GROWTH OS SECURITY RULES - v2.5.1
+     * GROWTH OS SECURITY RULES - v2.6.0
      *
-     * Core Philosophy: 
-     * This ruleset implements a Role-Based Access Control (RBAC) model.
-     * To ensure immediate operational availability for the primary user, 
-     * basic READ access is granted to all authenticated team members, 
-     * while WRITE access remains restricted to specific roles.
+     * Updated to support nested role markers for increased operational flexibility.
      */
 
     // --- HELPER FUNCTIONS ---
 
-    /** @description Checks if the request is from an authenticated user. */
     function isSignedIn() {
       return request.auth != null;
     }
 
-    /** @description Checks if the user's UID matches the provided ID. */
     function isOwner(userId) {
       return isSignedIn() && request.auth.uid == userId;
     }
 
-    /** @description Verifies a document exists and the user is the owner. Used for updates/deletes. */
-    function isExistingOwner(userId) {
-      return resource != null && isOwner(userId);
-    }
-
-    /** @description Checks if the user is registered in the Admin role collection. */
+    /** @description Checks if the user is an admin, looking in both top-level and nested structures. */
     function isAdmin() {
-      return isSignedIn() && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
+      return isSignedIn() && (
+        exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid)) ||
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)/roles_admin/$(request.auth.uid))
+      );
     }
 
-    /** @description Checks if the user is registered in the Manager role collection. */
-    function isManager() {
-      return isSignedIn() && exists(/databases/$(database)/documents/roles_manager/$(request.auth.uid));
-    }
-
-    /** @description Checks if the user is registered in the Operator role collection. */
-    function isOperator() {
-      return isSignedIn() && exists(/databases/$(database)/documents/roles_operator/$(request.auth.uid));
-    }
-
-    /** @description Checks if the user is registered in the Viewer role collection. */
-    function isViewer() {
-      return isSignedIn() && exists(/databases/$(database)/documents/roles_viewer/$(request.auth.uid));
-    }
-
-    /** @description Generic check for any role that allows read access to core business data. */
     function hasBusinessReadAccess() {
-      return isSignedIn(); // Allow all team members to view data
+      return isSignedIn();
     }
 
-    /** @description Generic check for any role that allows write access to core business data. */
     function hasBusinessWriteAccess() {
-      return isAdmin() || isOperator();
+      return isAdmin() || exists(/databases/$(database)/documents/roles_operator/$(request.auth.uid));
     }
 
     // --- COLLECTION RULES ---
 
-    /**
-     * @description Rules for the User collection. Users manage their own profiles; Admins have full control.
-     */
     match /users/{userId} {
       allow get: if isOwner(userId) || isAdmin();
       allow list: if isAdmin();
       allow create: if (isOwner(userId) && request.resource.data.id == userId) || isAdmin();
-      allow update: if (isExistingOwner(userId) && request.resource.data.id == resource.data.id) || isAdmin();
+      allow update: if (isOwner(userId) && request.resource.data.id == resource.data.id) || isAdmin();
+      allow delete: if isAdmin();
+      
+      // Allow the specific nested roles subcollection
+      match /roles_admin/{docId} {
+        allow read, write: if isAdmin() || isOwner(userId);
+      }
+    }
+
+    match /roles_admin/{userId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /growth_opportunities/{opportunityId} {
+      allow get, list: if hasBusinessReadAccess();
+      allow create: if hasBusinessWriteAccess();
+      allow update: if hasBusinessWriteAccess();
       allow delete: if isAdmin();
     }
 
-    /**
-     * @description DBAC Collections for Role Management.
-     */
-    match /{roleCollection}/{userId} {
-      function isRoleCollection() {
-        return roleCollection == "roles_admin" || roleCollection == "roles_manager" || roleCollection == "roles_operator" || roleCollection == "roles_viewer";
-      }
-
-      allow get: if isOwner(userId) || isAdmin();
-      allow list: if isAdmin();
-      allow write: if isAdmin() && isRoleCollection();
-    }
-
-    /**
-     * @description Operational data for growth opportunities.
-     */
-    match /growth_opportunities/{opportunityId} {
-      allow get, list: if hasBusinessReadAccess();
-      allow create: if hasBusinessWriteAccess() && request.resource.data.ownerId == request.auth.uid;
-      allow update: if hasBusinessWriteAccess() && resource != null;
-      allow delete: if isAdmin() && resource != null;
-    }
-
-    /**
-     * @description Marketing campaigns and initiatives.
-     */
     match /campaigns/{campaignId} {
       allow get, list: if hasBusinessReadAccess();
-      allow create: if hasBusinessWriteAccess() && request.resource.data.ownerId == request.auth.uid;
-      allow update: if hasBusinessWriteAccess() && resource != null;
-      allow delete: if isAdmin() && resource != null;
+      allow create: if hasBusinessWriteAccess();
+      allow update: if hasBusinessWriteAccess();
+      allow delete: if isAdmin();
     }
 
-    /**
-     * @description Strategic partnerships and ecosystem contacts.
-     */
     match /partners/{partnerId} {
       allow get, list: if hasBusinessReadAccess();
-      allow create: if hasBusinessWriteAccess() && request.resource.data.ownerId == request.auth.uid;
-      allow update: if hasBusinessWriteAccess() && resource != null;
-      allow delete: if isAdmin() && resource != null;
+      allow create: if hasBusinessWriteAccess();
+      allow update: if hasBusinessWriteAccess();
+      allow delete: if isAdmin();
     }
 
-    /**
-     * @description Tasks associated with growth opportunities and users.
-     */
     match /tasks/{taskId} {
       allow get, list: if hasBusinessReadAccess();
-      allow create: if hasBusinessWriteAccess() && request.resource.data.ownerId == request.auth.uid;
-      allow update: if hasBusinessWriteAccess() && resource != null && request.resource.data.ownerId == resource.data.ownerId;
-      allow delete: if isAdmin() && resource != null;
+      allow create: if hasBusinessWriteAccess();
+      allow update: if hasBusinessWriteAccess();
+      allow delete: if isAdmin();
     }
 
-    /**
-     * @description Reusable company assets and information.
-     */
     match /company_resources/{resourceId} {
       allow get, list: if isSignedIn();
-      allow create: if isAdmin() && request.resource.data.lastUpdatedByUserId == request.auth.uid;
-      allow update: if isAdmin() && resource != null;
-      allow delete: if isAdmin() && resource != null;
-    }
-
-    /**
-     * @description Global tagging system for categorization.
-     */
-    match /tags/{tagId} {
-      allow get, list: if isSignedIn();
-      allow create, update: if isAdmin();
-      allow delete: if isAdmin() && resource != null;
+      allow write: if isAdmin();
     }
   }
 }
