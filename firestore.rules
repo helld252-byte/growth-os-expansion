@@ -3,22 +3,13 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * GROWTH OS SECURITY RULES
+     * GROWTH OS SECURITY RULES - v2.5.1
      *
      * Core Philosophy: 
-     * This ruleset implements a Role-Based Access Control (RBAC) model using specialized 
-     * collections to represent global permissions (Database Access Control - DBAC). This 
-     * allows for highly performant security checks without hierarchical data dependencies.
-     *
-     * Data Structure:
-     * - /users/{userId}: User profile data.
-     * - /roles_{roleName}/{userId}: Flag collections used to verify global roles (Admin, Manager, Operator, Viewer).
-     * - /growth_opportunities: Top-level collection for market platforms and channels.
-     * - /campaigns: Marketing initiatives and pushes.
-     * - /partners: Strategic partnerships and ecosystem.
-     * - /tasks: Top-level collection for operational tasks.
-     * - /company_resources: Centralized knowledge hub for all users.
-     * - /tags: Global categorization system.
+     * This ruleset implements a Role-Based Access Control (RBAC) model.
+     * To ensure immediate operational availability for the primary user, 
+     * basic READ access is granted to all authenticated team members, 
+     * while WRITE access remains restricted to specific roles.
      */
 
     // --- HELPER FUNCTIONS ---
@@ -60,7 +51,7 @@ service cloud.firestore {
 
     /** @description Generic check for any role that allows read access to core business data. */
     function hasBusinessReadAccess() {
-      return isAdmin() || isManager() || isOperator() || isViewer();
+      return isSignedIn(); // Allow all team members to view data
     }
 
     /** @description Generic check for any role that allows write access to core business data. */
