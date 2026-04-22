@@ -1,4 +1,4 @@
-import { Platform, Task, HubSection } from './types';
+import { Platform, Task, HubSection, Campaign, Partner } from './types';
 
 export const platforms: Platform[] = [
   {
@@ -192,5 +192,83 @@ export const hubSections: HubSection[] = [
     category: 'Legal',
     content: 'Last uploaded 2024-01-01. Version 2.4. Includes updated EIN.',
     lastUpdated: '2024-01-01',
+  }
+];
+
+export const campaigns: Campaign[] = [
+  {
+    id: 'c1',
+    name: 'Spring Renewal Promo',
+    type: 'Promotion',
+    status: 'Active',
+    budget: 25000,
+    spend: 12400,
+    reach: 450000,
+    conversions: 890,
+    owner: 'Sarah Chen',
+    startDate: '2024-03-01',
+    endDate: '2024-04-15',
+  },
+  {
+    id: 'c2',
+    name: 'Meta Awareness Wave',
+    type: 'Paid Ads',
+    status: 'Active',
+    budget: 50000,
+    spend: 21000,
+    reach: 1200000,
+    conversions: 450,
+    owner: 'James Sterling',
+    startDate: '2024-03-10',
+    endDate: '2024-05-10',
+  },
+  {
+    id: 'c3',
+    name: 'Micro-Influencer Pilot',
+    type: 'Creator Outreach',
+    status: 'Scheduled',
+    budget: 15000,
+    spend: 0,
+    reach: 0,
+    conversions: 0,
+    owner: 'Alex Rivera',
+    startDate: '2024-04-01',
+    endDate: '2024-06-01',
+  }
+];
+
+export const partnerships: Partner[] = [
+  {
+    id: 'p1',
+    name: 'Parenting Bloom Blog',
+    type: 'Influencer',
+    status: 'Active',
+    contact: 'Mary Poppins',
+    impactScore: 9,
+    owner: 'Alex Rivera',
+    lastContact: '2024-03-20',
+    notes: 'High conversion on family-oriented modular units.',
+  },
+  {
+    id: 'p2',
+    name: 'Global Milk Co.',
+    type: 'B2B Partner',
+    status: 'Negotiating',
+    contact: 'John Cow',
+    impactScore: 7,
+    owner: 'James Sterling',
+    lastContact: '2024-03-22',
+    notes: 'Co-branding opportunity for kitchen efficiency sets.',
+  },
+  {
+    id: 'p3',
+    name: 'Reddit Home Office Community',
+    type: 'Community',
+    status: 'Prospecting',
+    contact: 'u/Moderator',
+    impactScore: 10,
+    owner: 'Sarah Chen',
+    lastContact: '2024-03-15',
+    notes: 'Direct outreach for AMA session.',
   }
 ];

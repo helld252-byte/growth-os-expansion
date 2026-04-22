@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -11,7 +12,9 @@ import {
   Settings,
   Zap,
   ShieldCheck,
-  Briefcase
+  Briefcase,
+  Megaphone,
+  Handshake
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { 
@@ -29,6 +32,8 @@ import {
 const navItems = [
   { icon: LayoutDashboard, label: "Command Center", path: "/" },
   { icon: Layers, label: "Expansion Pipeline", path: "/channels" },
+  { icon: Megaphone, label: "Campaign Engine", path: "/campaigns" },
+  { icon: Handshake, label: "Strategic Partnerships", path: "/partnerships" },
   { icon: CheckSquare, label: "Operational Tasks", path: "/tasks" },
   { icon: Library, label: "Intelligence Hub", path: "/hub" },
   { icon: BarChart3, label: "Performance Intel", path: "/reports" },

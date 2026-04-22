@@ -46,9 +46,12 @@ export default function DashboardLayout({
   const getSectionLabel = (path: string) => {
     if (path === "/") return "Command Center";
     if (path.startsWith("/channels")) return "Expansion Pipeline";
+    if (path.startsWith("/campaigns")) return "Campaign Engine";
+    if (path.startsWith("/partnerships")) return "Strategic Partnerships";
     if (path.startsWith("/tasks")) return "Operational Tasks";
     if (path.startsWith("/hub")) return "Intelligence Hub";
     if (path.startsWith("/reports")) return "Performance Intel";
+    if (path.startsWith("/settings")) return "System Config";
     return "Operations";
   };
 
