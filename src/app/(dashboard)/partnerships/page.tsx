@@ -252,7 +252,9 @@ export default function PartnershipsPage() {
             </div>
           ) : (
             filtered.map((p) => (
-              <PartnerListItem key={p.id} partner={p} />
+              <Link key={p.id} href={`/partnerships/${p.id}`}>
+                <PartnerListItem partner={p} />
+              </Link>
             ))
           )}
         </div>

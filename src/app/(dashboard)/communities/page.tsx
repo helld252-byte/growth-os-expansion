@@ -251,7 +251,9 @@ export default function CommunitiesPage() {
             </div>
           ) : (
             filtered.map((p) => (
-              <CommunityListItem key={p.id} community={p} />
+              <Link key={p.id} href={`/communities/${p.id}`}>
+                <CommunityListItem community={p} />
+              </Link>
             ))
           )}
         </div>
