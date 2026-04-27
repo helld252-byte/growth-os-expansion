@@ -11,10 +11,10 @@ import {
   BarChart3, 
   Settings,
   Zap,
-  ShieldCheck,
-  Briefcase,
-  Megaphone,
+  GraduationCap,
+  Coffee,
   Handshake,
+  Users2,
   ShieldAlert
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -36,8 +36,10 @@ const commandItems = [
 
 const growthItems = [
   { icon: Layers, label: "Expansion Pipeline", path: "/channels" },
-  { icon: Megaphone, label: "Campaign Engine", path: "/campaigns" },
-  { icon: Handshake, label: "Strategic Partnerships", path: "/partnerships" },
+  { icon: GraduationCap, label: "Schools", path: "/schools" },
+  { icon: Coffee, label: "Cafes", path: "/cafes" },
+  { icon: Handshake, label: "Partnerships", path: "/partnerships" },
+  { icon: Users2, label: "Communities", path: "/communities" },
 ];
 
 const operationsItems = [
@@ -97,7 +99,7 @@ export function AppSidebar({ isAdmin }: AppSidebarProps) {
         </SidebarGroup>
 
         <SidebarGroup className="mt-4">
-          <SidebarGroupLabel className="px-3 text-[10px] uppercase font-bold tracking-[0.2em] text-tier-4 mb-3">Growth Units</SidebarGroupLabel>
+          <SidebarGroupLabel className="px-3 text-[10px] uppercase font-bold tracking-[0.2em] text-tier-4 mb-3">Growth Verticals</SidebarGroupLabel>
           <SidebarMenu className="gap-1.5">
             {growthItems.map((item) => (
               <SidebarMenuItem key={item.path}>
@@ -201,10 +203,10 @@ export function AppSidebar({ isAdmin }: AppSidebarProps) {
         <div className="mt-6 flex flex-col gap-2.5 px-3.5">
           <div className="flex items-center justify-between text-[9px] font-bold uppercase tracking-[0.25em] text-tier-4">
             <span>Version</span>
-            <span>2.5.0-A</span>
+            <span>2.6.0-B</span>
           </div>
           <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
-            <div className="w-3/4 h-full bg-primary/40 rounded-full" />
+            <div className="w-full h-full bg-primary/40 rounded-full" />
           </div>
         </div>
       </SidebarFooter>

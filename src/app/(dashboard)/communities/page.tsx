@@ -5,7 +5,7 @@ import { useState } from "react";
 import { 
   Plus, 
   Search, 
-  Handshake, 
+  Users2, 
   Star, 
   ChevronRight,
   Loader2
@@ -34,7 +34,7 @@ import { collection, getFirestore, serverTimestamp } from "firebase/firestore";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 
-export default function PartnershipsPage() {
+export default function CommunitiesPage() {
   const { toast } = useToast();
   const { user } = useUser();
   const [searchQuery, setSearchQuery] = useState("");
@@ -44,20 +44,20 @@ export default function PartnershipsPage() {
   const partnersRef = useMemoFirebase(() => collection(firestore, 'partners'), [firestore]);
   const { data: partners, isLoading } = useCollection(partnersRef);
 
-  const [newPartner, setNewPartner] = useState({
+  const [newCommunity, setNewCommunity] = useState({
     name: "",
-    type: "Milk Brand",
+    type: "Forum",
     status: "Prospecting",
     contact: "",
     impactScore: 5,
     notes: ""
   });
 
-  const handleAddPartner = () => {
-    if (!user || !newPartner.name) return;
+  const handleAddCommunity = () => {
+    if (!user || !newCommunity.name) return;
 
     const docData = {
-      ...newPartner,
+      ...newCommunity,
       ownerId: user.uid,
       lastContact: new Date().toISOString().split('T')[0],
       createdAt: serverTimestamp(),
@@ -65,9 +65,9 @@ export default function PartnershipsPage() {
 
     addDocumentNonBlocking(partnersRef, docData);
     setIsAddOpen(false);
-    setNewPartner({
+    setNewCommunity({
       name: "",
-      type: "Milk Brand",
+      type: "Forum",
       status: "Prospecting",
       contact: "",
       impactScore: 5,
@@ -75,13 +75,13 @@ export default function PartnershipsPage() {
     });
     
     toast({
-      title: "Strategic Partnership Created",
-      description: `"${docData.name}" has been added to the growth ecosystem.`,
+      title: "Community Entry Created",
+      description: `"${docData.name}" has been added to the recommendation engine.`,
     });
   };
 
   const filtered = (partners || []).filter(p => 
-    ["Milk Brand", "Co-branding", "Event", "Influencer"].includes(p.type) && p.name.toLowerCase().includes(searchQuery.toLowerCase())
+    ["Forum", "Blog", "Review Site"].includes(p.type) && p.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -90,15 +90,15 @@ export default function PartnershipsPage() {
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-4">
             <div className="size-11 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center shadow-lg shadow-primary/10">
-              <Handshake className="size-5.5 text-primary" />
+              <Users2 className="size-5.5 text-primary" />
             </div>
             <div className="flex flex-col">
-              <h1 className="text-3xl font-semibold tracking-tight text-tier-1">Strategic Partnerships</h1>
-              <span className="text-[10px] font-bold text-tier-4 uppercase tracking-[0.25em] mt-1">Milk Brands, Co-Branding & Influencers</span>
+              <h1 className="text-3xl font-semibold tracking-tight text-tier-1">Community & Blogs Vertical</h1>
+              <span className="text-[10px] font-bold text-tier-4 uppercase tracking-[0.25em] mt-1">Forums, Parenting Blogs & Review Engines</span>
             </div>
           </div>
           <p className="text-tier-2 text-[14px] font-medium leading-relaxed max-w-xl">
-            Managing alliances with milk producers, co-branding initiatives, and high-impact influencer outreach.
+            Targeting high-trust environments like parenting blogs, niche forums, and recommendation websites.
           </p>
         </div>
 
@@ -108,7 +108,7 @@ export default function PartnershipsPage() {
             <Input 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search partnerships..." 
+              placeholder="Search communities..." 
               className="pl-10 h-10 bg-white/[0.02] border-white/[0.06] rounded-xl text-[13px] font-medium placeholder:text-tier-3 text-tier-1 focus-visible:ring-primary/20 transition-all" 
             />
           </div>
@@ -116,46 +116,45 @@ export default function PartnershipsPage() {
           <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
             <DialogTrigger asChild>
               <Button className="h-10 px-6 rounded-xl bg-primary text-white hover:bg-primary/90 text-[11px] font-bold uppercase tracking-wider shadow-lg shadow-primary/20">
-                <Plus className="size-4 mr-2" /> New Partnership
+                <Plus className="size-4 mr-2" /> Add Community
               </Button>
             </DialogTrigger>
             <DialogContent className="bg-background/95 backdrop-blur-2xl border-white/[0.1] rounded-2xl sm:max-w-[500px]">
               <DialogHeader>
-                <DialogTitle className="text-xl font-bold tracking-tight text-tier-1">New Strategic Connection</DialogTitle>
+                <DialogTitle className="text-xl font-bold tracking-tight text-tier-1">New Community Entry</DialogTitle>
               </DialogHeader>
               <div className="grid gap-6 py-4">
                 <div className="grid gap-2">
-                  <Label className="text-[10px] uppercase tracking-widest text-tier-3">Partner Entity Name</Label>
+                  <Label className="text-[10px] uppercase tracking-widest text-tier-3">Platform/Blog Name</Label>
                   <Input 
-                    value={newPartner.name}
-                    onChange={(e) => setNewPartner({...newPartner, name: e.target.value})}
-                    placeholder="e.g. Oatly Global" 
+                    value={newCommunity.name}
+                    onChange={(e) => setNewCommunity({...newCommunity, name: e.target.value})}
+                    placeholder="e.g. Modern Parent Weekly" 
                     className="bg-white/[0.03] border-white/[0.08] h-12 rounded-xl text-tier-1"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
-                    <Label className="text-[10px] uppercase tracking-widest text-tier-3">Category</Label>
-                    <Select value={newPartner.type} onValueChange={(v) => setNewPartner({...newPartner, type: v})}>
+                    <Label className="text-[10px] uppercase tracking-widest text-tier-3">Entry Type</Label>
+                    <Select value={newCommunity.type} onValueChange={(v) => setNewCommunity({...newCommunity, type: v})}>
                       <SelectTrigger className="bg-white/[0.03] border-white/[0.08] h-12 rounded-xl text-tier-1">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="bg-popover/95 backdrop-blur-xl border-white/[0.1]">
-                        <SelectItem value="Milk Brand">Milk Brand</SelectItem>
-                        <SelectItem value="Co-branding">Co-branding</SelectItem>
-                        <SelectItem value="Event">Event</SelectItem>
-                        <SelectItem value="Influencer">Influencer</SelectItem>
+                        <SelectItem value="Forum">Forum</SelectItem>
+                        <SelectItem value="Blog">Blog</SelectItem>
+                        <SelectItem value="Review Site">Review Site</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="grid gap-2">
-                    <Label className="text-[10px] uppercase tracking-widest text-tier-3">Impact Potential</Label>
+                    <Label className="text-[10px] uppercase tracking-widest text-tier-3">Trust Score</Label>
                     <Input 
                       type="number"
                       min="1"
                       max="10"
-                      value={newPartner.impactScore}
-                      onChange={(e) => setNewPartner({...newPartner, impactScore: Number(e.target.value)})}
+                      value={newCommunity.impactScore}
+                      onChange={(e) => setNewCommunity({...newCommunity, impactScore: Number(e.target.value)})}
                       className="bg-white/[0.03] border-white/[0.08] h-12 rounded-xl text-tier-1"
                     />
                   </div>
@@ -163,8 +162,8 @@ export default function PartnershipsPage() {
               </div>
               <DialogFooter>
                 <Button 
-                  onClick={handleAddPartner}
-                  disabled={!newPartner.name}
+                  onClick={handleAddCommunity}
+                  disabled={!newCommunity.name}
                   className="w-full bg-primary text-white h-12 rounded-xl font-bold uppercase tracking-widest"
                 >
                   Authorize Entry
@@ -186,7 +185,7 @@ export default function PartnershipsPage() {
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {filtered.map((entry) => (
-            <VerticalCard key={entry.id} entry={entry} icon={Handshake} />
+            <VerticalCard key={entry.id} entry={entry} icon={Users2} />
           ))}
         </div>
       )}
@@ -211,7 +210,7 @@ function VerticalCard({ entry, icon: Icon }: any) {
                 {entry.type}
               </Badge>
               <span className="text-[11px] text-tier-4 font-bold uppercase tracking-widest flex items-center gap-1.5">
-                <Star className="size-3 text-amber-500" /> {entry.impactScore}/10 Score
+                <Star className="size-3 text-amber-500" /> {entry.impactScore}/10 Trust
               </span>
             </div>
           </div>

@@ -5,10 +5,13 @@ import { useState } from "react";
 import { 
   Plus, 
   Search, 
-  Handshake, 
+  GraduationCap, 
   Star, 
+  MessageSquare, 
   ChevronRight,
-  Loader2
+  Users,
+  Loader2,
+  Calendar
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,7 +37,7 @@ import { collection, getFirestore, serverTimestamp } from "firebase/firestore";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 
-export default function PartnershipsPage() {
+export default function SchoolsPage() {
   const { toast } = useToast();
   const { user } = useUser();
   const [searchQuery, setSearchQuery] = useState("");
@@ -44,20 +47,20 @@ export default function PartnershipsPage() {
   const partnersRef = useMemoFirebase(() => collection(firestore, 'partners'), [firestore]);
   const { data: partners, isLoading } = useCollection(partnersRef);
 
-  const [newPartner, setNewPartner] = useState({
+  const [newSchool, setNewSchool] = useState({
     name: "",
-    type: "Milk Brand",
-    status: "Prospecting",
+    type: "School",
+    status: "Prospect",
     contact: "",
     impactScore: 5,
     notes: ""
   });
 
-  const handleAddPartner = () => {
-    if (!user || !newPartner.name) return;
+  const handleAddSchool = () => {
+    if (!user || !newSchool.name) return;
 
     const docData = {
-      ...newPartner,
+      ...newSchool,
       ownerId: user.uid,
       lastContact: new Date().toISOString().split('T')[0],
       createdAt: serverTimestamp(),
@@ -65,23 +68,23 @@ export default function PartnershipsPage() {
 
     addDocumentNonBlocking(partnersRef, docData);
     setIsAddOpen(false);
-    setNewPartner({
+    setNewSchool({
       name: "",
-      type: "Milk Brand",
-      status: "Prospecting",
+      type: "School",
+      status: "Prospect",
       contact: "",
       impactScore: 5,
       notes: ""
     });
     
     toast({
-      title: "Strategic Partnership Created",
-      description: `"${docData.name}" has been added to the growth ecosystem.`,
+      title: "School Vertical Entry Created",
+      description: `"${docData.name}" has been recorded in the education pipeline.`,
     });
   };
 
   const filtered = (partners || []).filter(p => 
-    ["Milk Brand", "Co-branding", "Event", "Influencer"].includes(p.type) && p.name.toLowerCase().includes(searchQuery.toLowerCase())
+    p.type === 'School' && p.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -90,15 +93,15 @@ export default function PartnershipsPage() {
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-4">
             <div className="size-11 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center shadow-lg shadow-primary/10">
-              <Handshake className="size-5.5 text-primary" />
+              <GraduationCap className="size-5.5 text-primary" />
             </div>
             <div className="flex flex-col">
-              <h1 className="text-3xl font-semibold tracking-tight text-tier-1">Strategic Partnerships</h1>
-              <span className="text-[10px] font-bold text-tier-4 uppercase tracking-[0.25em] mt-1">Milk Brands, Co-Branding & Influencers</span>
+              <h1 className="text-3xl font-semibold tracking-tight text-tier-1">School Systems Vertical</h1>
+              <span className="text-[10px] font-bold text-tier-4 uppercase tracking-[0.25em] mt-1">Lunch Programs & Private Education</span>
             </div>
           </div>
           <p className="text-tier-2 text-[14px] font-medium leading-relaxed max-w-xl">
-            Managing alliances with milk producers, co-branding initiatives, and high-impact influencer outreach.
+            Targeting lunch programs, private school networks, and district-level food service partnerships.
           </p>
         </div>
 
@@ -108,7 +111,7 @@ export default function PartnershipsPage() {
             <Input 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search partnerships..." 
+              placeholder="Search school systems..." 
               className="pl-10 h-10 bg-white/[0.02] border-white/[0.06] rounded-xl text-[13px] font-medium placeholder:text-tier-3 text-tier-1 focus-visible:ring-primary/20 transition-all" 
             />
           </div>
@@ -116,58 +119,78 @@ export default function PartnershipsPage() {
           <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
             <DialogTrigger asChild>
               <Button className="h-10 px-6 rounded-xl bg-primary text-white hover:bg-primary/90 text-[11px] font-bold uppercase tracking-wider shadow-lg shadow-primary/20">
-                <Plus className="size-4 mr-2" /> New Partnership
+                <Plus className="size-4 mr-2" /> Add School Entry
               </Button>
             </DialogTrigger>
             <DialogContent className="bg-background/95 backdrop-blur-2xl border-white/[0.1] rounded-2xl sm:max-w-[500px]">
               <DialogHeader>
-                <DialogTitle className="text-xl font-bold tracking-tight text-tier-1">New Strategic Connection</DialogTitle>
+                <DialogTitle className="text-xl font-bold tracking-tight text-tier-1">New Education Partnership</DialogTitle>
               </DialogHeader>
               <div className="grid gap-6 py-4">
                 <div className="grid gap-2">
-                  <Label className="text-[10px] uppercase tracking-widest text-tier-3">Partner Entity Name</Label>
+                  <Label className="text-[10px] uppercase tracking-widest text-tier-3">School/District Name</Label>
                   <Input 
-                    value={newPartner.name}
-                    onChange={(e) => setNewPartner({...newPartner, name: e.target.value})}
-                    placeholder="e.g. Oatly Global" 
+                    value={newSchool.name}
+                    onChange={(e) => setNewSchool({...newSchool, name: e.target.value})}
+                    placeholder="e.g. St. Jude's Academy" 
                     className="bg-white/[0.03] border-white/[0.08] h-12 rounded-xl text-tier-1"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
-                    <Label className="text-[10px] uppercase tracking-widest text-tier-3">Category</Label>
-                    <Select value={newPartner.type} onValueChange={(v) => setNewPartner({...newPartner, type: v})}>
+                    <Label className="text-[10px] uppercase tracking-widest text-tier-3">Current Status</Label>
+                    <Select value={newSchool.status} onValueChange={(v) => setNewSchool({...newSchool, status: v})}>
                       <SelectTrigger className="bg-white/[0.03] border-white/[0.08] h-12 rounded-xl text-tier-1">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="bg-popover/95 backdrop-blur-xl border-white/[0.1]">
-                        <SelectItem value="Milk Brand">Milk Brand</SelectItem>
-                        <SelectItem value="Co-branding">Co-branding</SelectItem>
-                        <SelectItem value="Event">Event</SelectItem>
-                        <SelectItem value="Influencer">Influencer</SelectItem>
+                        <SelectItem value="Prospect">Prospect</SelectItem>
+                        <SelectItem value="Contacted">Contacted</SelectItem>
+                        <SelectItem value="Sample Sent">Sample Sent</SelectItem>
+                        <SelectItem value="Pilot">Pilot</SelectItem>
+                        <SelectItem value="Approved">Approved</SelectItem>
+                        <SelectItem value="Active">Active</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="grid gap-2">
-                    <Label className="text-[10px] uppercase tracking-widest text-tier-3">Impact Potential</Label>
+                    <Label className="text-[10px] uppercase tracking-widest text-tier-3">Fit Score (1-10)</Label>
                     <Input 
                       type="number"
                       min="1"
                       max="10"
-                      value={newPartner.impactScore}
-                      onChange={(e) => setNewPartner({...newPartner, impactScore: Number(e.target.value)})}
+                      value={newSchool.impactScore}
+                      onChange={(e) => setNewSchool({...newSchool, impactScore: Number(e.target.value)})}
                       className="bg-white/[0.03] border-white/[0.08] h-12 rounded-xl text-tier-1"
                     />
                   </div>
                 </div>
+                <div className="grid gap-2">
+                  <Label className="text-[10px] uppercase tracking-widest text-tier-3">Primary Contact</Label>
+                  <Input 
+                    value={newSchool.contact}
+                    onChange={(e) => setNewSchool({...newSchool, contact: e.target.value})}
+                    placeholder="Principal or Food Service Director" 
+                    className="bg-white/[0.03] border-white/[0.08] h-12 rounded-xl text-tier-1"
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label className="text-[10px] uppercase tracking-widest text-tier-3">Intel/Notes</Label>
+                  <Input 
+                    value={newSchool.notes}
+                    onChange={(e) => setNewSchool({...newSchool, notes: e.target.value})}
+                    placeholder="Dietary requirements or enrollment data" 
+                    className="bg-white/[0.03] border-white/[0.08] h-12 rounded-xl text-tier-1"
+                  />
+                </div>
               </div>
               <DialogFooter>
                 <Button 
-                  onClick={handleAddPartner}
-                  disabled={!newPartner.name}
+                  onClick={handleAddSchool}
+                  disabled={!newSchool.name}
                   className="w-full bg-primary text-white h-12 rounded-xl font-bold uppercase tracking-widest"
                 >
-                  Authorize Entry
+                  Authorize School Entry
                 </Button>
               </DialogFooter>
             </DialogContent>
@@ -186,7 +209,7 @@ export default function PartnershipsPage() {
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {filtered.map((entry) => (
-            <VerticalCard key={entry.id} entry={entry} icon={Handshake} />
+            <VerticalCard key={entry.id} entry={entry} icon={GraduationCap} />
           ))}
         </div>
       )}
@@ -216,12 +239,21 @@ function VerticalCard({ entry, icon: Icon }: any) {
             </div>
           </div>
         </div>
-        <div className="px-3 py-1 rounded-lg text-[9px] font-bold uppercase tracking-widest border bg-slate-500/10 text-slate-300 border-slate-500/20">
+        <div className={cn(
+          "px-3 py-1 rounded-lg text-[9px] font-bold uppercase tracking-widest border",
+          entry.status === 'Active' || entry.status === 'Approved' ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : 
+          entry.status === 'Pilot' || entry.status === 'Trial' ? "bg-amber-500/10 text-amber-400 border-amber-500/20" : 
+          "bg-slate-500/10 text-slate-300 border-slate-500/20"
+        )}>
           {entry.status}
         </div>
       </div>
       <div className="flex items-center justify-between mt-2 pt-6 border-t border-white/[0.03]">
         <div className="flex items-center gap-8">
+          <div className="flex flex-col gap-1">
+            <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-tier-4">Primary Contact</span>
+            <span className="text-[13px] font-semibold text-tier-1">{entry.contact || 'N/A'}</span>
+          </div>
           <div className="flex flex-col gap-1">
             <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-tier-4">Last Interaction</span>
             <span className="text-[13px] font-semibold text-tier-1">{entry.lastContact}</span>

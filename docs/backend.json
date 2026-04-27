@@ -77,36 +77,15 @@
         "currentStage"
       ]
     },
-    "Campaign": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Campaign",
-      "type": "object",
-      "description": "Represents a marketing campaign or promotion.",
-      "properties": {
-        "id": { "type": "string" },
-        "name": { "type": "string" },
-        "type": { "type": "string" },
-        "status": { "type": "string" },
-        "budget": { "type": "number" },
-        "spend": { "type": "number" },
-        "reach": { "type": "number" },
-        "conversions": { "type": "number" },
-        "ownerId": { "type": "string" },
-        "startDate": { "type": "string", "format": "date" },
-        "endDate": { "type": "string", "format": "date" },
-        "createdAt": { "type": "string", "format": "date-time" }
-      },
-      "required": ["name", "type", "status", "ownerId"]
-    },
     "Partner": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Partner",
       "type": "object",
-      "description": "Represents a strategic partner or influencer.",
+      "description": "Represents a strategic partner or growth vertical entry (School, Cafe, Community, etc.).",
       "properties": {
         "id": { "type": "string" },
         "name": { "type": "string" },
-        "type": { "type": "string" },
+        "type": { "type": "string", "enum": ["School", "Cafe", "Milk Brand", "Co-branding", "Event", "Influencer", "Forum", "Blog", "Review Site"] },
         "status": { "type": "string" },
         "contact": { "type": "string" },
         "impactScore": { "type": "number" },
@@ -193,19 +172,11 @@
         }
       },
       {
-        "path": "/campaigns/{id}",
-        "definition": {
-          "entityName": "Campaign",
-          "schema": { "$ref": "#/backend/entities/Campaign" },
-          "description": "Marketing campaigns."
-        }
-      },
-      {
         "path": "/partners/{id}",
         "definition": {
           "entityName": "Partner",
           "schema": { "$ref": "#/backend/entities/Partner" },
-          "description": "Strategic partnerships."
+          "description": "Strategic partnerships and specialized verticals."
         }
       },
       {

@@ -22,10 +22,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { platforms } from "@/lib/mock-data";
 import Link from "next/link";
-import { useUser, useAuth, useDoc, useMemoFirebase, useCollection } from "@/firebase";
-import { doc, collection } from "firebase/firestore";
+import { useUser, useAuth, useDoc, useMemoFirebase } from "@/firebase";
+import { doc } from "firebase/firestore";
 import { getFirestore } from "firebase/firestore";
 
 export default function DashboardLayout({
@@ -42,7 +41,6 @@ export default function DashboardLayout({
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Check for Admin role (Top level or Nested)
   const adminRef = useMemoFirebase(() => {
     if (!user) return null;
     return doc(firestore, 'roles_admin', user.uid);
@@ -83,17 +81,13 @@ export default function DashboardLayout({
     }
   };
 
-  const filteredResults = platforms.filter(p => 
-    p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    p.type.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    p.market.toLowerCase().includes(searchQuery.toLowerCase())
-  ).slice(0, 5);
-
   const getSectionLabel = (path: string) => {
     if (path === "/") return "Command Center";
     if (path.startsWith("/channels")) return "Expansion Pipeline";
-    if (path.startsWith("/campaigns")) return "Campaign Engine";
+    if (path.startsWith("/schools")) return "School Vertical";
+    if (path.startsWith("/cafes")) return "Cafe Vertical";
     if (path.startsWith("/partnerships")) return "Strategic Partnerships";
+    if (path.startsWith("/communities")) return "Community Vertical";
     if (path.startsWith("/tasks")) return "Operational Tasks";
     if (path.startsWith("/hub")) return "Intelligence Hub";
     if (path.startsWith("/reports")) return "Performance Intel";
@@ -192,13 +186,13 @@ export default function DashboardLayout({
       <Dialog open={isSearchOpen} onOpenChange={setIsSearchOpen}>
         <DialogContent className="sm:max-w-[550px] p-0 border-white/[0.1] bg-[#0A0A0B]/95 backdrop-blur-2xl rounded-2xl overflow-hidden shadow-[0_0_50px_-12px_rgba(0,0,0,0.8)]">
           <DialogTitle className="px-4 pt-4 text-[10px] font-bold uppercase tracking-[0.25em] text-primary">Global Tactical Search</DialogTitle>
-          <DialogDescription className="px-4 pb-2 text-[11px] text-tier-3">Quickly locate channels, campaigns, and strategic intelligence.</DialogDescription>
+          <DialogDescription className="px-4 pb-2 text-[11px] text-tier-3">Quickly locate channels, verticals, and strategic intelligence.</DialogDescription>
           <div className="flex flex-col">
             <div className="flex items-center gap-3 px-4 py-4 border-b border-white/[0.05]">
               <Search className="size-5 text-primary" />
               <Input 
                 autoFocus
-                placeholder="Search platforms, channels, intel..." 
+                placeholder="Search platforms, schools, cafes..." 
                 className="border-0 bg-transparent focus-visible:ring-0 text-base placeholder:text-tier-3 h-auto p-0 text-tier-1"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -208,48 +202,14 @@ export default function DashboardLayout({
               </div>
             </div>
 
-            <div className="p-2 flex flex-col gap-1 max-h-[350px] overflow-y-auto custom-scrollbar">
-              {searchQuery.length > 0 ? (
-                <>
-                  <div className="px-3 pt-2 pb-1 text-[10px] font-bold text-tier-3 uppercase tracking-[0.2em]">Strategic Results</div>
-                  {filteredResults.length > 0 ? (
-                    filteredResults.map(p => (
-                      <Link 
-                        key={p.id} 
-                        href={`/channels/${p.id}`}
-                        onClick={() => setIsSearchOpen(false)}
-                        className="flex items-center justify-between p-3 rounded-xl hover:bg-white/[0.04] group transition-colors"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="size-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
-                            <Zap className="size-4" />
-                          </div>
-                          <div className="flex flex-col">
-                            <span className="text-[14px] font-semibold text-tier-1">{p.name}</span>
-                            <span className="text-[11px] text-tier-2">{p.type} • {p.market}</span>
-                          </div>
-                        </div>
-                        <ChevronRight className="size-4 text-tier-3 group-hover:text-primary transition-transform group-hover:translate-x-1" />
-                      </Link>
-                    ))
-                  ) : (
-                    <div className="p-8 flex flex-col items-center justify-center gap-3 opacity-40">
-                      <Search className="size-8 text-tier-3" />
-                      <span className="text-[11px] font-medium uppercase tracking-widest text-tier-3">No assets found</span>
-                    </div>
-                  )}
-                </>
-              ) : (
-                <div className="p-8 flex flex-col items-center justify-center gap-4 text-center">
-                  <div className="size-12 rounded-2xl bg-white/[0.02] border border-white/[0.05] flex items-center justify-center">
-                    <Command className="size-6 text-tier-3 opacity-40" />
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <p className="text-[13px] font-medium text-tier-2">Search the Operations Unit</p>
-                    <p className="text-[11px] text-tier-3">Find platforms, tasks, and strategic intel instantly.</p>
-                  </div>
-                </div>
-              )}
+            <div className="p-8 flex flex-col items-center justify-center gap-4 text-center">
+              <div className="size-12 rounded-2xl bg-white/[0.02] border border-white/[0.05] flex items-center justify-center">
+                <Command className="size-6 text-tier-3 opacity-40" />
+              </div>
+              <div className="flex flex-col gap-1">
+                <p className="text-[13px] font-medium text-tier-2">Search the Operations Unit</p>
+                <p className="text-[11px] text-tier-3">Find platforms, tasks, and strategic intel instantly.</p>
+              </div>
             </div>
             
             <div className="px-4 py-3 bg-white/[0.02] border-t border-white/[0.05] flex items-center justify-between">
@@ -263,7 +223,7 @@ export default function DashboardLayout({
                   <div className="bg-white/5 border border-white/10 rounded px-1.5 text-[9px] text-tier-2">↑↓</div>
                 </div>
               </div>
-              <span className="text-[10px] font-bold text-tier-3 uppercase tracking-[0.15em]">Growth OS v2.5.0</span>
+              <span className="text-[10px] font-bold text-tier-3 uppercase tracking-[0.15em]">Growth OS v2.6.0</span>
             </div>
           </div>
         </DialogContent>
