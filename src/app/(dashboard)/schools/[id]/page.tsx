@@ -1,7 +1,7 @@
 
 "use client";
 
-import { use } from "react";
+import { use, useEffect, useState } from "react";
 import { 
   ArrowLeft, 
   Edit3, 
@@ -15,11 +15,11 @@ import {
   Plus,
   Zap,
   ShieldCheck,
-  ClipboardCheck,
   Building2,
   Mail,
   MapPin,
-  ExternalLink
+  ExternalLink,
+  ChevronRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -28,7 +28,6 @@ import { useDoc, useMemoFirebase } from "@/firebase";
 import { doc, getFirestore } from "firebase/firestore";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { notFound } from "next/navigation";
 
 export default function SchoolDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -47,7 +46,20 @@ export default function SchoolDetailPage({ params }: { params: Promise<{ id: str
   }
 
   if (!school) {
-    return notFound();
+    return (
+      <div className="flex flex-col items-center justify-center h-[60vh] gap-6 text-center">
+        <div className="size-20 rounded-full bg-rose-500/10 border border-rose-500/20 flex items-center justify-center">
+          <ShieldCheck className="size-10 text-rose-400 opacity-50" />
+        </div>
+        <div className="flex flex-col gap-2">
+          <h1 className="text-2xl font-bold tracking-tight text-tier-1">Institutional Data Missing</h1>
+          <p className="text-tier-3 text-sm max-w-xs mx-auto">The requested school profile could not be located in the cloud registry. It may have been declassified or moved.</p>
+        </div>
+        <Button asChild variant="outline" className="border-white/10 text-tier-2 hover:text-tier-1">
+          <Link href="/schools"><ArrowLeft className="size-4 mr-2" /> Return to Vertical</Link>
+        </Button>
+      </div>
+    );
   }
 
   const getStatusStyles = (status: string) => {
@@ -133,7 +145,7 @@ export default function SchoolDetailPage({ params }: { params: Promise<{ id: str
             <SnapshotCard label="Impact Potential" value={`${school.impactScore}/10`} icon={Star} />
             <SnapshotCard label="Operational Status" value={school.status} icon={Activity} />
             <SnapshotCard label="Decision Maker" value={school.contact ? 'Identified' : 'TBD'} icon={User} />
-            <SnapshotCard label="Vertical" value="Education" icon={ClipboardCheck} />
+            <SnapshotCard label="Vertical" value="Education" icon={GraduationCap} />
           </div>
 
           {/* MISSION JOURNAL */}
