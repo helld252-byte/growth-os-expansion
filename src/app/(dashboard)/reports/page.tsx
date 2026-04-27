@@ -1,10 +1,9 @@
-
 "use client";
 
-import { useState } from "react";
+import { useMemo } from "react";
 import { 
-  AreaChart, 
-  Area, 
+  BarChart, 
+  Bar, 
   XAxis, 
   YAxis, 
   CartesianGrid, 
@@ -12,7 +11,8 @@ import {
   ResponsiveContainer, 
   PieChart, 
   Pie, 
-  Cell
+  Cell,
+  LabelList
 } from "recharts";
 import { 
   CheckCircle2, 
@@ -20,9 +20,12 @@ import {
   TrendingUp,
   Zap,
   Globe,
-  ArrowUpRight,
   BarChart3,
-  Loader2
+  Loader2,
+  Layers,
+  Flag,
+  Coffee,
+  GraduationCap
 } from "lucide-react";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { Button } from "@/components/ui/button";
@@ -31,176 +34,232 @@ import { useCollection, useMemoFirebase } from "@/firebase";
 import { collection, getFirestore } from "firebase/firestore";
 import { cn } from "@/lib/utils";
 
-const growthTrend = [
-  { month: 'Oct', apps: 4, live: 1 },
-  { month: 'Nov', apps: 6, live: 1 },
-  { month: 'Dec', apps: 8, live: 2 },
-  { month: 'Jan', apps: 12, live: 3 },
-  { month: 'Feb', apps: 15, live: 4 },
-  { month: 'Mar', apps: 20, live: 6 },
-];
-
-const marketShare = [
-  { name: 'EU', value: 45, color: 'hsl(var(--primary))' },
-  { name: 'US', value: 35, color: 'hsl(var(--accent))' },
-  { name: 'Global', value: 20, color: 'hsl(var(--muted-foreground) / 0.5)' },
-];
-
 export default function ReportsPage() {
-  const [period, setPeriod] = useState("Quarterly");
   const firestore = getFirestore();
+  
+  // Fetch real data from all core collections
   const opportunitiesRef = useMemoFirebase(() => collection(firestore, 'growth_opportunities'), [firestore]);
-  const { data: opportunities, isLoading } = useCollection(opportunitiesRef);
+  const { data: opportunities, isLoading: opLoading } = useCollection(opportunitiesRef);
 
-  const liveCount = (opportunities || []).filter(p => p.currentStage === "Live").length;
-  const totalValue = (opportunities || []).reduce((acc, curr) => acc + (curr.estimatedValue || 0), 0);
+  const partnersRef = useMemoFirebase(() => collection(firestore, 'partners'), [firestore]);
+  const { data: partners, isLoading: partnerLoading } = useCollection(partnersRef);
+
+  const tasksRef = useMemoFirebase(() => collection(firestore, 'tasks'), [firestore]);
+  const { data: tasks, isLoading: tasksLoading } = useCollection(tasksRef);
+
+  const isLoading = opLoading || partnerLoading || tasksLoading;
+
+  // Process data for charts
+  const metrics = useMemo(() => {
+    if (!opportunities || !partners || !tasks) return null;
+
+    // Vertical Distribution
+    const verticalData = [
+      { name: 'Schools', value: partners.filter(p => p.type === 'School').length, color: 'hsl(var(--primary))' },
+      { name: 'Cafes', value: partners.filter(p => p.type === 'Cafe' || p.partnerType === 'Cafe').length, color: 'hsl(var(--accent))' },
+      { name: 'Partners', value: partners.filter(p => ["Milk Brand", "Co-branding", "Event", "Influencer"].includes(p.type)).length, color: '#94a3b8' },
+      { name: 'Communities', value: partners.filter(p => ["Forum", "Blog", "Review Site"].includes(p.type)).length, color: '#6366f1' },
+    ].filter(v => v.value > 0);
+
+    // Platform Pipeline Stages
+    const stages = ['Not Started', 'Research', 'Applied', 'In Review', 'Approved', 'Onboarding', 'Live'];
+    const pipelineData = stages.map(stage => ({
+      stage,
+      count: opportunities.filter(o => o.currentStage === stage).length
+    }));
+
+    // High Level Totals
+    const totalEstValue = opportunities.reduce((acc, curr) => acc + (Number(curr.estimatedValue) || 0), 0);
+    const liveOps = opportunities.filter(o => o.currentStage === 'Live').length;
+    const completedTasks = tasks.filter(t => t.status === 'Completed').length;
+    const taskVelocity = tasks.length > 0 ? (completedTasks / tasks.length) * 100 : 0;
+
+    return {
+      verticalData,
+      pipelineData,
+      totalEstValue,
+      liveOps,
+      taskVelocity,
+      totalUnits: partners.length + opportunities.length
+    };
+  }, [opportunities, partners, tasks]);
 
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center h-[60vh] gap-4">
         <Loader2 className="size-10 text-primary animate-spin" />
-        <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-tier-3">Calculating Metrics...</span>
+        <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-tier-3">Aggregating Cloud Intel...</span>
       </div>
     );
   }
 
+  if (!metrics) return null;
+
   return (
-    <div className="max-w-[1400px] mx-auto flex flex-col gap-8 animate-in fade-in duration-700">
+    <div className="max-w-[1400px] mx-auto flex flex-col gap-10 animate-in fade-in duration-700">
       
       {/* Context Header */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-6 border-b border-white/[0.03]">
-        <div className="flex items-center gap-4">
-          <div className="size-10 rounded-xl bg-accent/5 border border-accent/10 flex items-center justify-center">
-            <BarChart3 className="size-5 text-accent/60" />
+        <div className="flex items-center gap-5">
+          <div className="size-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center shadow-lg active-glow">
+            <BarChart3 className="size-6 text-primary" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-white">Performance Intel</h1>
-            <p className="text-[10px] text-muted-foreground/40 font-semibold uppercase tracking-widest mt-0.5">
-              High-velocity market metrics and tactical trajectory analysis.
+            <h1 className="text-3xl font-bold tracking-tight text-white">Performance Intel</h1>
+            <p className="text-[11px] text-tier-3 font-semibold uppercase tracking-widest mt-1">
+              Live mission analytics synchronized from Unit-01 cloud registry.
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="bg-white/[0.015] border border-white/[0.03] rounded-full p-1 flex items-center">
-            {["Monthly", "Quarterly"].map((p) => (
-              <button
-                key={p}
-                onClick={() => setPeriod(p)}
-                className={cn(
-                  "px-4 py-1 rounded-full text-[9px] font-semibold uppercase tracking-wider transition-all",
-                  period === p ? "bg-primary/20 text-white shadow-sm" : "text-muted-foreground/30 hover:text-white/60"
-                )}
-              >
-                {p}
-              </button>
-            ))}
-          </div>
-          <Button variant="outline" className="h-8 font-medium gap-2 border-white/5 px-4 rounded-lg text-[10px] uppercase tracking-wider text-muted-foreground/60 hover:text-white">
-            <Download className="size-3" /> Export
-          </Button>
-        </div>
+        <Button variant="outline" className="h-10 font-bold gap-2.5 border-white/5 bg-white/[0.02] px-6 rounded-xl text-[11px] uppercase tracking-wider text-tier-2 hover:text-white hover:bg-white/[0.05] transition-all">
+          <Download className="size-4" /> Export Registry
+        </Button>
       </div>
 
-      {/* Metrics Rail */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label="Total Pipeline" value={`$${(totalValue / 1000).toFixed(1)}k`} icon={TrendingUp} iconColor="text-primary/60" trend="+12.4%" trendUp={true} />
-        <StatCard label="Onboarding Velocity" value="24.5%" icon={Zap} iconColor="text-accent/60" trend="+5.2%" trendUp={true} />
-        <StatCard label="Live Units" value={liveCount} icon={CheckCircle2} iconColor="text-green-500/60" trend="+2" trendUp={true} />
-        <StatCard label="Market Saturation" value="68%" icon={Globe} iconColor="text-muted-foreground/40" trend="-1.2%" trendUp={false} />
+      {/* Primary Metrics Rail */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <StatCard 
+          label="Estimated ARR" 
+          value={`$${(metrics.totalEstValue / 1000).toFixed(1)}k`} 
+          icon={TrendingUp} 
+          iconColor="text-emerald-500" 
+          trend="Total Platform Value"
+          trendUp={true} 
+        />
+        <StatCard 
+          label="Task Execution" 
+          value={`${metrics.taskVelocity.toFixed(0)}%`} 
+          icon={Zap} 
+          iconColor="text-primary" 
+          trend="Completion Velocity"
+          trendUp={true} 
+        />
+        <StatCard 
+          label="Active Initiatives" 
+          value={metrics.liveOps} 
+          icon={CheckCircle2} 
+          iconColor="text-accent" 
+          trend="Status: LIVE"
+          trendUp={true} 
+        />
+        <StatCard 
+          label="Tactical Reach" 
+          value={metrics.totalUnits} 
+          icon={Globe} 
+          iconColor="text-blue-400" 
+          trend="Total Registry Units"
+          trendUp={true} 
+        />
       </div>
 
-      {/* Charts Grid */}
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-5">
+      {/* Analytics Grid */}
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
         
-        {/* Momentum Area Chart */}
-        <div className="xl:col-span-8 premium-panel rounded-2xl p-6 flex flex-col gap-6">
+        {/* Pipeline Distribution Bar Chart */}
+        <div className="xl:col-span-8 premium-panel rounded-3xl p-8 flex flex-col gap-8">
           <div className="flex items-center justify-between">
-            <div className="flex flex-col">
-              <h3 className="font-semibold text-[11px] uppercase tracking-widest text-muted-foreground/30">Expansion Velocity</h3>
-              <p className="text-[12px] font-medium text-white/60 mt-1">Active market growth vs. live operationalization</p>
+            <div className="flex flex-col gap-1">
+              <h3 className="font-bold text-[10px] uppercase tracking-[0.25em] text-tier-4">Platform Pipeline Distribution</h3>
+              <p className="text-[14px] font-medium text-tier-2 mt-1">Distribution of growth opportunities by mission stage</p>
             </div>
+            <Layers className="size-4 text-primary" />
           </div>
 
-          <div className="h-[260px] w-full">
+          <div className="h-[300px] w-full mt-4">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={growthTrend}>
-                <defs>
-                  <linearGradient id="colorApps" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.15}/>
-                    <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
+              <BarChart data={metrics.pipelineData} margin={{ top: 20, right: 0, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" opacity={0.1} />
-                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: 'hsl(var(--muted-foreground)/0.3)', fontSize: 9, fontWeight: 500 }} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fill: 'hsl(var(--muted-foreground)/0.3)', fontSize: 9, fontWeight: 500 }} />
-                <Tooltip contentStyle={{ backgroundColor: 'rgba(0,0,0,0.9)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '12px', fontSize: '9px', backdropFilter: 'blur(8px)' }} />
-                <Area type="monotone" dataKey="apps" stroke="hsl(var(--primary))" strokeWidth={1.5} fillOpacity={1} fill="url(#colorApps)" />
-                <Area type="monotone" dataKey="live" stroke="hsl(var(--accent))" strokeWidth={1.5} fill="transparent" />
-              </AreaChart>
+                <XAxis 
+                  dataKey="stage" 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fill: 'hsl(var(--muted-foreground)/0.6)', fontSize: 10, fontWeight: 600 }} 
+                />
+                <YAxis 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fill: 'hsl(var(--muted-foreground)/0.6)', fontSize: 10, fontWeight: 600 }} 
+                />
+                <Tooltip 
+                  cursor={{ fill: 'white', opacity: 0.03 }}
+                  contentStyle={{ backgroundColor: 'rgba(5,5,5,0.95)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '14px', fontSize: '11px', fontWeight: 600, backdropFilter: 'blur(12px)', color: '#fff' }} 
+                />
+                <Bar dataKey="count" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} barSize={48}>
+                  <LabelList dataKey="count" position="top" fill="hsl(var(--primary))" fontSize={11} fontWeight={800} offset={10} />
+                </Bar>
+              </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        {/* Regional Reach Pie */}
-        <div className="xl:col-span-4 premium-panel rounded-2xl p-6 flex flex-col gap-6">
-          <div className="flex flex-col">
-            <h3 className="font-semibold text-[11px] uppercase tracking-widest text-muted-foreground/30">Regional Reach</h3>
-            <p className="text-[12px] font-medium text-white/60 mt-1">Market concentration</p>
+        {/* Vertical Saturation Pie Chart */}
+        <div className="xl:col-span-4 premium-panel rounded-3xl p-8 flex flex-col gap-8">
+          <div className="flex flex-col gap-1">
+            <h3 className="font-bold text-[10px] uppercase tracking-[0.25em] text-tier-4">Vertical Saturation</h3>
+            <p className="text-[14px] font-medium text-tier-2 mt-1">Active market coverage</p>
           </div>
 
-          <div className="h-[160px] w-full flex items-center justify-center relative">
+          <div className="h-[200px] w-full flex items-center justify-center relative">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
-                <Pie data={marketShare} cx="50%" cy="50%" innerRadius={55} outerRadius={68} paddingAngle={4} dataKey="value">
-                  {marketShare.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} opacity={0.7} />
+                <Pie 
+                  data={metrics.verticalData} 
+                  cx="50%" 
+                  cy="50%" 
+                  innerRadius={65} 
+                  outerRadius={85} 
+                  paddingAngle={8} 
+                  dataKey="value"
+                >
+                  {metrics.verticalData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} stroke="none" opacity={0.8} />
                   ))}
                 </Pie>
               </PieChart>
             </ResponsiveContainer>
             <div className="absolute flex flex-col items-center justify-center">
-              <span className="text-xl font-bold text-white leading-none">{liveCount}</span>
-              <span className="text-[8px] font-semibold uppercase tracking-wider text-muted-foreground/30 mt-1">Live Units</span>
+              <span className="text-3xl font-bold text-white tracking-tighter leading-none">{metrics.totalUnits}</span>
+              <span className="text-[9px] font-bold uppercase tracking-[0.15em] text-tier-4 mt-2">Units</span>
             </div>
           </div>
 
-          <div className="flex flex-col gap-2.5">
-            {marketShare.map((item) => (
-              <div key={item.name} className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="size-1.5 rounded-full" style={{ backgroundColor: item.color }} />
-                  <span className="text-[11px] font-medium text-white/60">{item.name} Operations</span>
+          <div className="flex flex-col gap-4 pt-4 border-t border-white/[0.03]">
+            {metrics.verticalData.map((item) => (
+              <div key={item.name} className="flex items-center justify-between group">
+                <div className="flex items-center gap-3">
+                  <div className="size-2 rounded-full" style={{ backgroundColor: item.color }} />
+                  <span className="text-[12px] font-semibold text-tier-2 group-hover:text-white transition-colors">{item.name}</span>
                 </div>
-                <span className="text-[11px] font-semibold text-white/40">{item.value}%</span>
+                <div className="flex items-center gap-3">
+                  <span className="text-[12px] font-bold text-white">{item.value}</span>
+                  <span className="text-[10px] font-bold text-tier-4">({((item.value / metrics.totalUnits) * 100).toFixed(0)}%)</span>
+                </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Intelligence Card */}
-        <div className="xl:col-span-12 premium-panel rounded-2xl p-6 flex flex-col lg:flex-row items-center justify-between bg-gradient-to-r from-primary/5 via-background to-accent/5 border-primary/10">
-          <div className="flex items-center gap-6">
-            <div className="size-11 rounded-xl bg-white/[0.015] border border-white/[0.03] flex items-center justify-center">
-              <Zap className="size-4.5 text-accent/80 animate-pulse" />
+        {/* Intelligence Insights Summary */}
+        <div className="xl:col-span-12 premium-panel rounded-3xl p-8 flex flex-col lg:flex-row items-center justify-between bg-gradient-to-r from-primary/5 via-transparent to-accent/5 border-primary/10 shadow-2xl">
+          <div className="flex items-center gap-8">
+            <div className="size-14 rounded-2xl bg-white/[0.02] border border-white/[0.05] flex items-center justify-center shadow-inner group">
+              <Zap className="size-6 text-primary group-hover:scale-110 transition-transform animate-pulse" />
             </div>
-            <div className="flex flex-col gap-1">
-              <div className="flex items-center gap-2">
-                <h4 className="text-base font-semibold tracking-tight text-white">Cloud Backend Synchronized</h4>
-                <Badge variant="outline" className="bg-accent/10 text-accent/80 border-accent/20 font-medium text-[8px] uppercase tracking-widest px-2 py-0">System Status</Badge>
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-3">
+                <h4 className="text-lg font-semibold tracking-tight text-white leading-none">Operational Intelligence Synchronized</h4>
+                <Badge className="bg-primary/20 text-primary border-primary/30 font-bold text-[9px] uppercase tracking-widest px-2.5 py-0.5 rounded-lg">System Integrity: 100%</Badge>
               </div>
-              <p className="text-secondary text-[12px] leading-relaxed max-w-2xl">
-                Your performance metrics are now being served live from <span className="text-white font-medium">Firestore</span>. All growth initiatives and historical data are synchronized across the tactical cloud network.
+              <p className="text-tier-3 text-[14px] leading-relaxed max-w-3xl">
+                Analytics are aggregated across all growth verticals. The <span className="text-white font-semibold">Expansion Velocity</span> metrics reflect real-time transitions in your Platform and Partner pipelines. Task completion rates are calculated based on the global execution backlog.
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 mt-6 lg:mt-0">
-            <Button className="h-9 bg-white text-black hover:bg-white/90 font-semibold uppercase text-[9px] tracking-wider rounded-lg px-6">
-              Optimize Strategy
-            </Button>
-            <Button variant="ghost" className="size-9 rounded-lg border border-white/[0.03] p-0 flex items-center justify-center text-muted-foreground/40 hover:text-white">
-              <ArrowUpRight className="size-4" />
+          <div className="flex items-center gap-4 mt-8 lg:mt-0">
+            <Button className="h-11 bg-primary hover:bg-primary/90 text-white font-bold uppercase text-[11px] tracking-wider rounded-xl px-8 shadow-xl shadow-primary/20 active:scale-95 transition-all">
+              Optimize Strategic Path
             </Button>
           </div>
         </div>
