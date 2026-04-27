@@ -137,7 +137,7 @@ export default function DashboardLayout({
                   className="hidden sm:flex items-center bg-white/[0.03] border border-white/[0.08] rounded-lg px-3 py-1.5 gap-3 cursor-pointer hover:bg-white/[0.06] hover:border-white/20 transition-all group"
                 >
                   <Search className="size-3.5 text-tier-2 group-hover:text-primary transition-colors" />
-                  <span className="text-[11px] font-medium tracking-tight text-tier-1 group-hover:text-primary pr-6 transition-colors">Search Strategic Assets</span>
+                  <span className="text-[11px] font-medium tracking-tight text-tier-3 group-hover:text-primary pr-6 transition-colors">Search Strategic Assets</span>
                   <span className="text-[9px] font-medium text-tier-2 tracking-widest bg-white/5 px-1.5 py-0.5 rounded border border-white/10">⌘K</span>
                 </div>
 
