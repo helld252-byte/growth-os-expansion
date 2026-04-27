@@ -1,4 +1,3 @@
-
 "use client";
 
 import { use, useState } from "react";
@@ -122,6 +121,21 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
       title: "Field Note Recorded",
       description: "Mission journal has been updated.",
     });
+  };
+
+  const handleToggleRequirement = (req: string) => {
+    if (!docRef) return;
+    const currentCompleted = platform.completedRequirements || [];
+    const isCompleted = currentCompleted.includes(req);
+    const newCompleted = isCompleted 
+      ? currentCompleted.filter((r: string) => r !== req)
+      : [...currentCompleted, req];
+    
+    updateDocumentNonBlocking(docRef, {
+      completedRequirements: newCompleted,
+      updatedAt: serverTimestamp(),
+    });
+  </采访>
   };
 
   const getStageStyles = (stage: string) => {
@@ -261,30 +275,37 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
             </div>
           </section>
 
-          {/* MISSION ONBOARDING - MINIMALIST CHECKLIST */}
+          {/* PLATFORM ONBOARDING CHECKLIST */}
           {platform.requirements && platform.requirements.length > 0 && (
             <section className="premium-panel p-8 rounded-3xl flex flex-col gap-6">
               <div className="flex items-center justify-between">
                 <div className="flex flex-col gap-1">
-                  <h3 className="text-[11px] font-bold uppercase tracking-[0.25em] text-tier-4">Mission Onboarding</h3>
-                  <span className="text-[13px] text-tier-2 font-medium">Platform compliance & validation checklist</span>
+                  <h3 className="text-[11px] font-bold uppercase tracking-[0.25em] text-tier-4">Platform Onboarding Checklist</h3>
+                  <span className="text-[13px] text-tier-2 font-medium">Compliance & validation protocols</span>
                 </div>
                 <div className="size-10 rounded-full bg-primary/5 border border-primary/10 flex items-center justify-center">
                   <ShieldCheck className="size-5 text-primary" />
                 </div>
               </div>
 
-              <div className="flex flex-col gap-px bg-white/[0.03] rounded-2xl overflow-hidden border border-white/[0.05]">
-                {platform.requirements.map((req: string, i: number) => (
-                  <div key={i} className="flex items-center gap-5 p-5 bg-background/40 hover:bg-white/[0.02] transition-colors group">
-                    <div className="size-5 rounded-md border border-white/10 flex items-center justify-center bg-white/[0.03] group-hover:border-primary/50 group-hover:bg-primary/5 transition-all">
-                      <div className="size-1.5 rounded-full bg-tier-4 group-hover:bg-primary transition-colors" />
+              <div className="flex flex-col gap-4">
+                {platform.requirements.map((req: string, i: number) => {
+                  const isChecked = (platform.completedRequirements || []).includes(req);
+                  return (
+                    <div key={i} className="flex items-center gap-4 py-2 group cursor-pointer" onClick={() => handleToggleRequirement(req)}>
+                      <Checkbox 
+                        checked={isChecked} 
+                        className="size-5 rounded-md border-white/10 data-[state=checked]:bg-primary data-[state=checked]:border-primary transition-all" 
+                      />
+                      <span className={cn(
+                        "text-[14px] font-medium tracking-tight transition-colors",
+                        isChecked ? "text-tier-4 line-through" : "text-tier-2 group-hover:text-tier-1"
+                      )}>
+                        {req}
+                      </span>
                     </div>
-                    <span className="text-[14px] font-medium tracking-tight text-tier-2 group-hover:text-tier-1 transition-colors">
-                      {req}
-                    </span>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </section>
           )}
