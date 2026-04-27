@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -281,7 +280,7 @@ function FilterButton({ icon: Icon, label, count, active, onClick }: any) {
       className={cn(
         "h-10 justify-start gap-4 px-4 rounded-lg transition-all relative group",
         active 
-          ? "bg-primary/10 text-primary shadow-sm" 
+          ? "bg-primary/10 hover:bg-primary/20 text-primary shadow-sm" 
           : "text-tier-2 hover:bg-white/[0.03] hover:text-tier-1"
       )}
     >

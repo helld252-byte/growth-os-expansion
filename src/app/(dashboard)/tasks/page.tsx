@@ -216,7 +216,7 @@ export default function TasksPage() {
 
           <div className="flex flex-col gap-1.5">
             <h3 className="text-[9px] font-bold uppercase tracking-[0.25em] text-tier-4 mb-3 ml-3">Timeline Filter</h3>
-            <Button variant="ghost" className="justify-start gap-4 h-10 px-4 bg-primary/10 text-primary rounded-lg font-medium text-[13px] transition-all relative">
+            <Button variant="ghost" className="justify-start gap-4 h-10 px-4 bg-primary/10 hover:bg-primary/20 text-primary rounded-lg font-medium text-[13px] transition-all relative">
               <Clock className="size-4.5" /> Active Missions
               <span className="ml-auto bg-primary/20 text-primary text-[10px] font-bold px-2 py-0.5 rounded-md">{activeTasks.length}</span>
               <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-primary rounded-full" />

@@ -10,14 +10,14 @@
     --card-foreground: 240 10% 96%;
     --popover: 240 10% 5%;
     --popover-foreground: 240 10% 96%;
-    --primary: 262 66% 58%; /* Boosted primary lightness slightly for dark bg */
+    --primary: 262 66% 58%; 
     --primary-foreground: 0 0% 100%;
     --secondary: 240 10% 12%;
     --secondary-foreground: 225 12% 75%;
     --muted: 240 10% 10%;
     --muted-foreground: 226 8% 54%;
-    --accent: 327 73% 75%;
-    --accent-foreground: 327 73% 20%;
+    --accent: 262 70% 65%; /* Replaced pink with technical violet */
+    --accent-foreground: 262 70% 10%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
     --border: 240 10% 12%;
@@ -66,16 +66,16 @@
 
   /* 4-Tier Typography System */
   .text-tier-1 {
-    color: hsl(240, 10%, 96%) !important; /* Soft White #F5F5F7 */
+    color: hsl(240, 10%, 96%) !important; 
   }
   .text-tier-2 {
-    color: hsl(225, 12%, 75%) !important; /* Light Gray #B8BCC8 */
+    color: hsl(225, 12%, 75%) !important; 
   }
   .text-tier-3 {
-    color: hsl(226, 8%, 54%) !important; /* Muted Gray #7E8394 */
+    color: hsl(226, 8%, 54%) !important; 
   }
   .text-tier-4 {
-    color: hsl(224, 9%, 40%) !important; /* Disabled #5D6270 */
+    color: hsl(224, 9%, 40%) !important; 
   }
 }
 

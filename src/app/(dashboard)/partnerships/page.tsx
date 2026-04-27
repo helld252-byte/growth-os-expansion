@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -113,7 +112,7 @@ export default function PartnershipsPage() {
   };
 
   return (
-    <div className="max-w-[1400px] mx-auto flex gap-12 animate-in fade-in duration-700">
+    <div className="max-w-[1440px] mx-auto flex gap-12 animate-in fade-in duration-700">
       <aside className="w-56 shrink-0 flex flex-col gap-10">
         <Link 
           href="/" 
@@ -271,7 +270,7 @@ function FilterButton({ icon: Icon, label, count, active, onClick }: any) {
       className={cn(
         "h-10 justify-start gap-4 px-4 rounded-lg transition-all relative group",
         active 
-          ? "bg-primary/10 text-primary shadow-sm" 
+          ? "bg-primary/10 hover:bg-primary/20 text-primary shadow-sm" 
           : "text-tier-2 hover:bg-white/[0.03] hover:text-tier-1"
       )}
     >
