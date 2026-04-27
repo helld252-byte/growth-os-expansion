@@ -135,7 +135,6 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
       completedRequirements: newCompleted,
       updatedAt: serverTimestamp(),
     });
-  </采访>
   };
 
   const getStageStyles = (stage: string) => {
