@@ -12,16 +12,34 @@ import {
   Target,
   Users,
   Calendar,
-  Loader2
+  Loader2,
+  X
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogTrigger,
+  DialogFooter
+} from "@/components/ui/dialog";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 import { useCollection, useMemoFirebase, useUser, addDocumentNonBlocking } from "@/firebase";
 import { collection, getFirestore, serverTimestamp } from "firebase/firestore";
 import { cn } from "@/lib/utils";
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from "recharts";
+import { useToast } from "@/hooks/use-toast";
 
 const performanceData = [
   { name: 'W1', reach: 120000 },
@@ -31,18 +49,61 @@ const performanceData = [
 ];
 
 export default function CampaignEnginePage() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const firestore = getFirestore();
+  const { toast } = useToast();
   const { user } = useUser();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isAddOpen, setIsAddOpen] = useState(false);
+  
+  const firestore = getFirestore();
   const campaignsRef = useMemoFirebase(() => collection(firestore, 'campaigns'), [firestore]);
   const { data: campaigns, isLoading } = useCollection(campaignsRef);
+
+  // New Campaign State
+  const [newCampaign, setNewCampaign] = useState({
+    name: "",
+    type: "Awareness",
+    status: "Active",
+    budget: 0,
+    startDate: new Date().toISOString().split('T')[0],
+    endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+  });
+
+  const handleLaunchCampaign = () => {
+    if (!user || !newCampaign.name) return;
+
+    const docData = {
+      ...newCampaign,
+      budget: Number(newCampaign.budget),
+      spend: 0,
+      reach: 0,
+      conversions: 0,
+      ownerId: user.uid,
+      createdAt: serverTimestamp(),
+    };
+
+    addDocumentNonBlocking(campaignsRef, docData);
+    setIsAddOpen(false);
+    setNewCampaign({
+      name: "",
+      type: "Awareness",
+      status: "Active",
+      budget: 0,
+      startDate: new Date().toISOString().split('T')[0],
+      endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    });
+    
+    toast({
+      title: "Initiative Launched",
+      description: `"${docData.name}" has been synchronized with the Campaign Engine.`,
+    });
+  };
 
   const filteredCampaigns = (campaigns || []).filter(c => 
     c.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const totalBudget = filteredCampaigns.reduce((acc, c) => acc + (c.budget || 0), 0);
-  const totalReach = filteredCampaigns.reduce((acc, c) => acc + (c.reach || 0), 0);
+  const totalBudget = filteredCampaigns.reduce((acc, c) => acc + (Number(c.budget) || 0), 0);
+  const totalReach = filteredCampaigns.reduce((acc, c) => acc + (Number(c.reach) || 0), 0);
 
   return (
     <div className="max-w-[1400px] mx-auto flex flex-col gap-10 animate-in fade-in duration-700">
@@ -72,9 +133,85 @@ export default function CampaignEnginePage() {
               className="pl-10 h-10 bg-white/[0.02] border-white/[0.06] rounded-xl text-[13px] font-medium placeholder:text-tier-3 text-tier-1 focus-visible:ring-primary/20 transition-all" 
             />
           </div>
-          <Button className="h-10 px-6 rounded-xl bg-primary hover:bg-primary/90 text-white text-[11px] font-bold uppercase tracking-wider shadow-lg shadow-primary/20">
-            <Plus className="size-4 mr-2" /> Launch Campaign
-          </Button>
+          
+          <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
+            <DialogTrigger asChild>
+              <Button className="h-10 px-6 rounded-xl bg-primary hover:bg-primary/90 text-white text-[11px] font-bold uppercase tracking-wider shadow-lg shadow-primary/20">
+                <Plus className="size-4 mr-2" /> Launch Campaign
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="bg-background/95 backdrop-blur-2xl border-white/[0.1] rounded-2xl sm:max-w-[500px]">
+              <DialogHeader>
+                <DialogTitle className="text-xl font-bold tracking-tight text-tier-1">New Marketing Initiative</DialogTitle>
+              </DialogHeader>
+              <div className="grid gap-6 py-4">
+                <div className="grid gap-2">
+                  <Label className="text-[10px] uppercase tracking-widest text-tier-3">Campaign Name</Label>
+                  <Input 
+                    value={newCampaign.name}
+                    onChange={(e) => setNewCampaign({...newCampaign, name: e.target.value})}
+                    placeholder="e.g. Q4 Peak Season Push" 
+                    className="bg-white/[0.03] border-white/[0.08] h-12 rounded-xl text-tier-1"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label className="text-[10px] uppercase tracking-widest text-tier-3">Type</Label>
+                    <Select value={newCampaign.type} onValueChange={(v) => setNewCampaign({...newCampaign, type: v})}>
+                      <SelectTrigger className="bg-white/[0.03] border-white/[0.08] h-12 rounded-xl text-tier-1">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-popover/95 backdrop-blur-xl border-white/[0.1]">
+                        <SelectItem value="Paid Ads">Paid Ads</SelectItem>
+                        <SelectItem value="Creator Outreach">Creator Outreach</SelectItem>
+                        <SelectItem value="Awareness">Awareness</SelectItem>
+                        <SelectItem value="Seasonal">Seasonal</SelectItem>
+                        <SelectItem value="Promotion">Promotion</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="grid gap-2">
+                    <Label className="text-[10px] uppercase tracking-widest text-tier-3">Budget ($)</Label>
+                    <Input 
+                      type="number"
+                      value={newCampaign.budget}
+                      onChange={(e) => setNewCampaign({...newCampaign, budget: Number(e.target.value)})}
+                      className="bg-white/[0.03] border-white/[0.08] h-12 rounded-xl text-tier-1"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label className="text-[10px] uppercase tracking-widest text-tier-3">Start Date</Label>
+                    <Input 
+                      type="date"
+                      value={newCampaign.startDate}
+                      onChange={(e) => setNewCampaign({...newCampaign, startDate: e.target.value})}
+                      className="bg-white/[0.03] border-white/[0.08] h-12 rounded-xl text-tier-1"
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label className="text-[10px] uppercase tracking-widest text-tier-3">End Date</Label>
+                    <Input 
+                      type="date"
+                      value={newCampaign.endDate}
+                      onChange={(e) => setNewCampaign({...newCampaign, endDate: e.target.value})}
+                      className="bg-white/[0.03] border-white/[0.08] h-12 rounded-xl text-tier-1"
+                    />
+                  </div>
+                </div>
+              </div>
+              <DialogFooter>
+                <Button 
+                  onClick={handleLaunchCampaign}
+                  disabled={!newCampaign.name}
+                  className="w-full bg-primary text-white h-12 rounded-xl font-bold uppercase tracking-widest"
+                >
+                  Deploy Initiative
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
       </header>
 
@@ -150,19 +287,19 @@ export default function CampaignEnginePage() {
                 <div className="flex flex-col gap-3 mt-1">
                   <div className="flex justify-between text-[11px] font-bold uppercase tracking-widest text-tier-4">
                     <span>Budget Allocation</span>
-                    <span className="text-tier-2">${(campaign.spend/1000).toFixed(1)}k / ${(campaign.budget/1000).toFixed(1)}k</span>
+                    <span className="text-tier-2">${((campaign.spend || 0)/1000).toFixed(1)}k / ${((campaign.budget || 0)/1000).toFixed(1)}k</span>
                   </div>
-                  <Progress value={(campaign.spend / campaign.budget) * 100} className="h-1.5 bg-white/5" />
+                  <Progress value={campaign.budget > 0 ? ((campaign.spend || 0) / campaign.budget) * 100 : 0} className="h-1.5 bg-white/5" />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/[0.03]">
                   <div className="flex flex-col gap-1">
                     <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-tier-4">Reach</span>
-                    <span className="text-[14px] font-semibold text-tier-1">{(campaign.reach/1000).toFixed(0)}k</span>
+                    <span className="text-[14px] font-semibold text-tier-1">{((campaign.reach || 0)/1000).toFixed(0)}k</span>
                   </div>
                   <div className="flex flex-col gap-1">
                     <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-tier-4">Conversions</span>
-                    <span className="text-[14px] font-semibold text-tier-1">{campaign.conversions}</span>
+                    <span className="text-[14px] font-semibold text-tier-1">{campaign.conversions || 0}</span>
                   </div>
                 </div>
 

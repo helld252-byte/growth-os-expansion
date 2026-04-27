@@ -16,22 +16,80 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { useCollection, useMemoFirebase, useUser } from "@/firebase";
-import { collection, getFirestore } from "firebase/firestore";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogTrigger,
+  DialogFooter
+} from "@/components/ui/dialog";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { useCollection, useMemoFirebase, useUser, addDocumentNonBlocking } from "@/firebase";
+import { collection, getFirestore, serverTimestamp } from "firebase/firestore";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 
 export default function PartnershipsPage() {
+  const { toast } = useToast();
+  const { user } = useUser();
   const [searchQuery, setSearchQuery] = useState("");
+  const [isAddOpen, setIsAddOpen] = useState(false);
+  
   const firestore = getFirestore();
   const partnersRef = useMemoFirebase(() => collection(firestore, 'partners'), [firestore]);
   const { data: partners, isLoading } = useCollection(partnersRef);
+
+  // New Partner State
+  const [newPartner, setNewPartner] = useState({
+    name: "",
+    type: "Influencer",
+    status: "Prospecting",
+    contact: "",
+    impactScore: 5,
+    notes: ""
+  });
+
+  const handleAddPartner = () => {
+    if (!user || !newPartner.name) return;
+
+    const docData = {
+      ...newPartner,
+      ownerId: user.uid,
+      lastContact: new Date().toISOString().split('T')[0],
+      createdAt: serverTimestamp(),
+    };
+
+    addDocumentNonBlocking(partnersRef, docData);
+    setIsAddOpen(false);
+    setNewPartner({
+      name: "",
+      type: "Influencer",
+      status: "Prospecting",
+      contact: "",
+      impactScore: 5,
+      notes: ""
+    });
+    
+    toast({
+      title: "Connection Recorded",
+      description: `"${docData.name}" has been added to the Strategic Ecosystem.`,
+    });
+  };
 
   const filteredPartners = (partners || []).filter(p => 
     p.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const avgImpact = filteredPartners.length > 0 
-    ? (filteredPartners.reduce((acc, p) => acc + (p.impactScore || 0), 0) / filteredPartners.length).toFixed(1)
+    ? (filteredPartners.reduce((acc, p) => acc + (Number(p.impactScore) || 0), 0) / filteredPartners.length).toFixed(1)
     : 0;
 
   return (
@@ -62,9 +120,85 @@ export default function PartnershipsPage() {
               className="pl-10 h-10 bg-white/[0.02] border-white/[0.06] rounded-xl text-[13px] font-medium placeholder:text-tier-3 text-tier-1 focus-visible:ring-accent/20 transition-all" 
             />
           </div>
-          <Button className="h-10 px-6 rounded-xl bg-accent text-accent-foreground hover:bg-accent/90 text-[11px] font-bold uppercase tracking-wider shadow-lg shadow-accent/20">
-            <Plus className="size-4 mr-2" /> New Connection
-          </Button>
+          
+          <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
+            <DialogTrigger asChild>
+              <Button className="h-10 px-6 rounded-xl bg-accent text-accent-foreground hover:bg-accent/90 text-[11px] font-bold uppercase tracking-wider shadow-lg shadow-accent/20">
+                <Plus className="size-4 mr-2" /> New Connection
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="bg-background/95 backdrop-blur-2xl border-white/[0.1] rounded-2xl sm:max-w-[500px]">
+              <DialogHeader>
+                <DialogTitle className="text-xl font-bold tracking-tight text-tier-1">Strategic Connection</DialogTitle>
+              </DialogHeader>
+              <div className="grid gap-6 py-4">
+                <div className="grid gap-2">
+                  <Label className="text-[10px] uppercase tracking-widest text-tier-3">Partner/Entity Name</Label>
+                  <Input 
+                    value={newPartner.name}
+                    onChange={(e) => setNewPartner({...newPartner, name: e.target.value})}
+                    placeholder="e.g. Home Office Weekly" 
+                    className="bg-white/[0.03] border-white/[0.08] h-12 rounded-xl text-tier-1"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label className="text-[10px] uppercase tracking-widest text-tier-3">Type</Label>
+                    <Select value={newPartner.type} onValueChange={(v) => setNewPartner({...newPartner, type: v})}>
+                      <SelectTrigger className="bg-white/[0.03] border-white/[0.08] h-12 rounded-xl text-tier-1">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-popover/95 backdrop-blur-xl border-white/[0.1]">
+                        <SelectItem value="Influencer">Influencer</SelectItem>
+                        <SelectItem value="Community">Community</SelectItem>
+                        <SelectItem value="B2B Partner">B2B Partner</SelectItem>
+                        <SelectItem value="School">School</SelectItem>
+                        <SelectItem value="Forum">Forum</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="grid gap-2">
+                    <Label className="text-[10px] uppercase tracking-widest text-tier-3">Impact Score (1-10)</Label>
+                    <Input 
+                      type="number"
+                      min="1"
+                      max="10"
+                      value={newPartner.impactScore}
+                      onChange={(e) => setNewPartner({...newPartner, impactScore: Number(e.target.value)})}
+                      className="bg-white/[0.03] border-white/[0.08] h-12 rounded-xl text-tier-1"
+                    />
+                  </div>
+                </div>
+                <div className="grid gap-2">
+                  <Label className="text-[10px] uppercase tracking-widest text-tier-3">Primary Contact</Label>
+                  <Input 
+                    value={newPartner.contact}
+                    onChange={(e) => setNewPartner({...newPartner, contact: e.target.value})}
+                    placeholder="Name or handle" 
+                    className="bg-white/[0.03] border-white/[0.08] h-12 rounded-xl text-tier-1"
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label className="text-[10px] uppercase tracking-widest text-tier-3">Notes/Intel</Label>
+                  <Input 
+                    value={newPartner.notes}
+                    onChange={(e) => setNewPartner({...newPartner, notes: e.target.value})}
+                    placeholder="Recent interaction or potential fit" 
+                    className="bg-white/[0.03] border-white/[0.08] h-12 rounded-xl text-tier-1"
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button 
+                  onClick={handleAddPartner}
+                  disabled={!newPartner.name}
+                  className="w-full bg-accent text-accent-foreground h-12 rounded-xl font-bold uppercase tracking-widest"
+                >
+                  Authorize Connection
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
       </header>
 
@@ -119,18 +253,20 @@ export default function PartnershipsPage() {
                   </div>
                 </div>
 
-                <div className="p-5 bg-white/[0.015] border border-white/[0.04] rounded-2xl flex flex-col gap-3">
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-tier-4">Latest Intel</span>
-                  <p className="text-[14px] text-tier-2 font-medium leading-relaxed italic">
-                    "{partner.notes}"
-                  </p>
-                </div>
+                {partner.notes && (
+                  <div className="p-5 bg-white/[0.015] border border-white/[0.04] rounded-2xl flex flex-col gap-3">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-tier-4">Latest Intel</span>
+                    <p className="text-[14px] text-tier-2 font-medium leading-relaxed italic">
+                      "{partner.notes}"
+                    </p>
+                  </div>
+                )}
 
                 <div className="flex items-center justify-between mt-2 pt-6 border-t border-white/[0.03]">
                   <div className="flex items-center gap-8">
                     <div className="flex flex-col gap-1">
                       <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-tier-4">Primary Contact</span>
-                      <span className="text-[13px] font-semibold text-tier-1">{partner.contact}</span>
+                      <span className="text-[13px] font-semibold text-tier-1">{partner.contact || 'N/A'}</span>
                     </div>
                     <div className="flex flex-col gap-1">
                       <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-tier-4">Last Contact</span>
