@@ -5,7 +5,7 @@ import {
   ArrowLeft, 
   Edit3, 
   Clock, 
-  Coffee,
+  Handshake,
   Calendar,
   Plus,
   Zap,
@@ -16,15 +16,13 @@ import {
   ChevronRight,
   Globe,
   Building2,
-  MapPin,
-  Phone,
   FileText,
   Upload,
   CheckCircle2,
   MessageSquare,
   ExternalLink,
-  Instagram,
-  Target
+  Target,
+  Users
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -55,7 +53,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 
-export default function CafeDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default function PartnershipDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const { toast } = useToast();
   const { user } = useUser();
@@ -66,26 +64,26 @@ export default function CafeDetailPage({ params }: { params: Promise<{ id: strin
   const [newNote, setNewNote] = useState("");
 
   const docRef = useMemoFirebase(() => doc(firestore, 'partners', id), [firestore, id]);
-  const { data: cafe, isLoading } = useDoc(docRef);
+  const { data: partner, isLoading } = useDoc(docRef);
 
   const tasksQuery = useMemoFirebase(() => {
     return query(collection(firestore, 'tasks'), where('growthOpportunityId', '==', id));
   }, [firestore, id]);
-  const { data: cafeTasks } = useCollection(tasksQuery);
+  const { data: partnerTasks } = useCollection(tasksQuery);
 
   const [editData, setEditData] = useState<any>(null);
 
   const historyItems = useMemo(() => {
-    if (!cafe) return [];
+    if (!partner) return [];
     
-    const journalItems = (cafe.journal || []).map((j: any) => ({
+    const journalItems = (partner.journal || []).map((j: any) => ({
       date: new Date(j.date),
       user: j.user,
       content: j.content,
       type: 'note'
     }));
 
-    const completedTasks = (cafeTasks || [])
+    const completedTasks = (partnerTasks || [])
       .filter(t => t.status === 'Completed')
       .map(t => ({
         date: t.updatedAt ? (t.updatedAt.toDate ? t.updatedAt.toDate() : new Date(t.updatedAt)) : new Date(t.dueDate || Date.now()),
@@ -95,7 +93,7 @@ export default function CafeDetailPage({ params }: { params: Promise<{ id: strin
       }));
 
     return [...journalItems, ...completedTasks].sort((a, b) => b.date.getTime() - a.date.getTime());
-  }, [cafe, cafeTasks]);
+  }, [partner, partnerTasks]);
 
   if (isLoading) {
     return (
@@ -106,22 +104,21 @@ export default function CafeDetailPage({ params }: { params: Promise<{ id: strin
     );
   }
 
-  if (!cafe) return notFound();
+  if (!partner) return notFound();
 
   const handleOpenEdit = () => {
     setEditData({
-      name: cafe.name,
-      status: cafe.status || "Prospect",
-      priority: cafe.priority || "Medium",
-      nextStep: cafe.nextStep || "",
-      dueDate: cafe.dueDate || "",
-      address: cafe.address || "",
-      phone: cafe.phone || "",
-      website: cafe.website || "",
-      instagram: cafe.instagram || "",
-      owner: cafe.contact || "",
-      locations: cafe.locationsCount || 1,
-      notes: cafe.notes || ""
+      name: partner.name,
+      status: partner.status || "Prospecting",
+      priority: partner.priority || "Medium",
+      nextStep: partner.nextStep || "",
+      dueDate: partner.dueDate || "",
+      website: partner.website || "",
+      reach: partner.reach || "",
+      relationshipStatus: partner.relationshipStatus || "Initial Outreach",
+      contactPerson: partner.contact || "",
+      contactRole: partner.contactRole || "",
+      notes: partner.notes || ""
     });
     setIsAddOpen(true);
   };
@@ -130,14 +127,13 @@ export default function CafeDetailPage({ params }: { params: Promise<{ id: strin
     if (!docRef || !editData) return;
     updateDocumentNonBlocking(docRef, {
       ...editData,
-      contact: editData.owner,
-      locationsCount: Number(editData.locations),
+      contact: editData.contactPerson,
       updatedAt: serverTimestamp(),
     });
     setIsAddOpen(false);
     toast({
       title: "Mission Calibration Updated",
-      description: "Cafe parameters have been synchronized with the cloud registry.",
+      description: "Partnership parameters have been synchronized.",
     });
   };
 
@@ -148,7 +144,7 @@ export default function CafeDetailPage({ params }: { params: Promise<{ id: strin
       user: user.displayName || "System Operator",
       content: newNote,
     };
-    const updatedJournal = [journalEntry, ...(cafe.journal || [])];
+    const updatedJournal = [journalEntry, ...(partner.journal || [])];
     updateDocumentNonBlocking(docRef, { journal: updatedJournal });
     setNewNote("");
     setIsNoteOpen(false);
@@ -157,8 +153,8 @@ export default function CafeDetailPage({ params }: { params: Promise<{ id: strin
 
   const getStatusStyles = (status: string) => {
     switch (status) {
-      case 'Live': return "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
-      case 'Negotiation': return "bg-amber-500/10 text-amber-400 border-amber-500/20";
+      case 'Active': return "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
+      case 'Negotiating': return "bg-amber-500/10 text-amber-400 border-amber-500/20";
       default: return "bg-blue-500/10 text-blue-400 border-blue-500/20";
     }
   };
@@ -167,23 +163,23 @@ export default function CafeDetailPage({ params }: { params: Promise<{ id: strin
     <div className="max-w-[1200px] mx-auto flex flex-col gap-8 animate-in fade-in duration-500">
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-2">
         <div className="flex flex-col gap-6">
-          <Link href="/cafes" className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.2em] text-tier-3 hover:text-tier-1 transition-colors w-fit group">
-            <ArrowLeft className="size-3.5 group-hover:-translate-x-1 transition-transform" /> Cafe Vertical
+          <Link href="/partnerships" className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.2em] text-tier-3 hover:text-tier-1 transition-colors w-fit group">
+            <ArrowLeft className="size-3.5 group-hover:-translate-x-1 transition-transform" /> Strategic Partnerships
           </Link>
           <div className="flex flex-col gap-3">
             <div className="flex items-center gap-4 flex-wrap">
-              <h1 className="text-4xl font-semibold tracking-tight text-tier-1">{cafe.name}</h1>
+              <h1 className="text-4xl font-semibold tracking-tight text-tier-1">{partner.name}</h1>
               <div className="flex gap-2">
-                <Badge variant="outline" className={cn("px-3 py-0.5 text-[10px] font-medium uppercase tracking-wider rounded-lg", getStatusStyles(cafe.status))}>
-                  {cafe.status}
+                <Badge variant="outline" className={cn("px-3 py-0.5 text-[10px] font-medium uppercase tracking-wider rounded-lg", getStatusStyles(partner.status))}>
+                  {partner.status}
                 </Badge>
                 <Badge variant="outline" className="px-3 py-0.5 text-[10px] font-medium uppercase tracking-wider rounded-lg border-accent/20 text-accent/80 bg-accent/5">
-                  {cafe.priority || 'Medium'} Priority
+                  {partner.priority || 'Medium'} Priority
                 </Badge>
               </div>
             </div>
             <div className="flex items-center gap-4 text-[13px] font-medium text-tier-3">
-              <span className="flex items-center gap-1.5"><Coffee className="size-4" /> {cafe.locationsCount || 1} Unit(s)</span>
+              <span className="flex items-center gap-1.5"><Handshake className="size-4" /> {partner.type} Alliance</span>
             </div>
           </div>
         </div>
@@ -191,9 +187,9 @@ export default function CafeDetailPage({ params }: { params: Promise<{ id: strin
           <Button variant="ghost" onClick={handleOpenEdit} className="h-10 px-4 rounded-xl border border-white/[0.05] text-tier-2 hover:text-tier-1 text-[12px] font-semibold uppercase tracking-wider">
             <Edit3 className="size-4 mr-2" /> Recalibrate
           </Button>
-          {cafe.website && (
+          {partner.website && (
             <Button asChild className="h-10 px-6 rounded-xl bg-primary hover:bg-primary/90 text-white text-[12px] font-semibold uppercase tracking-wider shadow-lg shadow-primary/20">
-              <a href={cafe.website.startsWith('http') ? cafe.website : `https://${cafe.website}`} target="_blank" rel="noopener noreferrer">
+              <a href={partner.website.startsWith('http') ? partner.website : `https://${partner.website}`} target="_blank" rel="noopener noreferrer">
                 <ExternalLink className="size-4 mr-2" /> Visit Site
               </a>
             </Button>
@@ -211,13 +207,13 @@ export default function CafeDetailPage({ params }: { params: Promise<{ id: strin
               <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-primary">Current Tactical Objective</span>
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <h2 className="text-2xl font-semibold text-tier-1 tracking-tight leading-snug">
-                  {cafe.nextStep || "Initializing growth protocols."}
+                  {partner.nextStep || "Initializing growth protocols."}
                 </h2>
                 <div className="flex flex-col items-start md:items-end gap-1.5 shrink-0">
                   <span className="text-[10px] font-semibold uppercase tracking-widest text-tier-4">Target Date</span>
                   <div className="flex items-center gap-2 text-accent font-semibold">
                     <Calendar className="size-4" />
-                    <span>{cafe.dueDate || 'Open Timeline'}</span>
+                    <span>{partner.dueDate || 'Open Timeline'}</span>
                   </div>
                 </div>
               </div>
@@ -226,7 +222,7 @@ export default function CafeDetailPage({ params }: { params: Promise<{ id: strin
 
           <section className="flex flex-col gap-8">
             <div className="flex items-center justify-between px-2">
-              <h3 className="text-[11px] font-bold uppercase tracking-[0.25em] text-tier-4">Hospitality onboarding history</h3>
+              <h3 className="text-[11px] font-bold uppercase tracking-[0.25em] text-tier-4">Partnership history</h3>
               <Dialog open={isNoteOpen} onOpenChange={setIsNoteOpen}>
                 <DialogTrigger asChild>
                   <Button variant="ghost" className="h-8 text-[10px] font-bold uppercase tracking-wider text-tier-3 hover:text-primary">
@@ -246,7 +242,7 @@ export default function CafeDetailPage({ params }: { params: Promise<{ id: strin
                   <TimelineEntry key={i} date={entry.date.toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })} user={entry.user} content={entry.content} type={entry.type} />
                 ))
               ) : (
-                <TimelineEntry date="Initial" user="System" content={cafe.notes || "Operational history synchronized."} type="note" />
+                <TimelineEntry date="Initial" user="System" content={partner.notes || "Operational history synchronized."} type="note" />
               )}
             </div>
           </section>
@@ -255,33 +251,35 @@ export default function CafeDetailPage({ params }: { params: Promise<{ id: strin
         <div className="lg:col-span-4 flex flex-col gap-8">
           <div className="flex flex-col gap-6 px-1">
             <div className="flex items-center justify-between">
-              <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4">Company Contact Hub</h3>
+              <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4">Partnership Hub</h3>
               <Building2 className="size-4 text-tier-3" />
             </div>
             <div className="flex flex-col gap-5">
-              <ContactField label="Location Address" value={cafe.address} icon={MapPin} />
-              <ContactField label="Office Phone" value={cafe.phone} icon={Phone} />
-              <ContactField label="Instagram" value={cafe.instagram} icon={Instagram} />
-              <ContactField label="Total Locations" value={`${cafe.locationsCount || 1} Unit(s)`} icon={Target} />
+              <ContactField label="Official Website" value={partner.website} icon={Globe} />
+              <ContactField label="Est. Reach" value={partner.reach} icon={Users} />
+              <ContactField label="Alliance Status" value={partner.relationshipStatus || 'Initial Outreach'} icon={Target} />
               <Separator className="bg-white/[0.04]" />
-              {cafe.contact && (
+              {partner.contact && (
                 <div className="flex flex-col gap-3 p-4 rounded-2xl bg-white/[0.02] border border-white/[0.05]">
-                  <span className="text-[9px] font-bold uppercase tracking-widest text-tier-4">Owner / Decision Maker</span>
+                  <span className="text-[9px] font-bold uppercase tracking-widest text-tier-4">Primary Contact Person</span>
                   <div className="flex items-center gap-3">
-                    <div className="size-9 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-bold text-xs">{cafe.contact.charAt(0)}</div>
-                    <span className="text-[13px] font-semibold text-tier-1">{cafe.contact}</span>
+                    <div className="size-9 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-bold text-xs">{partner.contact.charAt(0)}</div>
+                    <div className="flex flex-col">
+                      <span className="text-[13px] font-semibold text-tier-1">{partner.contact}</span>
+                      <span className="text-[11px] text-tier-3">{partner.contactRole || 'Decision Maker'}</span>
+                    </div>
                   </div>
                 </div>
               )}
             </div>
             <div className="grid grid-cols-2 gap-3 pt-2">
-              <Button variant="outline" className="h-10 rounded-xl border-white/[0.06] bg-white/[0.02] text-[10px] font-bold uppercase tracking-widest hover:bg-primary/10 transition-all" onClick={() => { if (cafe.website) window.open(cafe.website, '_blank'); }}>Open Site</Button>
+              <Button variant="outline" className="h-10 rounded-xl border-white/[0.06] bg-white/[0.02] text-[10px] font-bold uppercase tracking-widest hover:bg-primary/10 transition-all" onClick={() => { if (partner.website) window.open(partner.website, '_blank'); }}>Open Site</Button>
               <Button onClick={() => setIsNoteOpen(true)} className="h-10 rounded-xl bg-primary/20 text-primary border border-primary/20 text-[10px] font-bold uppercase tracking-widest hover:bg-primary hover:text-white transition-all">Log Interaction</Button>
             </div>
           </div>
           <section className="flex flex-col gap-4">
-            <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4">About Cafe</h3>
-            <p className="text-[13px] text-tier-2 leading-relaxed font-medium">{cafe.notes || "No detailed profile recorded."}</p>
+            <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4">About Alliance</h3>
+            <p className="text-[13px] text-tier-2 leading-relaxed font-medium">{partner.notes || "No alliance profile recorded."}</p>
           </section>
         </div>
       </div>
@@ -292,19 +290,19 @@ export default function CafeDetailPage({ params }: { params: Promise<{ id: strin
             <DialogHeader><DialogTitle className="text-xl font-bold tracking-tight text-tier-1">Mission Calibration</DialogTitle></DialogHeader>
             <div className="grid gap-6 py-4">
               <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2"><Label className="text-[10px] uppercase tracking-widest text-tier-3">Cafe Name</Label><Input value={editData.name} onChange={(e) => setEditData({...editData, name: e.target.value})} className="bg-white/[0.03] border-white/[0.08] h-11 rounded-xl text-tier-1" /></div>
-                <div className="grid gap-2"><Label className="text-[10px] uppercase tracking-widest text-tier-3">Status</Label><Select value={editData.status} onValueChange={(v) => setEditData({...editData, status: v})}><SelectTrigger className="bg-white/[0.03] border-white/[0.08] h-11 rounded-xl"><SelectValue /></SelectTrigger><SelectContent>{['Prospect', 'Contacted', 'Trial', 'Negotiation', 'Live'].map(s => (<SelectItem key={s} value={s}>{s}</SelectItem>))}</SelectContent></Select></div>
+                <div className="grid gap-2"><Label className="text-[10px] uppercase tracking-widest text-tier-3">Entity Name</Label><Input value={editData.name} onChange={(e) => setEditData({...editData, name: e.target.value})} className="bg-white/[0.03] border-white/[0.08] h-11 rounded-xl text-tier-1" /></div>
+                <div className="grid gap-2"><Label className="text-[10px] uppercase tracking-widest text-tier-3">Status</Label><Select value={editData.status} onValueChange={(v) => setEditData({...editData, status: v})}><SelectTrigger className="bg-white/[0.03] border-white/[0.08] h-11 rounded-xl"><SelectValue /></SelectTrigger><SelectContent>{['Prospecting', 'Outreach', 'Negotiating', 'Active', 'Inactive'].map(s => (<SelectItem key={s} value={s}>{s}</SelectItem>))}</SelectContent></Select></div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2"><Label className="text-[10px] uppercase tracking-widest text-tier-3">Objective</Label><Input value={editData.nextStep} onChange={(e) => setEditData({...editData, nextStep: e.target.value})} className="bg-white/[0.03] border-white/[0.08] h-11 rounded-xl text-tier-1" /></div>
                 <div className="grid gap-2"><Label className="text-[10px] uppercase tracking-widest text-tier-3">Target Date</Label><Input type="date" value={editData.dueDate} onChange={(e) => setEditData({...editData, dueDate: e.target.value})} className="bg-white/[0.03] border-white/[0.08] h-11 rounded-xl text-tier-1" /></div>
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2"><Label className="text-[10px] uppercase tracking-widest text-tier-3">Owner</Label><Input value={editData.owner} onChange={(e) => setEditData({...editData, owner: e.target.value})} className="bg-white/[0.03] border-white/[0.08] h-11 rounded-xl" /></div>
-                <div className="grid gap-2"><Label className="text-[10px] uppercase tracking-widest text-tier-3">Locations Count</Label><Input type="number" value={editData.locations} onChange={(e) => setEditData({...editData, locations: e.target.value})} className="bg-white/[0.03] border-white/[0.08] h-11 rounded-xl" /></div>
+                <div className="grid gap-2"><Label className="text-[10px] uppercase tracking-widest text-tier-3">Contact Name</Label><Input value={editData.contactPerson} onChange={(e) => setEditData({...editData, contactPerson: e.target.value})} className="bg-white/[0.03] border-white/[0.08] h-11 rounded-xl" /></div>
+                <div className="grid gap-2"><Label className="text-[10px] uppercase tracking-widest text-tier-3">Contact Role</Label><Input value={editData.contactRole} onChange={(e) => setEditData({...editData, contactRole: e.target.value})} className="bg-white/[0.03] border-white/[0.08] h-11 rounded-xl" /></div>
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2"><Label className="text-[10px] uppercase tracking-widest text-tier-3">Instagram Handle</Label><Input value={editData.instagram} onChange={(e) => setEditData({...editData, instagram: e.target.value})} className="bg-white/[0.03] border-white/[0.08] h-11 rounded-xl" /></div>
+                <div className="grid gap-2"><Label className="text-[10px] uppercase tracking-widest text-tier-3">Est. Reach</Label><Input value={editData.reach} onChange={(e) => setEditData({...editData, reach: e.target.value})} className="bg-white/[0.03] border-white/[0.08] h-11 rounded-xl" /></div>
                 <div className="grid gap-2"><Label className="text-[10px] uppercase tracking-widest text-tier-3">Website</Label><Input value={editData.website} onChange={(e) => setEditData({...editData, website: e.target.value})} className="bg-white/[0.03] border-white/[0.08] h-11 rounded-xl" /></div>
               </div>
               <div className="grid gap-2"><Label className="text-[10px] uppercase tracking-widest text-tier-3">About / Notes</Label><Textarea value={editData.notes} onChange={(e) => setEditData({...editData, notes: e.target.value})} className="bg-white/[0.03] border-white/[0.08] min-h-[100px] rounded-xl" /></div>
