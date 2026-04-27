@@ -276,7 +276,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
 
           {/* PLATFORM ONBOARDING CHECKLIST */}
           {platform.requirements && platform.requirements.length > 0 && (
-            <section className="premium-panel p-8 rounded-3xl flex flex-col gap-6">
+            <div className="flex flex-col gap-6 px-8 py-2">
               <div className="flex items-center justify-between">
                 <div className="flex flex-col gap-1">
                   <h3 className="text-[11px] font-bold uppercase tracking-[0.25em] text-tier-4">Platform Onboarding Checklist</h3>
@@ -306,7 +306,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
                   );
                 })}
               </div>
-            </section>
+            </div>
           )}
 
         </div>
