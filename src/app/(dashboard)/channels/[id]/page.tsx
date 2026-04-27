@@ -15,7 +15,10 @@ import {
   Loader2,
   Trash2,
   X,
-  MessageSquare
+  MessageSquare,
+  ShieldCheck,
+  CheckCircle2,
+  ChevronRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -258,20 +261,28 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
             </div>
           </section>
 
-          {/* ONBOARDING REQUIREMENTS - OPTIONAL */}
+          {/* MISSION ONBOARDING - MINIMALIST CHECKLIST */}
           {platform.requirements && platform.requirements.length > 0 && (
             <section className="premium-panel p-8 rounded-3xl flex flex-col gap-6">
-              <h3 className="text-[11px] font-bold uppercase tracking-[0.25em] text-tier-4">Onboarding Requirements</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-12">
+              <div className="flex items-center justify-between">
+                <div className="flex flex-col gap-1">
+                  <h3 className="text-[11px] font-bold uppercase tracking-[0.25em] text-tier-4">Mission Onboarding</h3>
+                  <span className="text-[13px] text-tier-2 font-medium">Platform compliance & validation checklist</span>
+                </div>
+                <div className="size-10 rounded-full bg-primary/5 border border-primary/10 flex items-center justify-center">
+                  <ShieldCheck className="size-5 text-primary" />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-px bg-white/[0.03] rounded-2xl overflow-hidden border border-white/[0.05]">
                 {platform.requirements.map((req: string, i: number) => (
-                  <div key={i} className="flex items-center gap-4 group cursor-pointer">
-                    <Checkbox 
-                      id={`req-${i}`} 
-                      className="size-5 rounded-md border-white/10 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
-                    />
-                    <label htmlFor={`req-${i}`} className="text-[14px] font-medium tracking-tight text-tier-2 group-hover:text-tier-1 transition-colors cursor-pointer">
+                  <div key={i} className="flex items-center gap-5 p-5 bg-background/40 hover:bg-white/[0.02] transition-colors group">
+                    <div className="size-5 rounded-md border border-white/10 flex items-center justify-center bg-white/[0.03] group-hover:border-primary/50 group-hover:bg-primary/5 transition-all">
+                      <div className="size-1.5 rounded-full bg-tier-4 group-hover:bg-primary transition-colors" />
+                    </div>
+                    <span className="text-[14px] font-medium tracking-tight text-tier-2 group-hover:text-tier-1 transition-colors">
                       {req}
-                    </label>
+                    </span>
                   </div>
                 ))}
               </div>
@@ -315,7 +326,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
         <Dialog open={isEditOpen} onOpenChange={setIsAddOpen}>
           <DialogContent className="bg-background/95 backdrop-blur-2xl border-white/[0.1] rounded-2xl sm:max-w-[600px] max-h-[90vh] overflow-y-auto custom-scrollbar">
             <DialogHeader>
-              <DialogTitle className="text-xl font-bold tracking-tight text-tier-1">Mission Recalibration</DialogTitle>
+              <DialogTitle className="text-xl font-bold tracking-tight text-tier-1">Mission Calibration</DialogTitle>
             </DialogHeader>
             <div className="grid gap-6 py-4">
               <div className="grid grid-cols-2 gap-4">
@@ -363,40 +374,50 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
               </div>
 
               <div className="grid gap-3">
-                <Label className="text-[10px] uppercase tracking-widest text-tier-3">Define Onboarding Requirements</Label>
+                <Label className="text-[10px] uppercase tracking-widest text-tier-4 font-bold">Onboarding Strategy</Label>
                 <div className="flex gap-2">
                   <Input 
-                    placeholder="e.g. Compliance Certification"
+                    placeholder="Add requirement (e.g. VAT validation)"
                     value={reqInput}
                     onChange={(e) => setReqInput(e.target.value)}
-                    className="bg-white/[0.03] border-white/[0.08] h-11 rounded-xl"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && reqInput) {
+                        e.preventDefault();
+                        setEditData({...editData, requirements: [...editData.requirements, reqInput]});
+                        setReqInput("");
+                      }
+                    }}
+                    className="bg-white/[0.02] border-white/[0.06] h-11 rounded-xl text-sm"
                   />
                   <Button variant="secondary" onClick={() => {
                     if (reqInput) {
                       setEditData({...editData, requirements: [...editData.requirements, reqInput]});
                       setReqInput("");
                     }
-                  }} className="rounded-xl h-11 px-4 font-bold uppercase text-[10px]">Add</Button>
+                  }} className="rounded-xl h-11 px-4 font-bold uppercase text-[10px] tracking-widest border border-white/[0.05]">Add</Button>
                 </div>
-                <div className="flex flex-wrap gap-2 pt-2">
+                <div className="flex flex-col gap-2 pt-2">
                   {editData.requirements.map((req: string, idx: number) => (
-                    <Badge key={idx} variant="secondary" className="pl-3 pr-1 py-1 gap-2 rounded-lg bg-white/5 border-white/10 group">
-                      <span className="text-[10px] font-medium">{req}</span>
+                    <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-white/[0.02] border border-white/[0.05] group">
+                      <span className="text-[13px] font-medium text-tier-2">{req}</span>
                       <Button 
                         variant="ghost" 
                         size="icon" 
                         onClick={() => setEditData({...editData, requirements: editData.requirements.filter((_: any, i: number) => i !== idx)})}
-                        className="size-4 rounded-full hover:bg-rose-500/20 hover:text-rose-400"
+                        className="size-7 rounded-lg text-tier-4 hover:text-rose-400 hover:bg-rose-500/10 transition-all"
                       >
-                        <X className="size-2.5" />
+                        <X className="size-3.5" />
                       </Button>
-                    </Badge>
+                    </div>
                   ))}
+                  {editData.requirements.length === 0 && (
+                    <span className="text-[11px] text-tier-4 italic ml-1">No specific requirements defined.</span>
+                  )}
                 </div>
               </div>
             </div>
-            <DialogFooter>
-              <Button onClick={handleUpdate} className="w-full bg-primary text-white h-12 rounded-xl font-bold uppercase tracking-widest shadow-xl shadow-primary/20">
+            <DialogFooter className="pt-2">
+              <Button onClick={handleUpdate} className="w-full bg-primary text-white h-12 rounded-xl font-bold uppercase tracking-widest shadow-xl shadow-primary/20 hover:scale-[1.01] active:scale-[0.99] transition-all">
                 Synchronize Mission
               </Button>
             </DialogFooter>
