@@ -380,10 +380,7 @@ function PlatformListItem({ platform }: { platform: any }) {
       <div className="flex items-center gap-12">
         <div className="flex flex-col text-right">
           <span className="text-[9px] font-semibold uppercase tracking-[0.25em] text-tier-4 mb-1.5">Target Action</span>
-          <span className={cn(
-            "text-[14px] font-medium tracking-tight",
-            platform.currentStage !== 'Live' ? "text-accent/90" : "text-tier-2"
-          )}>
+          <span className="text-[14px] font-medium tracking-tight text-tier-2">
             {platform.nextStep}
           </span>
         </div>
