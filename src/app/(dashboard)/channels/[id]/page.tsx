@@ -1,4 +1,3 @@
-
 "use client";
 
 import { use, useState } from "react";
@@ -324,7 +323,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
         <div className="lg:col-span-4 flex flex-col gap-8">
           
           {/* CONTACT HUB */}
-          <section className="premium-panel p-6 rounded-3xl flex flex-col gap-6">
+          <div className="flex flex-col gap-6 px-1">
             <div className="flex items-center justify-between">
               <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4">Company Contact Hub</h3>
               <Building2 className="size-4 text-tier-3" />
@@ -424,7 +423,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
                 <MessageSquare className="size-3.5 mr-2" /> Log Interaction
               </Button>
             </div>
-          </section>
+          </div>
 
           {/* ABOUT PLATFORM */}
           <section className="premium-panel p-6 rounded-3xl flex flex-col gap-4">
