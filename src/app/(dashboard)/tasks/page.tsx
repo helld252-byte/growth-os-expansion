@@ -1,4 +1,3 @@
-
 "use client";
 
 import { 
@@ -16,17 +15,93 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { useCollection, useMemoFirebase } from "@/firebase";
-import { collection, getFirestore } from "firebase/firestore";
+import { useCollection, useMemoFirebase, useUser, addDocumentNonBlocking, updateDocumentNonBlocking } from "@/firebase";
+import { collection, getFirestore, serverTimestamp, doc } from "firebase/firestore";
 import { cn } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useMemo, useState } from "react";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogTrigger,
+  DialogFooter
+} from "@/components/ui/dialog";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
 
 export default function TasksPage() {
+  const { toast } = useToast();
+  const { user } = useUser();
   const [searchQuery, setSearchQuery] = useState("");
+  const [isAddOpen, setIsAddOpen] = useState(false);
   const firestore = getFirestore();
+
+  // Firestore Collections
   const tasksRef = useMemoFirebase(() => collection(firestore, 'tasks'), [firestore]);
   const { data: tasks, isLoading } = useCollection(tasksRef);
+
+  const opportunitiesRef = useMemoFirebase(() => collection(firestore, 'growth_opportunities'), [firestore]);
+  const { data: platforms } = useCollection(opportunitiesRef);
+
+  // New Task State
+  const [newTask, setNewTask] = useState({
+    title: "",
+    priority: "Medium",
+    dueDate: new Date().toISOString().split('T')[0],
+    growthOpportunityId: "none",
+  });
+
+  const handleAddTask = () => {
+    if (!user || !newTask.title) return;
+
+    const docData = {
+      title: newTask.title,
+      priority: newTask.priority,
+      dueDate: newTask.dueDate,
+      growthOpportunityId: newTask.growthOpportunityId === "none" ? null : newTask.growthOpportunityId,
+      ownerId: user.uid,
+      status: "In Progress",
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    };
+
+    addDocumentNonBlocking(tasksRef, docData);
+    setIsAddOpen(false);
+    setNewTask({
+      title: "",
+      priority: "Medium",
+      dueDate: new Date().toISOString().split('T')[0],
+      growthOpportunityId: "none",
+    });
+
+    toast({
+      title: "Tactical Task Added",
+      description: `"${docData.title}" has been recorded in the execution backlog.`,
+    });
+  };
+
+  const handleToggleComplete = (task: any) => {
+    const taskRef = doc(firestore, 'tasks', task.id);
+    const newStatus = task.status === 'Completed' ? 'In Progress' : 'Completed';
+    updateDocumentNonBlocking(taskRef, {
+      status: newStatus,
+      updatedAt: serverTimestamp()
+    });
+    
+    toast({
+      title: newStatus === 'Completed' ? "Task Verified" : "Task Reopened",
+      description: `Mission parameter updated for "${task.title}".`,
+    });
+  };
 
   const filteredTasks = useMemo(() => {
     return (tasks || []).filter(t => 
@@ -61,9 +136,77 @@ export default function TasksPage() {
             </p>
           </div>
         </div>
-        <Button className="bg-primary hover:bg-primary/90 text-white font-semibold gap-2.5 rounded-xl h-11 px-6 shadow-xl shadow-primary/20 text-[11px] uppercase tracking-wider transition-all">
-          <Plus className="size-4" /> Quick Add Task
-        </Button>
+        
+        <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
+          <DialogTrigger asChild>
+            <Button className="bg-primary hover:bg-primary/90 text-white font-semibold gap-2.5 rounded-xl h-11 px-6 shadow-xl shadow-primary/20 text-[11px] uppercase tracking-wider transition-all">
+              <Plus className="size-4" /> Quick Add Task
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="bg-background/95 backdrop-blur-2xl border-white/[0.1] rounded-2xl sm:max-w-[500px]">
+            <DialogHeader>
+              <DialogTitle className="text-xl font-bold tracking-tight text-tier-1">New Tactical Task</DialogTitle>
+            </DialogHeader>
+            <div className="grid gap-6 py-4">
+              <div className="grid gap-2">
+                <Label className="text-[10px] uppercase tracking-widest text-tier-3">Task Title</Label>
+                <Input 
+                  value={newTask.title}
+                  onChange={(e) => setNewTask({...newTask, title: e.target.value})}
+                  placeholder="e.g. Upload VAT ID to Amazon EU" 
+                  className="bg-white/[0.03] border-white/[0.08] h-12 rounded-xl text-tier-1"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label className="text-[10px] uppercase tracking-widest text-tier-3">Priority</Label>
+                  <Select value={newTask.priority} onValueChange={(v) => setNewTask({...newTask, priority: v})}>
+                    <SelectTrigger className="bg-white/[0.03] border-white/[0.08] h-12 rounded-xl text-tier-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="High">High Priority</SelectItem>
+                      <SelectItem value="Medium">Medium Priority</SelectItem>
+                      <SelectItem value="Low">Low Priority</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid gap-2">
+                  <Label className="text-[10px] uppercase tracking-widest text-tier-3">Due Date</Label>
+                  <Input 
+                    type="date"
+                    value={newTask.dueDate}
+                    onChange={(e) => setNewTask({...newTask, dueDate: e.target.value})}
+                    className="bg-white/[0.03] border-white/[0.08] h-12 rounded-xl text-tier-1"
+                  />
+                </div>
+              </div>
+              <div className="grid gap-2">
+                <Label className="text-[10px] uppercase tracking-widest text-tier-3">Linked Platform (Optional)</Label>
+                <Select value={newTask.growthOpportunityId} onValueChange={(v) => setNewTask({...newTask, growthOpportunityId: v})}>
+                  <SelectTrigger className="bg-white/[0.03] border-white/[0.08] h-12 rounded-xl text-tier-1">
+                    <SelectValue placeholder="Select platform..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Internal / General</SelectItem>
+                    {platforms?.map(p => (
+                      <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button 
+                onClick={handleAddTask}
+                disabled={!newTask.title}
+                className="w-full bg-primary text-white h-12 rounded-xl font-bold uppercase tracking-widest"
+              >
+                Launch Task
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
@@ -115,7 +258,7 @@ export default function TasksPage() {
                 </div>
               ) : activeTasks.length > 0 ? (
                 activeTasks.map((task) => (
-                  <TaskRow key={task.id} task={task} getStatusStyles={getStatusStyles} />
+                  <TaskRow key={task.id} task={task} getStatusStyles={getStatusStyles} onToggle={() => handleToggleComplete(task)} />
                 ))
               ) : (
                 <div className="p-12 text-center opacity-40">
@@ -137,7 +280,7 @@ export default function TasksPage() {
               <div className="flex flex-col">
                 {!isLoading && completedTasks.length > 0 ? (
                   completedTasks.map((task) => (
-                    <TaskRow key={task.id} task={task} getStatusStyles={getStatusStyles} />
+                    <TaskRow key={task.id} task={task} getStatusStyles={getStatusStyles} onToggle={() => handleToggleComplete(task)} />
                   ))
                 ) : (
                   <div className="p-12 text-center opacity-30">
@@ -153,11 +296,12 @@ export default function TasksPage() {
   );
 }
 
-function TaskRow({ task, getStatusStyles }: { task: any, getStatusStyles: (s: string) => string }) {
+function TaskRow({ task, getStatusStyles, onToggle }: { task: any, getStatusStyles: (s: string) => string, onToggle: () => void }) {
   return (
     <div className="px-8 py-6 flex items-start gap-6 hover:bg-white/[0.015] transition-all group border-b border-white/[0.03] last:border-0">
       <Checkbox 
         checked={task.status === 'Completed'}
+        onClick={onToggle}
         className="mt-1 size-5 rounded-md border-white/10 data-[state=checked]:bg-primary data-[state=checked]:border-primary transition-all" 
       />
       

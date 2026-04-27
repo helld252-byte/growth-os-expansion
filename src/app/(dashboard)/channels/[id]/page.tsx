@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useState } from "react";
+import { use, useState, useMemo } from "react";
 import { 
   ArrowLeft, 
   ExternalLink, 
@@ -18,7 +18,9 @@ import {
   Link2,
   Building2,
   User,
-  MessageSquare
+  MessageSquare,
+  CheckCircle2,
+  History
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -42,8 +44,8 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
-import { useDoc, useMemoFirebase, useUser, updateDocumentNonBlocking } from "@/firebase";
-import { doc, getFirestore, serverTimestamp } from "firebase/firestore";
+import { useDoc, useMemoFirebase, useUser, updateDocumentNonBlocking, useCollection } from "@/firebase";
+import { doc, getFirestore, serverTimestamp, collection, query, where } from "firebase/firestore";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -62,9 +64,37 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
   const docRef = useMemoFirebase(() => doc(firestore, 'growth_opportunities', id), [firestore, id]);
   const { data: platform, isLoading } = useDoc(docRef);
 
+  // Fetch associated tasks to display in history if completed
+  const tasksQuery = useMemoFirebase(() => {
+    return query(collection(firestore, 'tasks'), where('growthOpportunityId', '==', id));
+  }, [firestore, id]);
+  const { data: platformTasks } = useCollection(tasksQuery);
+
   // Edit State
   const [editData, setEditData] = useState<any>(null);
   const [reqInput, setReqInput] = useState("");
+
+  const historyItems = useMemo(() => {
+    if (!platform) return [];
+    
+    const journalItems = (platform.journal || []).map((j: any) => ({
+      date: new Date(j.date),
+      user: j.user,
+      content: j.content,
+      type: 'note'
+    }));
+
+    const completedTasks = (platformTasks || [])
+      .filter(t => t.status === 'Completed')
+      .map(t => ({
+        date: t.updatedAt ? (t.updatedAt.toDate ? t.updatedAt.toDate() : new Date(t.updatedAt)) : new Date(t.dueDate || Date.now()),
+        user: "System",
+        content: `Step Verified: ${t.title}`,
+        type: 'task'
+      }));
+
+    return [...journalItems, ...completedTasks].sort((a, b) => b.date.getTime() - a.date.getTime());
+  }, [platform, platformTasks]);
 
   if (isLoading) {
     return (
@@ -127,7 +157,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
     setIsNoteOpen(false);
     toast({
       title: "Field Note Recorded",
-      description: "Mission journal has been updated.",
+      description: "Platform onboarding history has been updated.",
     });
   };
 
@@ -231,10 +261,13 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
             </div>
           </div>
 
-          {/* MISSION JOURNAL */}
-          <section className="premium-panel p-8 rounded-3xl flex flex-col gap-8">
-            <div className="flex items-center justify-between">
-              <h3 className="text-[11px] font-bold uppercase tracking-[0.25em] text-tier-4">Mission Journal</h3>
+          {/* ONBOARDING HISTORY */}
+          <section className="flex flex-col gap-8">
+            <div className="flex items-center justify-between px-2">
+              <div className="flex flex-col gap-1">
+                <h3 className="text-[11px] font-bold uppercase tracking-[0.25em] text-tier-4">Platform onboarding history</h3>
+                <span className="text-[13px] text-tier-2 font-medium">Tactical log and verified steps</span>
+              </div>
               <Dialog open={isNoteOpen} onOpenChange={setIsNoteOpen}>
                 <DialogTrigger asChild>
                   <Button variant="ghost" className="h-8 text-[10px] font-bold uppercase tracking-wider text-tier-3 hover:text-primary">
@@ -255,7 +288,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
                   </div>
                   <DialogFooter>
                     <Button onClick={handleAddNote} className="w-full bg-primary text-white h-12 rounded-xl font-bold uppercase tracking-widest">
-                      Commit to Journal
+                      Commit to History
                     </Button>
                   </DialogFooter>
                 </DialogContent>
@@ -263,13 +296,14 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
             </div>
             
             <div className="flex flex-col gap-8 relative before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-px before:bg-white/[0.05]">
-              {(platform.journal && platform.journal.length > 0) ? (
-                platform.journal.map((entry: any, i: number) => (
+              {historyItems.length > 0 ? (
+                historyItems.map((entry: any, i: number) => (
                   <TimelineEntry 
                     key={i}
-                    date={new Date(entry.date).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })} 
+                    date={entry.date.toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })} 
                     user={entry.user} 
                     content={entry.content} 
+                    type={entry.type}
                   />
                 ))
               ) : (
@@ -277,6 +311,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
                   date={platform.lastUpdate ? new Date(platform.lastUpdate).toLocaleDateString() : 'Initial'} 
                   user="System" 
                   content={platform.notes || "Operational history synchronized. Growth protocols active."} 
+                  type="note"
                 />
               )}
             </div>
@@ -284,7 +319,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
 
           {/* PLATFORM ONBOARDING CHECKLIST */}
           {platform.requirements && platform.requirements.length > 0 && (
-            <div className="flex flex-col gap-6 px-8 py-2">
+            <div className="flex flex-col gap-6 py-2">
               <div className="flex items-center justify-between">
                 <div className="flex flex-col gap-1">
                   <h3 className="text-[11px] font-bold uppercase tracking-[0.25em] text-tier-4">Platform Onboarding Checklist</h3>
@@ -632,15 +667,22 @@ function ContactField({ label, value, icon: Icon, link }: { label: string, value
   );
 }
 
-function TimelineEntry({ date, user, content }: { date: string, user: string, content: string }) {
+function TimelineEntry({ date, user, content, type }: { date: string, user: string, content: string, type: 'note' | 'task' }) {
   return (
     <div className="flex flex-col gap-2 pl-8 relative">
       <div className="absolute left-0 top-1.5 size-[23px] rounded-full bg-background border-2 border-white/[0.08] flex items-center justify-center shadow-lg shadow-black">
-        <div className="size-1.5 rounded-full bg-primary" />
+        {type === 'task' ? (
+          <div className="size-full rounded-full bg-emerald-500/20 flex items-center justify-center">
+            <CheckCircle2 className="size-3 text-emerald-500" />
+          </div>
+        ) : (
+          <div className="size-1.5 rounded-full bg-primary" />
+        )}
       </div>
       <div className="flex items-center gap-3">
         <span className="text-[12px] font-semibold text-tier-2">{user}</span>
         <span className="text-[10px] font-bold uppercase tracking-widest text-tier-4">{date}</span>
+        {type === 'task' && <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-[8px] uppercase tracking-tighter px-1.5 h-4">Verified Step</Badge>}
       </div>
       <p className="text-[14px] text-tier-3 leading-relaxed font-medium">
         {content}
