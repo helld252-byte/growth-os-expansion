@@ -1,4 +1,3 @@
-
 "use client";
 
 import { 
@@ -222,10 +221,10 @@ export default function CommandCenter() {
                   <tr key={p.id} className="border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors group">
                     <td className="p-6">
                       <Link href={`/channels/${p.id}`} className="flex items-center gap-5">
-                        <div className="size-10 rounded-xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center font-bold text-sm text-primary group-hover:bg-primary/10 transition-all">
+                        <div className="size-10 rounded-xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center font-bold text-sm text-tier-3 group-hover:text-primary group-hover:bg-primary/10 transition-all">
                           {p.name.charAt(0)}
                         </div>
-                        <span className="font-semibold tracking-tight text-[15px] text-primary group-hover:text-tier-1 transition-colors">{p.name}</span>
+                        <span className="font-semibold tracking-tight text-[15px] text-tier-1 group-hover:text-primary transition-colors">{p.name}</span>
                       </Link>
                     </td>
                     <td className="p-6 text-[12px] font-semibold text-tier-2 uppercase tracking-[0.12em]">{p.type}</td>

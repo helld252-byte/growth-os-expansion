@@ -285,7 +285,7 @@ function FilterButton({ icon: Icon, label, count, active, onClick }: any) {
       )}
     >
       <Icon className={cn("size-4.5", active ? "text-primary" : "text-tier-3 group-hover:text-tier-2")} />
-      <span className={cn("text-[13px] tracking-tight font-medium")}>{label}</span>
+      <span className={cn("text-[13px] tracking-tight font-medium", active ? "text-primary" : "")}>{label}</span>
       <span className={cn(
         "ml-auto text-[10px] font-semibold tracking-tighter",
         active ? "text-primary" : "text-tier-2"
@@ -316,7 +316,7 @@ function CafeListItem({ cafe }: { cafe: any }) {
         
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-4">
-            <h3 className="text-base font-semibold tracking-tight text-primary group-hover:text-tier-1 transition-colors">
+            <h3 className="text-base font-semibold tracking-tight text-tier-1 group-hover:text-primary transition-colors">
               {cafe.name}
             </h3>
             <span className="text-[10px] font-medium uppercase tracking-[0.12em] text-tier-1 px-2.5 py-0.5 border border-white/[0.1] rounded-md bg-white/[0.05]">
