@@ -129,13 +129,23 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
             </div>
           </div>
 
-          {/* SNAPSHOT ROW */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <SnapshotCard label="Stage" value={platform.currentStage} icon={Activity} />
-            <SnapshotCard label="Strategic Fit" value={`${platform.fitScore}/10`} icon={Star} />
-            <SnapshotCard label="Risk Level" value={platform.riskLevel} icon={AlertTriangle} />
-            <SnapshotCard label="Value Prop" value={`$${((platform.estimatedValue || 0) / 1000).toFixed(0)}k`} icon={Zap} />
-          </div>
+          {/* MISSION JOURNAL - MOVED HERE */}
+          <section className="premium-panel p-8 rounded-3xl flex flex-col gap-8">
+            <div className="flex items-center justify-between">
+              <h3 className="text-[11px] font-bold uppercase tracking-[0.25em] text-tier-4">Mission Journal</h3>
+              <Button variant="ghost" className="h-8 text-[10px] font-bold uppercase tracking-wider text-tier-3 hover:text-primary">
+                <Plus className="size-3.5 mr-2" /> Add Note
+              </Button>
+            </div>
+            
+            <div className="flex flex-col gap-8 relative before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-px before:bg-white/[0.05]">
+              <TimelineEntry 
+                date={platform.lastUpdate ? new Date(platform.lastUpdate).toLocaleDateString() : 'Recent'} 
+                user="System" 
+                content={platform.notes || "Operational history synchronized. Initiating growth protocols for this platform."} 
+              />
+            </div>
+          </section>
 
           {/* REQUIREMENTS */}
           <section className="premium-panel p-8 rounded-3xl flex flex-col gap-6">
@@ -152,24 +162,6 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
                   </label>
                 </div>
               ))}
-            </div>
-          </section>
-
-          {/* MISSION JOURNAL */}
-          <section className="premium-panel p-8 rounded-3xl flex flex-col gap-8">
-            <div className="flex items-center justify-between">
-              <h3 className="text-[11px] font-bold uppercase tracking-[0.25em] text-tier-4">Mission Journal</h3>
-              <Button variant="ghost" className="h-8 text-[10px] font-bold uppercase tracking-wider text-tier-3 hover:text-primary">
-                <Plus className="size-3.5 mr-2" /> Add Note
-              </Button>
-            </div>
-            
-            <div className="flex flex-col gap-8 relative before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-px before:bg-white/[0.05]">
-              <TimelineEntry 
-                date={platform.lastUpdate ? new Date(platform.lastUpdate).toLocaleDateString() : 'Recent'} 
-                user="System" 
-                content={platform.notes || "Operational history synchronized. Initiating growth protocols for this platform."} 
-              />
             </div>
           </section>
 
@@ -194,18 +186,6 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
           </section>
         </div>
       </div>
-    </div>
-  );
-}
-
-function SnapshotCard({ label, value, icon: Icon }: { label: string, value: string | number, icon: any }) {
-  return (
-    <div className="glass-card p-5 rounded-2xl flex flex-col gap-3 border-white/[0.03] hover:border-white/10 transition-all">
-      <div className="flex items-center justify-between">
-        <Icon className="size-4 text-tier-3" />
-        <span className="text-[9px] font-bold uppercase tracking-widest text-tier-4">{label}</span>
-      </div>
-      <span className="text-[15px] font-bold text-tier-1 tracking-tight">{value}</span>
     </div>
   );
 }
