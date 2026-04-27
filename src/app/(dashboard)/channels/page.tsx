@@ -300,19 +300,19 @@ function FilterButton({ icon: Icon, label, count, active, onClick }: any) {
       className={cn(
         "h-10 justify-start gap-4 px-4 rounded-lg transition-all relative group",
         active 
-          ? "bg-primary/8 text-primary hover:bg-primary/12 hover:text-primary" 
-          : "text-tier-3 hover:bg-white/[0.03] hover:text-tier-1"
+          ? "bg-primary/10 hover:bg-primary/20 text-primary hover:text-primary shadow-sm" 
+          : "text-tier-2 hover:bg-white/[0.03] hover:text-tier-1"
       )}
     >
       <Icon className={cn("size-4.5", active ? "text-primary" : "text-tier-3 group-hover:text-tier-2")} />
       <span className={cn("text-[13px] tracking-tight font-medium", active ? "text-primary" : "")}>{label}</span>
       <span className={cn(
         "ml-auto text-[10px] font-semibold tracking-tighter",
-        active ? "text-primary" : "text-tier-3"
+        active ? "text-primary" : "text-tier-2"
       )}>
         {count}
       </span>
-      {active && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-primary rounded-full" />}
+      {active && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-primary rounded-full shadow-[0_0_10px_hsl(var(--primary))]" />}
     </Button>
   );
 }
