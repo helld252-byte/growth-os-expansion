@@ -1,4 +1,3 @@
-
 "use client";
 
 import { use, useState, useEffect } from "react";
@@ -21,7 +20,8 @@ import {
   ExternalLink,
   MapPin,
   TrendingDown,
-  Sparkles
+  Sparkles,
+  SearchX
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -32,7 +32,6 @@ import { useDoc, useMemoFirebase, useUser } from "@/firebase";
 import { doc, getFirestore } from "firebase/firestore";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import { suggestNextActions } from "@/ai/flows/suggest-next-actions";
 
 const pipelineStages = ["Prospect", "Contacted", "Sample Sent", "Trial", "Negotiation", "Live"];
@@ -83,7 +82,22 @@ export default function CafeDetailPage({ params }: { params: Promise<{ id: strin
     );
   }
 
-  if (!cafe) return notFound();
+  if (!cafe) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[60vh] gap-6 text-center">
+        <div className="size-20 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center">
+          <SearchX className="size-10 text-primary opacity-50" />
+        </div>
+        <div className="flex flex-col gap-2">
+          <h1 className="text-2xl font-bold tracking-tight text-tier-1">Hospitality Intel Missing</h1>
+          <p className="text-tier-3 text-sm max-w-xs mx-auto">The requested cafe profile could not be located in the cloud registry.</p>
+        </div>
+        <Button asChild variant="outline" className="border-white/10 text-tier-2 hover:text-tier-1 rounded-xl">
+          <Link href="/cafes"><ArrowLeft className="size-4 mr-2" /> Return to Vertical</Link>
+        </Button>
+      </div>
+    );
+  }
 
   const getStatusStyles = (status: string) => {
     switch (status) {
