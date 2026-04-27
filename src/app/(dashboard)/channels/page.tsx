@@ -187,7 +187,7 @@ export default function PlatformsPage() {
         <div className="mt-auto">
           <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
             <DialogTrigger asChild>
-              <Button className="w-full bg-primary/20 hover:bg-primary text-tier-1 font-semibold text-[11px] uppercase tracking-wider h-11 rounded-xl transition-all shadow-lg active-glow border border-primary/20">
+              <Button className="w-full bg-primary/20 hover:bg-primary text-tier-1 font-semibold text-[11px] uppercase tracking-wider h-11 rounded-xl transition-all shadow-lg border border-primary/20">
                 <Plus className="size-4 mr-2" /> Add Platform
               </Button>
             </DialogTrigger>
@@ -281,7 +281,7 @@ export default function PlatformsPage() {
             </div>
           ) : (
             filteredPlatforms.map((p) => (
-              <Link key={p.id} href={`/channels/${p.id}`}>
+              <Link key={p.id} href={`/channels/${p.id}`} className="block group">
                 <PlatformListItem platform={p} />
               </Link>
             ))
@@ -300,19 +300,19 @@ function FilterButton({ icon: Icon, label, count, active, onClick }: any) {
       className={cn(
         "h-10 justify-start gap-4 px-4 rounded-lg transition-all relative group",
         active 
-          ? "bg-primary/10 hover:bg-primary/20 text-primary hover:text-primary shadow-sm" 
-          : "text-tier-2 hover:bg-white/[0.03] hover:text-tier-1"
+          ? "bg-primary/8 text-primary hover:bg-primary/12 hover:text-primary" 
+          : "text-tier-3 hover:bg-white/[0.03] hover:text-tier-1"
       )}
     >
       <Icon className={cn("size-4.5", active ? "text-primary" : "text-tier-3 group-hover:text-tier-2")} />
       <span className={cn("text-[13px] tracking-tight font-medium", active ? "text-primary" : "")}>{label}</span>
       <span className={cn(
         "ml-auto text-[10px] font-semibold tracking-tighter",
-        active ? "text-primary" : "text-tier-2"
+        active ? "text-primary" : "text-tier-3"
       )}>
         {count}
       </span>
-      {active && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-primary rounded-full shadow-[0_0_10px_hsl(var(--primary))]" />}
+      {active && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-primary rounded-full" />}
     </Button>
   );
 }
@@ -353,7 +353,7 @@ function PlatformListItem({ platform }: { platform: any }) {
             <h3 className="text-base font-semibold tracking-tight text-tier-1 group-hover:text-primary transition-colors">
               {platform.name}
             </h3>
-            <span className="text-[10px] font-medium uppercase tracking-[0.12em] text-tier-1 px-2.5 py-0.5 border border-white/[0.1] rounded-md bg-white/[0.05]">
+            <span className="text-[10px] font-medium uppercase tracking-[0.12em] text-tier-2 px-2.5 py-0.5 border border-white/[0.1] rounded-md bg-white/[0.05]">
               {platform.type}
             </span>
           </div>
@@ -371,7 +371,7 @@ function PlatformListItem({ platform }: { platform: any }) {
             </Badge>
             <div className="flex items-center gap-2">
               <Zap className={cn("size-4", platform.priority === 'High' ? "text-accent" : "text-tier-3")} />
-              <span className="text-[12px] font-medium tracking-tight text-tier-1 opacity-90">{platform.priority} Priority</span>
+              <span className="text-[12px] font-medium tracking-tight text-tier-2 opacity-90">{platform.priority} Priority</span>
             </div>
           </div>
         </div>
