@@ -52,6 +52,7 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
+import { DatePicker } from "@/components/ui/date-picker";
 
 export default function SchoolDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -66,7 +67,6 @@ export default function SchoolDetailPage({ params }: { params: Promise<{ id: str
   const docRef = useMemoFirebase(() => doc(firestore, 'partners', id), [firestore, id]);
   const { data: school, isLoading } = useDoc(docRef);
 
-  // Link tasks to this partner ID
   const tasksQuery = useMemoFirebase(() => {
     return query(collection(firestore, 'tasks'), where('growthOpportunityId', '==', id));
   }, [firestore, id]);
@@ -129,7 +129,7 @@ export default function SchoolDetailPage({ params }: { params: Promise<{ id: str
     if (!docRef || !editData) return;
     updateDocumentNonBlocking(docRef, {
       ...editData,
-      contact: editData.principal, // sync primary contact
+      contact: editData.principal,
       updatedAt: serverTimestamp(),
     });
     setIsAddOpen(false);
@@ -303,7 +303,10 @@ export default function SchoolDetailPage({ params }: { params: Promise<{ id: str
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2"><Label className="text-[10px] uppercase tracking-widest text-tier-3">Objective</Label><Input value={editData.nextStep} onChange={(e) => setEditData({...editData, nextStep: e.target.value})} className="bg-white/[0.03] border-white/[0.08] h-11 rounded-xl text-tier-1" /></div>
-                <div className="grid gap-2"><Label className="text-[10px] uppercase tracking-widest text-tier-3">Target Date</Label><Input type="date" value={editData.dueDate} onChange={(e) => setEditData({...editData, dueDate: e.target.value})} className="bg-white/[0.03] border-white/[0.08] h-11 rounded-xl text-tier-1" /></div>
+                <div className="grid gap-2">
+                  <Label className="text-[10px] uppercase tracking-widest text-tier-3">Target Date</Label>
+                  <DatePicker value={editData.dueDate} onChange={(v) => setEditData({...editData, dueDate: v})} />
+                </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2"><Label className="text-[10px] uppercase tracking-widest text-tier-3">Principal</Label><Input value={editData.principal} onChange={(e) => setEditData({...editData, principal: e.target.value})} className="bg-white/[0.03] border-white/[0.08] h-11 rounded-xl" /></div>

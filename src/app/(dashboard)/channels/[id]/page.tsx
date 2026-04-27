@@ -52,6 +52,7 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
+import { DatePicker } from "@/components/ui/date-picker";
 
 export default function PlatformDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -188,7 +189,6 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
 
   return (
     <div className="max-w-[1200px] mx-auto flex flex-col gap-8 animate-in fade-in duration-500">
-      {/* HEADER */}
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-2">
         <div className="flex flex-col gap-6">
           <Link 
@@ -237,10 +237,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* MAIN COLUMN */}
         <div className="lg:col-span-8 flex flex-col gap-10">
-          
-          {/* CURRENT FOCUS */}
           <div className="premium-panel p-8 rounded-3xl border-primary/20 bg-gradient-to-br from-primary/5 via-transparent to-transparent shadow-2xl relative overflow-hidden group">
             <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
               <Zap className="size-16 text-primary" />
@@ -262,7 +259,6 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
             </div>
           </div>
 
-          {/* ONBOARDING HISTORY */}
           <section className="flex flex-col gap-8">
             <div className="flex items-center justify-between px-2">
               <div className="flex flex-col gap-1">
@@ -318,7 +314,6 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
             </div>
           </section>
 
-          {/* PLATFORM ONBOARDING CHECKLIST */}
           {platform.requirements && platform.requirements.length > 0 && (
             <div className="flex flex-col gap-6 py-2">
               <div className="flex items-center justify-between">
@@ -355,10 +350,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
 
         </div>
 
-        {/* SIDEBAR COLUMN */}
         <div className="lg:col-span-4 flex flex-col gap-8">
-          
-          {/* CONTACT HUB */}
           <div className="flex flex-col gap-6 px-1">
             <div className="flex items-center justify-between">
               <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4">Company Contact Hub</h3>
@@ -452,7 +444,6 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
             </div>
           </div>
 
-          {/* ABOUT PLATFORM */}
           <section className="flex flex-col gap-4">
             <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4">About Platform</h3>
             <p className="text-[13px] text-tier-2 leading-relaxed font-medium">
@@ -460,7 +451,6 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
             </p>
           </section>
 
-          {/* FILES & DOCUMENTS */}
           <section className="flex flex-col gap-5 pt-2">
             <div className="flex items-center justify-between">
               <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4">Files & Documents</h3>
@@ -483,7 +473,6 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
         </div>
       </div>
 
-      {/* EDIT DIALOG */}
       {editData && (
         <Dialog open={isEditOpen} onOpenChange={setIsAddOpen}>
           <DialogContent className="bg-background/95 backdrop-blur-2xl border-white/[0.1] rounded-2xl sm:max-w-[600px] max-h-[90vh] overflow-y-auto custom-scrollbar">
@@ -526,11 +515,9 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
                 </div>
                 <div className="grid gap-2">
                   <Label className="text-[10px] uppercase tracking-widest text-tier-3">Target Date</Label>
-                  <Input 
-                    type="date"
+                  <DatePicker 
                     value={editData.dueDate}
-                    onChange={(e) => setEditData({...editData, dueDate: e.target.value})}
-                    className="bg-white/[0.03] border-white/[0.08] h-11 rounded-xl text-tier-1"
+                    onChange={(v) => setEditData({...editData, dueDate: v})}
                   />
                 </div>
               </div>
@@ -602,11 +589,9 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
                 </div>
                 <div className="grid gap-2">
                   <Label className="text-[10px] uppercase tracking-widest text-tier-3">Last Contact</Label>
-                  <Input 
-                    type="date"
+                  <DatePicker 
                     value={editData.lastContactDate}
-                    onChange={(e) => setEditData({...editData, lastContactDate: e.target.value})}
-                    className="bg-white/[0.03] border-white/[0.08] h-11 rounded-xl text-tier-1"
+                    onChange={(v) => setEditData({...editData, lastContactDate: v})}
                   />
                 </div>
               </div>

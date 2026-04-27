@@ -37,6 +37,7 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { DatePicker } from "@/components/ui/date-picker";
 
 export default function TasksPage() {
   const { toast } = useToast();
@@ -45,14 +46,12 @@ export default function TasksPage() {
   const [isAddOpen, setIsAddOpen] = useState(false);
   const firestore = getFirestore();
 
-  // Firestore Collections
   const tasksRef = useMemoFirebase(() => collection(firestore, 'tasks'), [firestore]);
   const { data: tasks, isLoading } = useCollection(tasksRef);
 
   const opportunitiesRef = useMemoFirebase(() => collection(firestore, 'growth_opportunities'), [firestore]);
   const { data: platforms } = useCollection(opportunitiesRef);
 
-  // New Task State
   const [newTask, setNewTask] = useState({
     title: "",
     priority: "Medium",
@@ -123,7 +122,6 @@ export default function TasksPage() {
 
   return (
     <div className="max-w-[1440px] mx-auto flex flex-col gap-10 animate-in slide-in-from-right-4 duration-500">
-      {/* Context Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-8 border-b border-white/[0.03]">
         <div className="flex items-center gap-5">
           <div className="size-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center shadow-lg active-glow">
@@ -173,12 +171,7 @@ export default function TasksPage() {
                 </div>
                 <div className="grid gap-2">
                   <Label className="text-[10px] uppercase tracking-widest text-tier-3">Due Date</Label>
-                  <Input 
-                    type="date"
-                    value={newTask.dueDate}
-                    onChange={(e) => setNewTask({...newTask, dueDate: e.target.value})}
-                    className="bg-white/[0.03] border-white/[0.08] h-12 rounded-xl text-tier-1"
-                  />
+                  <DatePicker value={newTask.dueDate} onChange={(v) => setNewTask({...newTask, dueDate: v})} />
                 </div>
               </div>
               <div className="grid gap-2">
@@ -210,7 +203,6 @@ export default function TasksPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
-        {/* Left Sidebar: Filters */}
         <div className="flex flex-col gap-10">
           <div className="relative group">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-tier-3 group-focus-within:text-primary transition-colors" />
@@ -241,9 +233,7 @@ export default function TasksPage() {
           </div>
         </div>
 
-        {/* Task List */}
         <div className="lg:col-span-3 flex flex-col gap-12">
-          {/* ACTIVE MISSIONS */}
           <div className="premium-panel rounded-2xl border border-white/[0.06] overflow-hidden shadow-2xl">
             <div className="px-8 py-5 border-b border-white/[0.04] bg-white/[0.01] flex items-center justify-between">
               <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4">Active Missions</span>
@@ -269,7 +259,6 @@ export default function TasksPage() {
             </div>
           </div>
 
-          {/* COMPLETED HISTORY */}
           <div className="flex flex-col gap-6">
             <div className="flex items-center gap-3 px-3">
               <History className="size-4 text-tier-3" />

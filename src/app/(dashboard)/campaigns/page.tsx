@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -40,6 +39,7 @@ import { collection, getFirestore, serverTimestamp } from "firebase/firestore";
 import { cn } from "@/lib/utils";
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from "recharts";
 import { useToast } from "@/hooks/use-toast";
+import { DatePicker } from "@/components/ui/date-picker";
 
 const performanceData = [
   { name: 'W1', reach: 120000 },
@@ -58,7 +58,6 @@ export default function CampaignEnginePage() {
   const campaignsRef = useMemoFirebase(() => collection(firestore, 'campaigns'), [firestore]);
   const { data: campaigns, isLoading } = useCollection(campaignsRef);
 
-  // New Campaign State
   const [newCampaign, setNewCampaign] = useState({
     name: "",
     type: "Awareness",
@@ -106,7 +105,7 @@ export default function CampaignEnginePage() {
   const totalReach = filteredCampaigns.reduce((acc, c) => acc + (Number(c.reach) || 0), 0);
 
   return (
-    <div className="max-w-[1400px] mx-auto flex flex-col gap-10 animate-in fade-in duration-700">
+    <div className="max-w-[1440px] mx-auto flex flex-col gap-10 animate-in fade-in duration-700">
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-8 pb-6 border-b border-white/[0.03]">
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-4">
@@ -183,20 +182,16 @@ export default function CampaignEnginePage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
                     <Label className="text-[10px] uppercase tracking-widest text-tier-3">Start Date</Label>
-                    <Input 
-                      type="date"
+                    <DatePicker 
                       value={newCampaign.startDate}
-                      onChange={(e) => setNewCampaign({...newCampaign, startDate: e.target.value})}
-                      className="bg-white/[0.03] border-white/[0.08] h-12 rounded-xl text-tier-1"
+                      onChange={(v) => setNewCampaign({...newCampaign, startDate: v})}
                     />
                   </div>
                   <div className="grid gap-2">
                     <Label className="text-[10px] uppercase tracking-widest text-tier-3">End Date</Label>
-                    <Input 
-                      type="date"
+                    <DatePicker 
                       value={newCampaign.endDate}
-                      onChange={(e) => setNewCampaign({...newCampaign, endDate: e.target.value})}
-                      className="bg-white/[0.03] border-white/[0.08] h-12 rounded-xl text-tier-1"
+                      onChange={(v) => setNewCampaign({...newCampaign, endDate: v})}
                     />
                   </div>
                 </div>
