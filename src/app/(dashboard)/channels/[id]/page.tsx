@@ -20,7 +20,9 @@ import {
   User,
   MessageSquare,
   CheckCircle2,
-  History
+  History,
+  FileText,
+  Upload
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -64,13 +66,11 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
   const docRef = useMemoFirebase(() => doc(firestore, 'growth_opportunities', id), [firestore, id]);
   const { data: platform, isLoading } = useDoc(docRef);
 
-  // Fetch associated tasks to display in history if completed
   const tasksQuery = useMemoFirebase(() => {
     return query(collection(firestore, 'tasks'), where('growthOpportunityId', '==', id));
   }, [firestore, id]);
   const { data: platformTasks } = useCollection(tasksQuery);
 
-  // Edit State
   const [editData, setEditData] = useState<any>(null);
   const [reqInput, setReqInput] = useState("");
 
@@ -124,6 +124,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
       contactRole: platform.contactRole || "",
       lastContactDate: platform.lastContactDate || "",
       commStatus: platform.commStatus || "No outreach",
+      notes: platform.notes || ""
     });
     setIsAddOpen(true);
   };
@@ -237,7 +238,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* MAIN COLUMN */}
-        <div className="lg:col-span-8 flex flex-col gap-8">
+        <div className="lg:col-span-8 flex flex-col gap-10">
           
           {/* CURRENT FOCUS */}
           <div className="premium-panel p-8 rounded-3xl border-primary/20 bg-gradient-to-br from-primary/5 via-transparent to-transparent shadow-2xl relative overflow-hidden group">
@@ -266,7 +267,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
             <div className="flex items-center justify-between px-2">
               <div className="flex flex-col gap-1">
                 <h3 className="text-[11px] font-bold uppercase tracking-[0.25em] text-tier-4">Platform onboarding history</h3>
-                <span className="text-[13px] text-tier-2 font-medium">Tactical log and verified steps</span>
+                <span className="text-[13px] text-tier-3 font-medium">Tactical log and verified steps</span>
               </div>
               <Dialog open={isNoteOpen} onOpenChange={setIsNoteOpen}>
                 <DialogTrigger asChild>
@@ -323,7 +324,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
               <div className="flex items-center justify-between">
                 <div className="flex flex-col gap-1">
                   <h3 className="text-[11px] font-bold uppercase tracking-[0.25em] text-tier-4">Platform Onboarding Checklist</h3>
-                  <span className="text-[13px] text-tier-2 font-medium">Compliance & validation protocols</span>
+                  <span className="text-[13px] text-tier-3 font-medium">Compliance & validation protocols</span>
                 </div>
                 <div className="size-10 rounded-full bg-primary/5 border border-primary/10 flex items-center justify-center">
                   <ShieldCheck className="size-5 text-primary" />
@@ -365,7 +366,6 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
             </div>
 
             <div className="flex flex-col gap-5">
-              {/* Web Assets */}
               <div className="flex flex-col gap-3">
                 <ContactField 
                   label="Official Website" 
@@ -383,7 +383,6 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
 
               <Separator className="bg-white/[0.04]" />
 
-              {/* Support & Comm */}
               <div className="flex flex-col gap-3">
                 <ContactField 
                   label="Onboarding Support" 
@@ -404,7 +403,6 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
 
               <Separator className="bg-white/[0.04]" />
 
-              {/* Optional Personnel */}
               {platform.contactPerson && (
                 <div className="flex flex-col gap-3 p-4 rounded-2xl bg-white/[0.02] border border-white/[0.05]">
                   <span className="text-[9px] font-bold uppercase tracking-widest text-tier-4">Primary Contact Unit</span>
@@ -417,11 +415,6 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
                       <span className="text-[11px] text-tier-3 mt-1">{platform.contactRole || 'Decision Maker'}</span>
                     </div>
                   </div>
-                  {platform.contactEmail && (
-                    <a href={`mailto:${platform.contactEmail}`} className="text-[12px] text-primary hover:underline flex items-center gap-2 mt-1">
-                      <Mail className="size-3" /> {platform.contactEmail}
-                    </a>
-                  )}
                 </div>
               )}
 
@@ -431,7 +424,6 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
               </div>
             </div>
 
-            {/* Quick Actions */}
             <div className="grid grid-cols-2 gap-3 pt-2">
               <Button 
                 variant="outline" 
@@ -461,11 +453,32 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
           </div>
 
           {/* ABOUT PLATFORM */}
-          <section className="premium-panel p-6 rounded-3xl flex flex-col gap-4">
-            <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4">Platform Intel</h3>
+          <section className="flex flex-col gap-4">
+            <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4">About Platform</h3>
             <p className="text-[13px] text-tier-2 leading-relaxed font-medium">
               {platform.notes || "No detailed institutional profile recorded. Strategic expansion protocols active."}
             </p>
+          </section>
+
+          {/* FILES & DOCUMENTS */}
+          <section className="flex flex-col gap-5 pt-2">
+            <div className="flex items-center justify-between">
+              <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4">Files & Documents</h3>
+              <Upload className="size-3.5 text-tier-3 cursor-pointer hover:text-primary transition-colors" />
+            </div>
+            
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/[0.05] group hover:border-primary/20 transition-all cursor-pointer">
+                <div className="size-8 rounded-lg bg-primary/5 flex items-center justify-center text-primary group-hover:bg-primary/10">
+                  <FileText className="size-4" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[12px] font-semibold text-tier-2 leading-none">Partnership_Agreement.pdf</span>
+                  <span className="text-[10px] text-tier-4 mt-1">2.4 MB • Pending Signature</span>
+                </div>
+              </div>
+              <p className="text-[11px] text-tier-4 italic px-1">Awaiting document synchronization...</p>
+            </div>
           </section>
         </div>
       </div>
@@ -520,6 +533,16 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
                     className="bg-white/[0.03] border-white/[0.08] h-11 rounded-xl text-tier-1"
                   />
                 </div>
+              </div>
+
+              <div className="grid gap-2">
+                <Label className="text-[10px] uppercase tracking-widest text-tier-3">About Platform / Description</Label>
+                <Textarea 
+                  value={editData.notes}
+                  onChange={(e) => setEditData({...editData, notes: e.target.value})}
+                  placeholder="Enter detailed institutional profile or marketplace description..."
+                  className="bg-white/[0.03] border-white/[0.08] min-h-[100px] rounded-xl text-tier-1 p-4"
+                />
               </div>
 
               <Separator className="bg-white/[0.05]" />
