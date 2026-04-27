@@ -9,7 +9,6 @@ import {
   Coffee,
   ArrowLeft,
   Clock,
-  ShieldAlert,
   Zap,
   LayoutGrid,
   Star,
@@ -57,7 +56,7 @@ export default function CafesPage() {
 
   const [newCafe, setNewCafe] = useState({
     name: "",
-    type: "Cafe",
+    type: "Independent",
     status: "Prospect",
     contact: "",
     impactScore: 5,
@@ -69,16 +68,23 @@ export default function CafesPage() {
 
     const docData = {
       ...newCafe,
+      partnerType: "Cafe", // Internal vertical marker
       ownerId: user.uid,
       lastContact: new Date().toISOString().split('T')[0],
       createdAt: serverTimestamp(),
+      region: "Global",
+      priority: "Medium",
+      locationsCount: 1,
+      dailyTraffic: "Medium",
+      milkMenuFit: 7,
+      nextStep: "Initial Outreach"
     };
 
     addDocumentNonBlocking(partnersRef, docData);
     setIsAddOpen(false);
     setNewCafe({
       name: "",
-      type: "Cafe",
+      type: "Independent",
       status: "Prospect",
       contact: "",
       impactScore: 5,
@@ -92,7 +98,7 @@ export default function CafesPage() {
   };
 
   const filtered = (partners || []).filter(p => {
-    const isType = p.type === 'Cafe';
+    const isType = p.partnerType === 'Cafe' || p.type === 'Cafe';
     const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase());
     if (!isType || !matchesSearch) return false;
 
@@ -104,10 +110,10 @@ export default function CafesPage() {
   });
 
   const counts = {
-    'live': (partners || []).filter(p => p.type === 'Cafe' && p.status === 'Live').length,
-    'negotiation': (partners || []).filter(p => p.type === 'Cafe' && p.status === 'Negotiation').length,
-    'needs-action': (partners || []).filter(p => p.type === 'Cafe' && ['Prospect', 'Contacted', 'Trial'].includes(p.status)).length,
-    'all': (partners || []).filter(p => p.type === 'Cafe').length
+    'live': (partners || []).filter(p => (p.partnerType === 'Cafe' || p.type === 'Cafe') && p.status === 'Live').length,
+    'negotiation': (partners || []).filter(p => (p.partnerType === 'Cafe' || p.type === 'Cafe') && p.status === 'Negotiation').length,
+    'needs-action': (partners || []).filter(p => (p.partnerType === 'Cafe' || p.type === 'Cafe') && ['Prospect', 'Contacted', 'Trial'].includes(p.status)).length,
+    'all': (partners || []).filter(p => p.partnerType === 'Cafe' || p.type === 'Cafe').length
   };
 
   return (
@@ -180,6 +186,20 @@ export default function CafesPage() {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
+                    <Label className="text-[10px] uppercase tracking-widest text-tier-3">Type</Label>
+                    <Select value={newCafe.type} onValueChange={(v) => setNewCafe({...newCafe, type: v})}>
+                      <SelectTrigger className="bg-white/[0.03] border-white/[0.08] h-12 rounded-xl text-tier-1">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-popover/95 backdrop-blur-xl border-white/[0.1]">
+                        <SelectItem value="Independent">Independent</SelectItem>
+                        <SelectItem value="Chain">Chain</SelectItem>
+                        <SelectItem value="Hotel">Hotel</SelectItem>
+                        <SelectItem value="Restaurant">Restaurant</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="grid gap-2">
                     <Label className="text-[10px] uppercase tracking-widest text-tier-3">Status</Label>
                     <Select value={newCafe.status} onValueChange={(v) => setNewCafe({...newCafe, status: v})}>
                       <SelectTrigger className="bg-white/[0.03] border-white/[0.08] h-12 rounded-xl text-tier-1">
@@ -193,15 +213,6 @@ export default function CafesPage() {
                         <SelectItem value="Live">Live</SelectItem>
                       </SelectContent>
                     </Select>
-                  </div>
-                  <div className="grid gap-2">
-                    <Label className="text-[10px] uppercase tracking-widest text-tier-3">Impact Score</Label>
-                    <Input 
-                      type="number"
-                      value={newCafe.impactScore}
-                      onChange={(e) => setNewCafe({...newCafe, impactScore: Number(e.target.value)})}
-                      className="bg-white/[0.03] border-white/[0.08] h-12 rounded-xl text-tier-1"
-                    />
                   </div>
                 </div>
               </div>
@@ -251,7 +262,9 @@ export default function CafesPage() {
             </div>
           ) : (
             filtered.map((p) => (
-              <CafeListItem key={p.id} cafe={p} />
+              <Link key={p.id} href={`/cafes/${p.id}`}>
+                <CafeListItem cafe={p} />
+              </Link>
             ))
           )}
         </div>
