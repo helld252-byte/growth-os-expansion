@@ -66,7 +66,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
             href="/channels" 
             className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.2em] text-tier-3 hover:text-tier-1 transition-colors w-fit"
           >
-            <ArrowLeft className="size-3.5" /> Pipeline
+            <ArrowLeft className="size-3.5" /> Platforms
           </Link>
           
           <div className="flex flex-col gap-3">

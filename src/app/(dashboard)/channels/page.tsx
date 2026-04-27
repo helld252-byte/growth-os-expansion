@@ -43,7 +43,7 @@ import { useToast } from "@/hooks/use-toast";
 
 type FilterStatus = 'needs-action' | 'waiting' | 'blocked' | 'high-priority' | 'live' | 'all';
 
-export default function ExpansionOperationsPage() {
+export default function PlatformsPage() {
   const { toast } = useToast();
   const { user } = useUser();
   const firestore = getFirestore();
@@ -97,7 +97,7 @@ export default function ExpansionOperationsPage() {
     });
     toast({
       title: "Initiative Launched",
-      description: `${docData.name} has been added to the expansion pipeline.`,
+      description: `${docData.name} has been added to the platforms registry.`,
     });
   };
 
@@ -250,7 +250,7 @@ export default function ExpansionOperationsPage() {
       <main className="flex-1 flex flex-col gap-10">
         <header className="flex items-center justify-between">
           <div className="flex flex-col gap-2.5">
-            <h1 className="text-3xl font-semibold tracking-tight text-tier-1">Expansion Operations</h1>
+            <h1 className="text-3xl font-semibold tracking-tight text-tier-1">Platforms</h1>
             <p className="text-tier-2 text-[14px] font-medium leading-relaxed max-w-2xl">
               Manage wholesale, retail, and global digital channel scaling across tactical operational zones.
             </p>
@@ -278,7 +278,7 @@ export default function ExpansionOperationsPage() {
           ) : filteredPlatforms.length === 0 ? (
             <div className="h-72 border border-dashed border-white/5 rounded-2xl flex flex-col items-center justify-center gap-4 opacity-30">
               <LayoutGrid className="size-12 text-tier-3" />
-              <span className="text-[11px] font-medium uppercase tracking-[0.25em] text-tier-3">No active units found</span>
+              <span className="text-[11px] font-medium uppercase tracking-[0.25em] text-tier-3">No active platforms found</span>
             </div>
           ) : (
             filteredPlatforms.map((p) => (

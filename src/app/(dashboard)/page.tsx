@@ -150,7 +150,7 @@ export default function CommandCenter() {
             <div className="flex items-center justify-between">
               <div className="flex flex-col">
                 <span className="text-[10px] font-bold text-tier-4 uppercase tracking-[0.2em]">Latest Update</span>
-                <span className="text-[16px] font-semibold text-tier-1 mt-1.5 tracking-tight">Pipeline Sync Complete</span>
+                <span className="text-[16px] font-semibold text-tier-1 mt-1.5 tracking-tight">Platforms Sync Complete</span>
               </div>
               <Badge variant="outline" className="bg-emerald-500/15 text-emerald-400 border-emerald-500/25 text-[10px] font-bold tracking-[0.15em] uppercase px-3 py-0.5 rounded-lg shadow-sm">Ready</Badge>
             </div>
@@ -196,9 +196,9 @@ export default function CommandCenter() {
         </div>
       </div>
 
-      {/* Expansion Registry */}
+      {/* Platforms Registry */}
       <div className="flex flex-col gap-8">
-        <h2 className="text-[11px] font-bold uppercase tracking-[0.3em] text-tier-4">Recent Registry Updates</h2>
+        <h2 className="text-[11px] font-bold uppercase tracking-[0.3em] text-tier-4">Recent Platforms Updates</h2>
         <div className="premium-panel rounded-2xl overflow-hidden border border-white/[0.06] shadow-2xl">
           {isLoading ? (
             <div className="p-20 flex flex-col items-center justify-center gap-4">

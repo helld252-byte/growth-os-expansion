@@ -35,7 +35,7 @@ const commandItems = [
 ];
 
 const growthItems = [
-  { icon: Layers, label: "Expansion Pipeline", path: "/channels" },
+  { icon: Layers, label: "Platforms", path: "/channels" },
   { icon: GraduationCap, label: "Schools", path: "/schools" },
   { icon: Coffee, label: "Cafes", path: "/cafes" },
   { icon: Handshake, label: "Partnerships", path: "/partnerships" },

@@ -83,7 +83,7 @@ export default function DashboardLayout({
 
   const getSectionLabel = (path: string) => {
     if (path === "/") return "Command Center";
-    if (path.startsWith("/channels")) return "Expansion Pipeline";
+    if (path.startsWith("/channels")) return "Platforms";
     if (path.startsWith("/schools")) return "School Vertical";
     if (path.startsWith("/cafes")) return "Cafe Vertical";
     if (path.startsWith("/partnerships")) return "Strategic Partnerships";
