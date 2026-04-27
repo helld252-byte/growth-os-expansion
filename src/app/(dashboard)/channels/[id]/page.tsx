@@ -1,7 +1,7 @@
 
 "use client";
 
-import { use } from "react";
+import { use, useState } from "react";
 import { 
   ArrowLeft, 
   ExternalLink, 
@@ -10,29 +10,58 @@ import {
   Globe,
   Calendar,
   User,
-  Activity,
-  AlertTriangle,
   Plus,
   Zap,
-  Star,
-  Loader2
+  Loader2,
+  Trash2,
+  X,
+  MessageSquare
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
-import { useDoc, useMemoFirebase } from "@/firebase";
-import { doc, getFirestore } from "firebase/firestore";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogTrigger,
+  DialogFooter
+} from "@/components/ui/dialog";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
+import { useDoc, useMemoFirebase, useUser, updateDocumentNonBlocking } from "@/firebase";
+import { doc, getFirestore, serverTimestamp } from "firebase/firestore";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
 
 export default function PlatformDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
+  const { toast } = useToast();
+  const { user } = useUser();
   const firestore = getFirestore();
+
+  const [isEditOpen, setIsAddOpen] = useState(false);
+  const [isNoteOpen, setIsNoteOpen] = useState(false);
+  const [newNote, setNewNote] = useState("");
 
   const docRef = useMemoFirebase(() => doc(firestore, 'growth_opportunities', id), [firestore, id]);
   const { data: platform, isLoading } = useDoc(docRef);
+
+  // Edit State
+  const [editData, setEditData] = useState<any>(null);
+  const [reqInput, setReqInput] = useState("");
 
   if (isLoading) {
     return (
@@ -46,6 +75,51 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
   if (!platform) {
     return notFound();
   }
+
+  const handleOpenEdit = () => {
+    setEditData({
+      name: platform.name,
+      currentStage: platform.currentStage,
+      priority: platform.priority,
+      nextStep: platform.nextStep,
+      dueDate: platform.dueDate || "",
+      requirements: platform.requirements || [],
+    });
+    setIsAddOpen(true);
+  };
+
+  const handleUpdate = () => {
+    if (!docRef || !editData) return;
+    updateDocumentNonBlocking(docRef, {
+      ...editData,
+      updatedAt: serverTimestamp(),
+    });
+    setIsAddOpen(false);
+    toast({
+      title: "Mission Calibration Updated",
+      description: "Platform parameters have been synchronized with the cloud registry.",
+    });
+  };
+
+  const handleAddNote = () => {
+    if (!docRef || !newNote || !user) return;
+    const journalEntry = {
+      date: new Date().toISOString(),
+      user: user.displayName || "System Operator",
+      content: newNote,
+    };
+    const updatedJournal = [journalEntry, ...(platform.journal || [])];
+    updateDocumentNonBlocking(docRef, {
+      journal: updatedJournal,
+      lastUpdate: serverTimestamp(),
+    });
+    setNewNote("");
+    setIsNoteOpen(false);
+    toast({
+      title: "Field Note Recorded",
+      description: "Mission journal has been updated.",
+    });
+  };
 
   const getStageStyles = (stage: string) => {
     switch (stage) {
@@ -64,9 +138,9 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
         <div className="flex flex-col gap-6">
           <Link 
             href="/channels" 
-            className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.2em] text-tier-3 hover:text-tier-1 transition-colors w-fit"
+            className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.2em] text-tier-3 hover:text-tier-1 transition-colors w-fit group"
           >
-            <ArrowLeft className="size-3.5" /> Platforms
+            <ArrowLeft className="size-3.5 group-hover:-translate-x-1 transition-transform" /> Platforms
           </Link>
           
           <div className="flex flex-col gap-3">
@@ -84,14 +158,18 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
             <div className="flex items-center gap-4 text-[13px] font-medium text-tier-3">
               <span className="flex items-center gap-1.5"><Globe className="size-4" /> {platform.market} Region</span>
               <span className="text-tier-4">•</span>
-              <span className="uppercase tracking-wider text-[11px]">{platform.type}</span>
+              <span className="uppercase tracking-wider text-[11px] font-bold text-primary">{platform.type}</span>
             </div>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
-          <Button variant="ghost" className="h-10 px-4 rounded-xl border border-white/[0.05] text-tier-2 hover:text-tier-1 text-[12px] font-semibold uppercase tracking-wider">
-            <Edit3 className="size-4 mr-2" /> Edit
+          <Button 
+            variant="ghost" 
+            onClick={handleOpenEdit}
+            className="h-10 px-4 rounded-xl border border-white/[0.05] text-tier-2 hover:text-tier-1 text-[12px] font-semibold uppercase tracking-wider"
+          >
+            <Edit3 className="size-4 mr-2" /> Recalibrate
           </Button>
           {platform.website && (
             <Button asChild className="h-10 px-6 rounded-xl bg-primary hover:bg-primary/90 text-white text-[12px] font-semibold uppercase tracking-wider shadow-lg shadow-primary/20">
@@ -116,54 +194,89 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
               <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-primary">Current Tactical Objective</span>
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <h2 className="text-2xl font-semibold text-tier-1 tracking-tight leading-snug">
-                  {platform.nextStep}
+                  {platform.nextStep || "Initializing growth protocols."}
                 </h2>
                 <div className="flex flex-col items-start md:items-end gap-1.5 shrink-0">
                   <span className="text-[10px] font-semibold uppercase tracking-widest text-tier-4">Target Date</span>
                   <div className="flex items-center gap-2 text-accent font-semibold">
                     <Calendar className="size-4" />
-                    <span>{platform.dueDate || 'No Date Set'}</span>
+                    <span>{platform.dueDate || 'Open Timeline'}</span>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* MISSION JOURNAL - MOVED HERE */}
+          {/* MISSION JOURNAL */}
           <section className="premium-panel p-8 rounded-3xl flex flex-col gap-8">
             <div className="flex items-center justify-between">
               <h3 className="text-[11px] font-bold uppercase tracking-[0.25em] text-tier-4">Mission Journal</h3>
-              <Button variant="ghost" className="h-8 text-[10px] font-bold uppercase tracking-wider text-tier-3 hover:text-primary">
-                <Plus className="size-3.5 mr-2" /> Add Note
-              </Button>
+              <Dialog open={isNoteOpen} onOpenChange={setIsNoteOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="ghost" className="h-8 text-[10px] font-bold uppercase tracking-wider text-tier-3 hover:text-primary">
+                    <Plus className="size-3.5 mr-2" /> New Field Note
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="bg-background/95 backdrop-blur-2xl border-white/[0.1] rounded-2xl">
+                  <DialogHeader>
+                    <DialogTitle className="text-xl font-bold tracking-tight text-tier-1">Record Field Note</DialogTitle>
+                  </DialogHeader>
+                  <div className="py-4">
+                    <Textarea 
+                      placeholder="Enter operational update or contact summary..."
+                      value={newNote}
+                      onChange={(e) => setNewNote(e.target.value)}
+                      className="bg-white/[0.03] border-white/[0.08] min-h-[150px] rounded-xl text-tier-1 p-4"
+                    />
+                  </div>
+                  <DialogFooter>
+                    <Button onClick={handleAddNote} className="w-full bg-primary text-white h-12 rounded-xl font-bold uppercase tracking-widest">
+                      Commit to Journal
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </div>
             
             <div className="flex flex-col gap-8 relative before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-px before:bg-white/[0.05]">
-              <TimelineEntry 
-                date={platform.lastUpdate ? new Date(platform.lastUpdate).toLocaleDateString() : 'Recent'} 
-                user="System" 
-                content={platform.notes || "Operational history synchronized. Initiating growth protocols for this platform."} 
-              />
+              {(platform.journal && platform.journal.length > 0) ? (
+                platform.journal.map((entry: any, i: number) => (
+                  <TimelineEntry 
+                    key={i}
+                    date={new Date(entry.date).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })} 
+                    user={entry.user} 
+                    content={entry.content} 
+                  />
+                ))
+              ) : (
+                <TimelineEntry 
+                  date={platform.lastUpdate ? new Date(platform.lastUpdate).toLocaleDateString() : 'Initial'} 
+                  user="System" 
+                  content={platform.notes || "Operational history synchronized. Growth protocols active."} 
+                />
+              )}
             </div>
           </section>
 
-          {/* REQUIREMENTS */}
-          <section className="premium-panel p-8 rounded-3xl flex flex-col gap-6">
-            <h3 className="text-[11px] font-bold uppercase tracking-[0.25em] text-tier-4">Onboarding Requirements</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-12">
-              {(platform.requirements || ['Logistics Setup', 'Catalog Audit', 'Compliance Verify']).map((req: string, i: number) => (
-                <div key={req} className="flex items-center gap-4 group cursor-pointer">
-                  <Checkbox 
-                    id={`req-${i}`} 
-                    className="size-5 rounded-md border-white/10 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
-                  />
-                  <label htmlFor={`req-${i}`} className="text-[14px] font-medium tracking-tight text-tier-2 group-hover:text-tier-1 transition-colors cursor-pointer">
-                    {req}
-                  </label>
-                </div>
-              ))}
-            </div>
-          </section>
+          {/* ONBOARDING REQUIREMENTS - OPTIONAL */}
+          {platform.requirements && platform.requirements.length > 0 && (
+            <section className="premium-panel p-8 rounded-3xl flex flex-col gap-6">
+              <h3 className="text-[11px] font-bold uppercase tracking-[0.25em] text-tier-4">Onboarding Requirements</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-12">
+                {platform.requirements.map((req: string, i: number) => (
+                  <div key={i} className="flex items-center gap-4 group cursor-pointer">
+                    <Checkbox 
+                      id={`req-${i}`} 
+                      className="size-5 rounded-md border-white/10 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                    />
+                    <label htmlFor={`req-${i}`} className="text-[14px] font-medium tracking-tight text-tier-2 group-hover:text-tier-1 transition-colors cursor-pointer">
+                      {req}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
 
         </div>
 
@@ -172,20 +285,124 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
           <section className="premium-panel p-8 rounded-3xl flex flex-col gap-6">
             <h3 className="text-[11px] font-bold uppercase tracking-[0.25em] text-tier-4">Metadata Intel</h3>
             <div className="flex flex-col gap-6">
-              <InfoRow label="Market" value={platform.market} icon={Globe} />
-              <InfoRow label="Created" value={platform.dateStarted} icon={Calendar} />
-              <InfoRow label="Last Update" value={platform.lastUpdate ? new Date(platform.lastUpdate).toLocaleDateString() : 'N/A'} icon={Clock} />
-              <InfoRow label="Value" value={`$${(platform.estimatedValue || 0).toLocaleString()}`} icon={Zap} />
+              <InfoRow label="Market Zone" value={platform.market} icon={Globe} />
+              <InfoRow label="Mission Start" value={platform.dateStarted} icon={Calendar} />
+              <InfoRow label="Last Sync" value={platform.lastUpdate ? new Date(platform.lastUpdate).toLocaleDateString() : 'N/A'} icon={Clock} />
+              <InfoRow label="Strategic Fit" value={`${platform.fitScore || 7}/10`} icon={Zap} />
               <Separator className="bg-white/[0.05]" />
-              <div className="flex flex-col gap-2">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-tier-4">Contact Intelligence</span>
-                <span className="text-[14px] font-semibold text-tier-1">{platform.contactPerson || 'N/A'}</span>
-                <span className="text-[12px] text-tier-3 font-medium truncate">{platform.contactEmail || 'No email recorded'}</span>
+              <div className="flex flex-col gap-3">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-tier-4">Primary Contact</span>
+                <div className="flex items-center gap-4">
+                  <div className="size-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-bold">
+                    {platform.contactPerson?.charAt(0) || '?'}
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[14px] font-semibold text-tier-1">{platform.contactPerson || 'Unknown Unit'}</span>
+                    <span className="text-[12px] text-tier-3 truncate">{platform.contactEmail || 'No secure channel'}</span>
+                  </div>
+                </div>
+                <Button variant="outline" className="h-9 w-full rounded-lg border-white/[0.05] bg-white/[0.02] text-[10px] uppercase font-bold tracking-widest hover:bg-primary/10 hover:text-primary transition-all">
+                  <MessageSquare className="size-3.5 mr-2" /> Open Comms
+                </Button>
               </div>
             </div>
           </section>
         </div>
       </div>
+
+      {/* EDIT DIALOG */}
+      {editData && (
+        <Dialog open={isEditOpen} onOpenChange={setIsAddOpen}>
+          <DialogContent className="bg-background/95 backdrop-blur-2xl border-white/[0.1] rounded-2xl sm:max-w-[600px] max-h-[90vh] overflow-y-auto custom-scrollbar">
+            <DialogHeader>
+              <DialogTitle className="text-xl font-bold tracking-tight text-tier-1">Mission Recalibration</DialogTitle>
+            </DialogHeader>
+            <div className="grid gap-6 py-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label className="text-[10px] uppercase tracking-widest text-tier-3">Platform Name</Label>
+                  <Input 
+                    value={editData.name}
+                    onChange={(e) => setEditData({...editData, name: e.target.value})}
+                    className="bg-white/[0.03] border-white/[0.08] h-11 rounded-xl text-tier-1"
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label className="text-[10px] uppercase tracking-widest text-tier-3">Current Stage</Label>
+                  <Select value={editData.currentStage} onValueChange={(v) => setEditData({...editData, currentStage: v})}>
+                    <SelectTrigger className="bg-white/[0.03] border-white/[0.08] h-11 rounded-xl text-tier-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {['Not Started', 'Research', 'Applied', 'In Review', 'Approved', 'Onboarding', 'Live'].map(s => (
+                        <SelectItem key={s} value={s}>{s}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label className="text-[10px] uppercase tracking-widest text-tier-3">Objective</Label>
+                  <Input 
+                    value={editData.nextStep}
+                    onChange={(e) => setEditData({...editData, nextStep: e.target.value})}
+                    className="bg-white/[0.03] border-white/[0.08] h-11 rounded-xl text-tier-1"
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label className="text-[10px] uppercase tracking-widest text-tier-3">Target Date</Label>
+                  <Input 
+                    type="date"
+                    value={editData.dueDate}
+                    onChange={(e) => setEditData({...editData, dueDate: e.target.value})}
+                    className="bg-white/[0.03] border-white/[0.08] h-11 rounded-xl text-tier-1"
+                  />
+                </div>
+              </div>
+
+              <div className="grid gap-3">
+                <Label className="text-[10px] uppercase tracking-widest text-tier-3">Define Onboarding Requirements</Label>
+                <div className="flex gap-2">
+                  <Input 
+                    placeholder="e.g. Compliance Certification"
+                    value={reqInput}
+                    onChange={(e) => setReqInput(e.target.value)}
+                    className="bg-white/[0.03] border-white/[0.08] h-11 rounded-xl"
+                  />
+                  <Button variant="secondary" onClick={() => {
+                    if (reqInput) {
+                      setEditData({...editData, requirements: [...editData.requirements, reqInput]});
+                      setReqInput("");
+                    }
+                  }} className="rounded-xl h-11 px-4 font-bold uppercase text-[10px]">Add</Button>
+                </div>
+                <div className="flex flex-wrap gap-2 pt-2">
+                  {editData.requirements.map((req: string, idx: number) => (
+                    <Badge key={idx} variant="secondary" className="pl-3 pr-1 py-1 gap-2 rounded-lg bg-white/5 border-white/10 group">
+                      <span className="text-[10px] font-medium">{req}</span>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={() => setEditData({...editData, requirements: editData.requirements.filter((_: any, i: number) => i !== idx)})}
+                        className="size-4 rounded-full hover:bg-rose-500/20 hover:text-rose-400"
+                      >
+                        <X className="size-2.5" />
+                      </Button>
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button onClick={handleUpdate} className="w-full bg-primary text-white h-12 rounded-xl font-bold uppercase tracking-widest shadow-xl shadow-primary/20">
+                Synchronize Mission
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }
@@ -193,7 +410,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
 function TimelineEntry({ date, user, content }: { date: string, user: string, content: string }) {
   return (
     <div className="flex flex-col gap-2 pl-8 relative">
-      <div className="absolute left-0 top-1.5 size-[23px] rounded-full bg-background border-2 border-white/[0.08] flex items-center justify-center">
+      <div className="absolute left-0 top-1.5 size-[23px] rounded-full bg-background border-2 border-white/[0.08] flex items-center justify-center shadow-lg shadow-black">
         <div className="size-1.5 rounded-full bg-primary" />
       </div>
       <div className="flex items-center gap-3">
@@ -214,7 +431,7 @@ function InfoRow({ label, value, icon: Icon }: { label: string, value: string, i
         <Icon className="size-3.5" />
         <span className="text-[11px] font-bold uppercase tracking-widest">{label}</span>
       </div>
-      <span className="text-[13px] font-semibold text-tier-1 text-right">{value}</span>
+      <span className="text-[13px] font-semibold text-tier-1 text-right">{value || 'N/A'}</span>
     </div>
   );
 }

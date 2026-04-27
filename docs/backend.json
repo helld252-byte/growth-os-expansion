@@ -52,7 +52,7 @@
         "name": { "type": "string" },
         "type": { "type": "string" },
         "market": { "type": "string" },
-        "website": { "type": "string", "format": "uri" },
+        "website": { "type": "string", format: "uri" },
         "ownerId": { "type": "string" },
         "priority": { "type": "string", "enum": ["High", "Medium", "Low"] },
         "estimatedValue": { "type": "number" },
@@ -64,9 +64,25 @@
         "productsUploaded": { "type": "boolean" },
         "salesStarted": { "type": "boolean" },
         "nextStep": { "type": "string" },
+        "dueDate": { "type": "string", "format": "date" },
         "contactPerson": { "type": "string" },
         "contactEmail": { "type": "string", "format": "email" },
         "notes": { "type": "string" },
+        "requirements": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "journal": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "date": { "type": "string", "format": "date-time" },
+              "user": { "type": "string" },
+              "content": { "type": "string" }
+            }
+          }
+        },
         "createdAt": { "type": "string", "format": "date-time" },
         "updatedAt": { "type": "string", "format": "date-time" }
       },
