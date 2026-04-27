@@ -314,28 +314,33 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
         {/* SIDEBAR COLUMN */}
         <div className="lg:col-span-4 flex flex-col gap-8">
           <section className="premium-panel p-8 rounded-3xl flex flex-col gap-6">
-            <h3 className="text-[11px] font-bold uppercase tracking-[0.25em] text-tier-4">Metadata Intel</h3>
+            <h3 className="text-[11px] font-bold uppercase tracking-[0.25em] text-tier-4">Company Contact Information</h3>
             <div className="flex flex-col gap-6">
               <InfoRow label="Market Zone" value={platform.market} icon={Globe} />
               <InfoRow label="Mission Start" value={platform.dateStarted} icon={Calendar} />
               <InfoRow label="Last Sync" value={platform.lastUpdate ? new Date(platform.lastUpdate).toLocaleDateString() : 'N/A'} icon={Clock} />
               <InfoRow label="Strategic Fit" value={`${platform.fitScore || 7}/10`} icon={Zap} />
-              <Separator className="bg-white/[0.05]" />
-              <div className="flex flex-col gap-3">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-tier-4">Primary Contact</span>
-                <div className="flex items-center gap-4">
-                  <div className="size-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-bold">
-                    {platform.contactPerson?.charAt(0) || '?'}
+              
+              {(platform.contactPerson || platform.contactEmail) && (
+                <>
+                  <Separator className="bg-white/[0.05]" />
+                  <div className="flex flex-col gap-3">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-tier-4">Primary Contact</span>
+                    <div className="flex items-center gap-4">
+                      <div className="size-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-bold">
+                        {platform.contactPerson?.charAt(0) || '?'}
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-[14px] font-semibold text-tier-1">{platform.contactPerson || 'Unknown Unit'}</span>
+                        <span className="text-[12px] text-tier-3 truncate">{platform.contactEmail || 'No secure channel'}</span>
+                      </div>
+                    </div>
+                    <Button variant="outline" className="h-9 w-full rounded-lg border-white/[0.05] bg-white/[0.02] text-[10px] uppercase font-bold tracking-widest hover:bg-primary/10 hover:text-primary transition-all">
+                      <MessageSquare className="size-3.5 mr-2" /> Open Comms
+                    </Button>
                   </div>
-                  <div className="flex flex-col">
-                    <span className="text-[14px] font-semibold text-tier-1">{platform.contactPerson || 'Unknown Unit'}</span>
-                    <span className="text-[12px] text-tier-3 truncate">{platform.contactEmail || 'No secure channel'}</span>
-                  </div>
-                </div>
-                <Button variant="outline" className="h-9 w-full rounded-lg border-white/[0.05] bg-white/[0.02] text-[10px] uppercase font-bold tracking-widest hover:bg-primary/10 hover:text-primary transition-all">
-                  <MessageSquare className="size-3.5 mr-2" /> Open Comms
-                </Button>
-              </div>
+                </>
+              )}
             </div>
           </section>
         </div>
