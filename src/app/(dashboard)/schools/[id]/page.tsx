@@ -15,7 +15,11 @@ import {
   Plus,
   Zap,
   ShieldCheck,
-  ClipboardCheck
+  ClipboardCheck,
+  Building2,
+  Mail,
+  MapPin,
+  ExternalLink
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -63,9 +67,9 @@ export default function SchoolDetailPage({ params }: { params: Promise<{ id: str
         <div className="flex flex-col gap-6">
           <Link 
             href="/schools" 
-            className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.2em] text-tier-3 hover:text-tier-1 transition-colors w-fit"
+            className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.2em] text-tier-3 hover:text-tier-1 transition-colors w-fit group"
           >
-            <ArrowLeft className="size-3.5" /> School Systems
+            <ArrowLeft className="size-3.5 group-hover:-translate-x-1 transition-transform" /> School Systems
           </Link>
           
           <div className="flex flex-col gap-3">
@@ -83,7 +87,7 @@ export default function SchoolDetailPage({ params }: { params: Promise<{ id: str
             <div className="flex items-center gap-4 text-[13px] font-medium text-tier-3">
               <span className="flex items-center gap-1.5"><GraduationCap className="size-4" /> Education Vertical</span>
               <span className="text-tier-4">•</span>
-              <span className="uppercase tracking-wider text-[11px]">System Unit-0{school.id.slice(-1) || '1'}</span>
+              <span className="uppercase tracking-wider text-[11px]">System Unit-01</span>
             </div>
           </div>
         </div>
@@ -136,7 +140,7 @@ export default function SchoolDetailPage({ params }: { params: Promise<{ id: str
           <section className="premium-panel p-8 rounded-3xl flex flex-col gap-8">
             <div className="flex items-center justify-between">
               <h3 className="text-[11px] font-bold uppercase tracking-[0.25em] text-tier-4">Operational Journal</h3>
-              <Button variant="ghost" className="h-8 text-[10px] font-bold uppercase tracking-wider text-tier-3 hover:text-primary">
+              <Button variant="ghost" className="h-8 text-[10px] font-bold uppercase tracking-wider text-tier-3 hover:text-primary transition-all">
                 <Plus className="size-3.5 mr-2" /> Add Field Note
               </Button>
             </div>
@@ -164,7 +168,24 @@ export default function SchoolDetailPage({ params }: { params: Promise<{ id: str
               <div className="flex flex-col gap-2">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-tier-4">Primary Decision Maker</span>
                 <span className="text-[14px] font-semibold text-tier-1">{school.contact || 'N/A'}</span>
-                <span className="text-[11px] text-tier-3 font-medium">Verified Point of Contact</span>
+                <div className="flex items-center gap-2 text-[11px] text-tier-3 font-medium">
+                  <Mail className="size-3" /> Verified Point of Contact
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section className="premium-panel p-8 rounded-3xl flex flex-col gap-6">
+            <h3 className="text-[11px] font-bold uppercase tracking-[0.25em] text-tier-4">Geographic Profile</h3>
+            <div className="flex items-start gap-4">
+              <div className="size-10 rounded-xl bg-white/[0.03] border border-white/[0.08] flex items-center justify-center shrink-0">
+                <MapPin className="size-5 text-primary" />
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-[13px] font-semibold text-tier-1">Location Details</span>
+                <p className="text-[12px] text-tier-3 leading-relaxed">
+                  Awaiting detailed campus address for logistics synchronization.
+                </p>
               </div>
             </div>
           </section>
@@ -189,7 +210,7 @@ function SnapshotCard({ label, value, icon: Icon }: { label: string, value: stri
 function TimelineEntry({ date, user, content }: { date: string, user: string, content: string }) {
   return (
     <div className="flex flex-col gap-2 pl-8 relative">
-      <div className="absolute left-0 top-1.5 size-[23px] rounded-full bg-background border-2 border-white/[0.08] flex items-center justify-center">
+      <div className="absolute left-0 top-1.5 size-[23px] rounded-full bg-background border-2 border-white/[0.08] flex items-center justify-center shadow-lg shadow-black">
         <div className="size-1.5 rounded-full bg-primary" />
       </div>
       <div className="flex items-center gap-3">

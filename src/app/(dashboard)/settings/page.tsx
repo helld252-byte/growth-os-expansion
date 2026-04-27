@@ -62,7 +62,7 @@ export default function SettingsPage() {
     zone: "Global (EU/US/APAC)"
   });
 
-  // Check for Admin role (Top level or Nested as shown in user screenshot)
+  // Check for Admin role (Top level or Nested)
   const adminCheckRef = useMemoFirebase(() => {
     if (!currentUser) return null;
     return doc(firestore, 'roles_admin', currentUser.uid);
@@ -84,7 +84,7 @@ export default function SettingsPage() {
   }, [isAdmin, firestore]);
   const { data: allUsers, isLoading: isUsersLoading } = useCollection(usersQuery);
 
-  // Fetch All Admins (Admin Only) - This collection might be empty if they use the nested structure
+  // Fetch All Admins (Admin Only)
   const adminsQuery = useMemoFirebase(() => {
     if (!isAdmin) return null;
     return collection(firestore, 'roles_admin');
@@ -114,7 +114,6 @@ export default function SettingsPage() {
   };
 
   const toggleAdminRole = (userId: string, currentIsAdmin: boolean) => {
-    // We prefer the top-level collection for consistency in role management
     const roleRef = doc(firestore, 'roles_admin', userId);
     if (currentIsAdmin) {
       if (userId === currentUser?.uid) {
@@ -126,7 +125,6 @@ export default function SettingsPage() {
         return;
       }
       deleteDocumentNonBlocking(roleRef);
-      // Also try to delete nested if it exists
       const nestedRef = doc(firestore, 'users', userId, 'roles_admin', userId);
       deleteDocumentNonBlocking(nestedRef);
       
@@ -183,17 +181,12 @@ export default function SettingsPage() {
           <div className="premium-panel p-8 rounded-2xl flex flex-col gap-8">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-6">
-                <div className="relative group">
-                  <Avatar className="size-24 border-2 border-white/[0.08] group-hover:border-primary/50 transition-all shadow-2xl">
-                    <AvatarImage src={currentUser?.photoURL || "https://picsum.photos/seed/user/200/200"} />
-                    <AvatarFallback className="bg-primary/10 text-primary text-2xl font-bold">
-                      {profile.name ? profile.name.split(' ').map(n => n[0]).join('') : "U"}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 rounded-full cursor-pointer transition-opacity">
-                    <Cloud className="size-6 text-white" />
-                  </div>
-                </div>
+                <Avatar className="size-24 border-2 border-white/[0.08] shadow-2xl">
+                  <AvatarImage src={currentUser?.photoURL || "https://picsum.photos/seed/user/200/200"} />
+                  <AvatarFallback className="bg-primary/10 text-primary text-2xl font-bold">
+                    {profile.name ? profile.name.split(' ').map(n => n[0]).join('') : "U"}
+                  </AvatarFallback>
+                </Avatar>
                 <div className="flex flex-col gap-2">
                   <h3 className="text-xl font-semibold text-tier-1">{profile.name || "Unknown Identity"}</h3>
                   <p className="text-tier-3 text-[14px]">{isAdmin ? "System Administrator" : profile.role} • Unit-01</p>
@@ -215,7 +208,7 @@ export default function SettingsPage() {
                 <DropdownMenuContent align="end" className="w-56 bg-background/95 backdrop-blur-xl border-white/[0.08] rounded-xl">
                   <DropdownMenuItem onClick={() => setIsEditingProfile(!isEditingProfile)} className="flex items-center gap-2.5 py-2.5 cursor-pointer">
                     <Edit3 className="size-4 text-primary" />
-                    <span className="text-[12px] font-semibold text-tier-2">{isEditingProfile ? "Cancel Editing" : "Edit Strategic Profile"}</span>
+                    <span className="text-[12px] font-semibold text-tier-2">{isEditingProfile ? "Hide Profile Intel" : "Edit Strategic Profile"}</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem className="flex items-center gap-2.5 py-2.5 cursor-pointer">
                     <Settings2 className="size-4 text-tier-3" />
