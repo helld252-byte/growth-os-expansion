@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -317,7 +316,7 @@ export default function HubPage() {
               className={cn(
                 "justify-start gap-4 h-10 px-3.5 rounded-lg transition-all text-[13px] font-medium",
                 selectedCategory === "All Assets" 
-                  ? "bg-primary/10 text-primary" 
+                  ? "bg-primary/10 text-primary hover:text-primary" 
                   : "text-tier-2 hover:bg-white/[0.03] hover:text-tier-1"
               )}
             >
@@ -332,7 +331,7 @@ export default function HubPage() {
                 className={cn(
                   "justify-start gap-4 h-10 px-3.5 rounded-lg transition-all text-[13px] font-medium",
                   selectedCategory === cat.label 
-                    ? "bg-primary/10 text-primary" 
+                    ? "bg-primary/10 text-primary hover:text-primary" 
                     : "text-tier-2 hover:bg-white/[0.03] hover:text-tier-1"
                 )}
               >

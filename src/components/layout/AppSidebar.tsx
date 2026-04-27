@@ -83,7 +83,7 @@ export function AppSidebar({ isAdmin }: AppSidebarProps) {
                   className={cn(
                     "h-11 rounded-xl transition-all duration-300 px-3.5",
                     pathname === item.path 
-                      ? "bg-primary/10 hover:bg-primary/15 text-tier-1 shadow-[0_0_20px_rgba(168,85,247,0.15)] font-semibold" 
+                      ? "bg-primary/10 hover:bg-primary/15 text-tier-1 hover:text-tier-1 shadow-[0_0_20px_rgba(168,85,247,0.15)] font-semibold" 
                       : "text-tier-2 hover:bg-white/[0.03] hover:text-tier-1 font-medium"
                   )}
                 >
@@ -108,7 +108,7 @@ export function AppSidebar({ isAdmin }: AppSidebarProps) {
                   className={cn(
                     "h-11 rounded-xl transition-all duration-300 px-3.5",
                     pathname === item.path 
-                      ? "bg-primary/10 hover:bg-primary/15 text-tier-1 shadow-[0_0_20px_rgba(168,85,247,0.15)] font-semibold" 
+                      ? "bg-primary/10 hover:bg-primary/15 text-tier-1 hover:text-tier-1 shadow-[0_0_20px_rgba(168,85,247,0.15)] font-semibold" 
                       : "text-tier-2 hover:bg-white/[0.03] hover:text-tier-1 font-medium"
                   )}
                 >
@@ -133,7 +133,7 @@ export function AppSidebar({ isAdmin }: AppSidebarProps) {
                   className={cn(
                     "h-11 rounded-xl transition-all duration-300 px-3.5",
                     pathname === item.path 
-                      ? "bg-primary/10 hover:bg-primary/15 text-tier-1 shadow-[0_0_20px_rgba(168,85,247,0.15)] font-semibold" 
+                      ? "bg-primary/10 hover:bg-primary/15 text-tier-1 hover:text-tier-1 shadow-[0_0_20px_rgba(168,85,247,0.15)] font-semibold" 
                       : "text-tier-2 hover:bg-white/[0.03] hover:text-tier-1 font-medium"
                   )}
                 >
@@ -172,7 +172,7 @@ export function AppSidebar({ isAdmin }: AppSidebarProps) {
                   className={cn(
                     "h-11 rounded-xl transition-all duration-300 px-3.5",
                     pathname === item.path 
-                      ? "bg-primary/10 hover:bg-primary/15 text-tier-1 shadow-[0_0_20px_rgba(168,85,247,0.15)] font-semibold" 
+                      ? "bg-primary/10 hover:bg-primary/15 text-tier-1 hover:text-tier-1 shadow-[0_0_20px_rgba(168,85,247,0.15)] font-semibold" 
                       : "text-tier-2 hover:bg-white/[0.03] hover:text-tier-1 font-medium"
                   )}
                 >
