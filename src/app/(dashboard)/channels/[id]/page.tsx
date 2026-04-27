@@ -1,3 +1,4 @@
+
 "use client";
 
 import { use, useState } from "react";
@@ -8,16 +9,17 @@ import {
   Clock, 
   Globe,
   Calendar,
-  User,
   Plus,
   Zap,
   Loader2,
-  Trash2,
   X,
-  MessageSquare,
+  Mail,
   ShieldCheck,
-  CheckCircle2,
-  ChevronRight
+  ChevronRight,
+  Link2,
+  Building2,
+  User,
+  MessageSquare
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -86,6 +88,13 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
       nextStep: platform.nextStep,
       dueDate: platform.dueDate || "",
       requirements: platform.requirements || [],
+      website: platform.website || "",
+      portalUrl: platform.portalUrl || "",
+      supportEmail: platform.supportEmail || "",
+      contactPerson: platform.contactPerson || "",
+      contactRole: platform.contactRole || "",
+      lastContactDate: platform.lastContactDate || "",
+      commStatus: platform.commStatus || "No outreach",
     });
     setIsAddOpen(true);
   };
@@ -313,35 +322,116 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
 
         {/* SIDEBAR COLUMN */}
         <div className="lg:col-span-4 flex flex-col gap-8">
-          <section className="premium-panel p-8 rounded-3xl flex flex-col gap-6">
-            <h3 className="text-[11px] font-bold uppercase tracking-[0.25em] text-tier-4">Company Contact Information</h3>
-            <div className="flex flex-col gap-6">
-              <InfoRow label="Market Zone" value={platform.market} icon={Globe} />
-              <InfoRow label="Mission Start" value={platform.dateStarted} icon={Calendar} />
-              <InfoRow label="Last Sync" value={platform.lastUpdate ? new Date(platform.lastUpdate).toLocaleDateString() : 'N/A'} icon={Clock} />
-              <InfoRow label="Strategic Fit" value={`${platform.fitScore || 7}/10`} icon={Zap} />
-              
-              {(platform.contactPerson || platform.contactEmail) && (
-                <>
-                  <Separator className="bg-white/[0.05]" />
-                  <div className="flex flex-col gap-3">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-tier-4">Primary Contact</span>
-                    <div className="flex items-center gap-4">
-                      <div className="size-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-bold">
-                        {platform.contactPerson?.charAt(0) || '?'}
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-[14px] font-semibold text-tier-1">{platform.contactPerson || 'Unknown Unit'}</span>
-                        <span className="text-[12px] text-tier-3 truncate">{platform.contactEmail || 'No secure channel'}</span>
-                      </div>
-                    </div>
-                    <Button variant="outline" className="h-9 w-full rounded-lg border-white/[0.05] bg-white/[0.02] text-[10px] uppercase font-bold tracking-widest hover:bg-primary/10 hover:text-primary transition-all">
-                      <MessageSquare className="size-3.5 mr-2" /> Open Comms
-                    </Button>
-                  </div>
-                </>
-              )}
+          
+          {/* CONTACT HUB */}
+          <section className="premium-panel p-6 rounded-3xl flex flex-col gap-6">
+            <div className="flex items-center justify-between">
+              <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4">Company Contact Hub</h3>
+              <Building2 className="size-4 text-tier-3" />
             </div>
+
+            <div className="flex flex-col gap-5">
+              {/* Web Assets */}
+              <div className="flex flex-col gap-3">
+                <ContactField 
+                  label="Official Website" 
+                  value={platform.website} 
+                  icon={Globe} 
+                  link={platform.website}
+                />
+                <ContactField 
+                  label="Supplier Portal" 
+                  value={platform.portalUrl} 
+                  icon={Link2} 
+                  link={platform.portalUrl}
+                />
+              </div>
+
+              <Separator className="bg-white/[0.04]" />
+
+              {/* Support & Comm */}
+              <div className="flex flex-col gap-3">
+                <ContactField 
+                  label="Onboarding Support" 
+                  value={platform.supportEmail} 
+                  icon={Mail} 
+                  link={platform.supportEmail ? `mailto:${platform.supportEmail}` : undefined}
+                />
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-2.5 text-tier-3">
+                    <Zap className="size-3.5" />
+                    <span className="text-[10px] font-bold uppercase tracking-widest">Comm Status</span>
+                  </div>
+                  <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 text-[9px] uppercase tracking-widest font-bold">
+                    {platform.commStatus || "No outreach"}
+                  </Badge>
+                </div>
+              </div>
+
+              <Separator className="bg-white/[0.04]" />
+
+              {/* Optional Personnel */}
+              {platform.contactPerson && (
+                <div className="flex flex-col gap-3 p-4 rounded-2xl bg-white/[0.02] border border-white/[0.05]">
+                  <span className="text-[9px] font-bold uppercase tracking-widest text-tier-4">Primary Contact Unit</span>
+                  <div className="flex items-center gap-3">
+                    <div className="size-9 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-bold text-xs">
+                      {platform.contactPerson.charAt(0)}
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-[13px] font-semibold text-tier-1 leading-none">{platform.contactPerson}</span>
+                      <span className="text-[11px] text-tier-3 mt-1">{platform.contactRole || 'Decision Maker'}</span>
+                    </div>
+                  </div>
+                  {platform.contactEmail && (
+                    <a href={`mailto:${platform.contactEmail}`} className="text-[12px] text-primary hover:underline flex items-center gap-2 mt-1">
+                      <Mail className="size-3" /> {platform.contactEmail}
+                    </a>
+                  )}
+                </div>
+              )}
+
+              <div className="flex items-center justify-between px-1">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-tier-4">Last Interaction</span>
+                <span className="text-[11px] font-semibold text-tier-2">{platform.lastContactDate || 'Never'}</span>
+              </div>
+            </div>
+
+            {/* Quick Actions */}
+            <div className="grid grid-cols-2 gap-3 pt-2">
+              <Button 
+                variant="outline" 
+                className="h-10 rounded-xl border-white/[0.06] bg-white/[0.02] text-[10px] font-bold uppercase tracking-widest hover:bg-primary/10 hover:text-primary transition-all"
+                onClick={() => {
+                  if (platform.website) window.open(platform.website.startsWith('http') ? platform.website : `https://${platform.website}`, '_blank');
+                }}
+              >
+                Open Site
+              </Button>
+              <Button 
+                variant="outline" 
+                className="h-10 rounded-xl border-white/[0.06] bg-white/[0.02] text-[10px] font-bold uppercase tracking-widest hover:bg-primary/10 hover:text-primary transition-all"
+                onClick={() => {
+                  if (platform.supportEmail) window.location.href = `mailto:${platform.supportEmail}`;
+                }}
+              >
+                Send Email
+              </Button>
+              <Button 
+                onClick={() => setIsNoteOpen(true)}
+                className="col-span-2 h-10 rounded-xl bg-primary/20 text-primary border border-primary/20 text-[10px] font-bold uppercase tracking-widest hover:bg-primary hover:text-white transition-all shadow-lg active-glow"
+              >
+                <MessageSquare className="size-3.5 mr-2" /> Log Interaction
+              </Button>
+            </div>
+          </section>
+
+          {/* ABOUT PLATFORM */}
+          <section className="premium-panel p-6 rounded-3xl flex flex-col gap-4">
+            <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4">Platform Intel</h3>
+            <p className="text-[13px] text-tier-2 leading-relaxed font-medium">
+              {platform.notes || "No detailed institutional profile recorded. Strategic expansion protocols active."}
+            </p>
           </section>
         </div>
       </div>
@@ -398,6 +488,74 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
                 </div>
               </div>
 
+              <Separator className="bg-white/[0.05]" />
+              <span className="text-[10px] font-bold uppercase tracking-widest text-primary">Contact Calibration</span>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label className="text-[10px] uppercase tracking-widest text-tier-3">Website</Label>
+                  <Input 
+                    value={editData.website}
+                    onChange={(e) => setEditData({...editData, website: e.target.value})}
+                    className="bg-white/[0.03] border-white/[0.08] h-11 rounded-xl text-tier-1"
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label className="text-[10px] uppercase tracking-widest text-tier-3">Portal URL</Label>
+                  <Input 
+                    value={editData.portalUrl}
+                    onChange={(e) => setEditData({...editData, portalUrl: e.target.value})}
+                    className="bg-white/[0.03] border-white/[0.08] h-11 rounded-xl text-tier-1"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label className="text-[10px] uppercase tracking-widest text-tier-3">Support Email</Label>
+                  <Input 
+                    value={editData.supportEmail}
+                    onChange={(e) => setEditData({...editData, supportEmail: e.target.value})}
+                    className="bg-white/[0.03] border-white/[0.08] h-11 rounded-xl text-tier-1"
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label className="text-[10px] uppercase tracking-widest text-tier-3">Comm Status</Label>
+                  <Select value={editData.commStatus} onValueChange={(v) => setEditData({...editData, commStatus: v})}>
+                    <SelectTrigger className="bg-white/[0.03] border-white/[0.08] h-11 rounded-xl text-tier-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {["No outreach", "Contacted", "Waiting reply", "In discussion", "Approved", "Rejected"].map(s => (
+                        <SelectItem key={s} value={s}>{s}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label className="text-[10px] uppercase tracking-widest text-tier-3">Contact Person</Label>
+                  <Input 
+                    value={editData.contactPerson}
+                    onChange={(e) => setEditData({...editData, contactPerson: e.target.value})}
+                    className="bg-white/[0.03] border-white/[0.08] h-11 rounded-xl text-tier-1"
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label className="text-[10px] uppercase tracking-widest text-tier-3">Last Contact</Label>
+                  <Input 
+                    type="date"
+                    value={editData.lastContactDate}
+                    onChange={(e) => setEditData({...editData, lastContactDate: e.target.value})}
+                    className="bg-white/[0.03] border-white/[0.08] h-11 rounded-xl text-tier-1"
+                  />
+                </div>
+              </div>
+
+              <Separator className="bg-white/[0.05]" />
+
               <div className="grid gap-3">
                 <Label className="text-[10px] uppercase tracking-widest text-tier-4 font-bold">Onboarding Strategy</Label>
                 <div className="flex gap-2">
@@ -435,9 +593,6 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
                       </Button>
                     </div>
                   ))}
-                  {editData.requirements.length === 0 && (
-                    <span className="text-[11px] text-tier-4 italic ml-1">No specific requirements defined.</span>
-                  )}
                 </div>
               </div>
             </div>
@@ -448,6 +603,31 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
             </DialogFooter>
           </DialogContent>
         </Dialog>
+      )}
+    </div>
+  );
+}
+
+function ContactField({ label, value, icon: Icon, link }: { label: string, value?: string, icon: any, link?: string }) {
+  if (!value && !link) return null;
+  
+  return (
+    <div className="flex items-center justify-between gap-4 group">
+      <div className="flex items-center gap-2.5 text-tier-3">
+        <Icon className="size-3.5" />
+        <span className="text-[10px] font-bold uppercase tracking-widest">{label}</span>
+      </div>
+      {link ? (
+        <a 
+          href={link.startsWith('http') || link.startsWith('mailto') ? link : `https://${link}`} 
+          target={link.startsWith('mailto') ? undefined : "_blank"} 
+          rel="noopener noreferrer"
+          className="text-[12px] font-semibold text-primary hover:underline truncate max-w-[150px]"
+        >
+          {value || 'Link'}
+        </a>
+      ) : (
+        <span className="text-[12px] font-semibold text-tier-1">{value || 'N/A'}</span>
       )}
     </div>
   );
@@ -466,18 +646,6 @@ function TimelineEntry({ date, user, content }: { date: string, user: string, co
       <p className="text-[14px] text-tier-3 leading-relaxed font-medium">
         {content}
       </p>
-    </div>
-  );
-}
-
-function InfoRow({ label, value, icon: Icon }: { label: string, value: string, icon: any }) {
-  return (
-    <div className="flex items-center justify-between gap-4">
-      <div className="flex items-center gap-2.5 text-tier-3">
-        <Icon className="size-3.5" />
-        <span className="text-[11px] font-bold uppercase tracking-widest">{label}</span>
-      </div>
-      <span className="text-[13px] font-semibold text-tier-1 text-right">{value || 'N/A'}</span>
     </div>
   );
 }

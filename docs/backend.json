@@ -1,3 +1,4 @@
+
 {
   "entities": {
     "User": {
@@ -52,6 +53,13 @@
         "type": { "type": "string" },
         "market": { "type": "string" },
         "website": { "type": "string", "format": "uri" },
+        "portalUrl": { "type": "string", "format": "uri" },
+        "supportEmail": { "type": "string", "format": "email" },
+        "commStatus": { 
+          "type": "string", 
+          "enum": ["No outreach", "Contacted", "Waiting reply", "In discussion", "Approved", "Rejected"] 
+        },
+        "lastContactDate": { "type": "string", "format": "date" },
         "ownerId": { "type": "string" },
         "priority": { "type": "string", "enum": ["High", "Medium", "Low"] },
         "estimatedValue": { "type": "number" },
@@ -65,6 +73,7 @@
         "nextStep": { "type": "string" },
         "dueDate": { "type": "string", "format": "date" },
         "contactPerson": { "type": "string" },
+        "contactRole": { "type": "string" },
         "contactEmail": { "type": "string", "format": "email" },
         "notes": { "type": "string" },
         "requirements": {

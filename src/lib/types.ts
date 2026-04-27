@@ -17,6 +17,10 @@ export interface Platform {
   type: string;
   market: string;
   website?: string;
+  portalUrl?: string;
+  supportEmail?: string;
+  commStatus?: string;
+  lastContactDate?: string;
   ownerId: string;
   priority: Priority;
   estimatedValue: number;
@@ -32,9 +36,16 @@ export interface Platform {
   dueDate: string;
   blockers?: string;
   contactPerson?: string;
+  contactRole?: string;
   contactEmail?: string;
   notes?: string;
   requirements?: string[];
+  completedRequirements?: string[];
+  journal?: {
+    date: string;
+    user: string;
+    content: string;
+  }[];
   rejectionReason?: string;
 }
 
