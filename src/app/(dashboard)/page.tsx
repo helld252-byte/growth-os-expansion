@@ -47,7 +47,7 @@ export default function CommandCenter() {
     const now = new Date();
     const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
-    // 1. Executive KPIs
+    // 1. KPIs
     const trackedOpps = opportunities.length + partners.length;
     const activeConversations = opportunities.filter(o => o.commStatus && o.commStatus !== 'No outreach').length;
     const inReview = opportunities.filter(o => o.currentStage === 'In Review').length;
@@ -68,7 +68,7 @@ export default function CommandCenter() {
       { label: 'Live', count: opportunities.filter(o => o.currentStage === 'Live').length },
     ];
 
-    // 3. Vertical Breakdown
+    // 3. Verticals
     const verticals = [
       { label: 'Platforms', count: opportunities.length, icon: Globe, path: '/channels' },
       { label: 'Schools', count: partners.filter(p => p.type === 'School').length, icon: GraduationCap, path: '/schools' },
@@ -107,7 +107,7 @@ export default function CommandCenter() {
 
     const stalledCategory = verticals.sort((a, b) => b.count - a.count)[0]?.label;
 
-    // 6. Recent Updates only
+    // 6. Recent Updates
     const recentActivity = [...opportunities, ...partners]
       .sort((a, b) => {
         const dateA = a.updatedAt?.toDate ? a.updatedAt.toDate() : new Date(a.updatedAt || a.createdAt || 0);
