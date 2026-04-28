@@ -67,7 +67,7 @@ export function AppSidebar({ isAdmin }: AppSidebarProps) {
           className={cn(
             "h-10 rounded-lg transition-all duration-200 px-3 relative group overflow-hidden",
             isActive 
-              ? "bg-primary/8 text-primary font-semibold" 
+              ? "bg-primary/10 text-primary font-semibold" 
               : "text-tier-3 hover:bg-white/[0.03] hover:text-tier-1 font-medium"
           )}
         >
@@ -75,7 +75,7 @@ export function AppSidebar({ isAdmin }: AppSidebarProps) {
             <item.icon className={cn("size-4.5 transition-colors", isActive ? "text-primary" : "text-tier-3 group-hover:text-tier-2")} />
             <span className="tracking-tight ml-3.5 text-[13px]">{item.label}</span>
             {isActive && (
-              <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-primary rounded-full" />
+              <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-primary rounded-full shadow-[0_0_10px_hsl(var(--primary))]" />
             )}
           </Link>
         </SidebarMenuButton>
@@ -123,12 +123,7 @@ export function AppSidebar({ isAdmin }: AppSidebarProps) {
           <SidebarGroup className="mt-4">
             <SidebarGroupLabel className="px-3 text-[10px] uppercase font-bold tracking-[0.2em] text-primary mb-3">System Control</SidebarGroupLabel>
             <SidebarMenu className="gap-1">
-              <SidebarMenuItem>
-                <SidebarMenuButton className="h-10 rounded-lg text-primary/80 hover:bg-primary/8 hover:text-primary px-3 font-semibold border border-primary/10 transition-all">
-                  <ShieldAlert className="size-4.5" />
-                  <span className="tracking-tight ml-3.5 text-[13px]">Admin Console</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+              {renderMenuItem({ icon: ShieldAlert, label: "Admin Console", path: "/admin" })}
             </SidebarMenu>
           </SidebarGroup>
         )}

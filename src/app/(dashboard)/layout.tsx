@@ -1,4 +1,3 @@
-
 'use client';
 
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
@@ -92,6 +91,7 @@ export default function DashboardLayout({
     if (path.startsWith("/hub")) return "Intelligence Hub";
     if (path.startsWith("/reports")) return "Performance Intel";
     if (path.startsWith("/settings")) return "System Config";
+    if (path.startsWith("/admin")) return "Admin Console";
     return "Operations";
   };
 
@@ -136,7 +136,7 @@ export default function DashboardLayout({
                   onClick={() => setIsSearchOpen(true)}
                   className="hidden sm:flex items-center bg-white/[0.03] border border-white/[0.08] rounded-lg px-3 py-1.5 gap-3 cursor-pointer hover:bg-white/[0.06] hover:border-white/20 transition-all group"
                 >
-                  <Search className="size-3.5 text-tier-2 group-hover:text-primary transition-colors" />
+                  <Search className="size-3.5 text-tier-3 group-hover:text-primary transition-colors" />
                   <span className="text-[11px] font-medium tracking-tight text-tier-3 group-hover:text-primary pr-6 transition-colors">Search Strategic Assets</span>
                   <span className="text-[9px] font-medium text-tier-2 tracking-widest bg-white/5 px-1.5 py-0.5 rounded border border-white/10">⌘K</span>
                 </div>
@@ -168,6 +168,14 @@ export default function DashboardLayout({
                       <span className="text-[12px] font-semibold text-tier-2">Profile Intel</span>
                     </Link>
                   </DropdownMenuItem>
+                  {isAdmin && (
+                    <DropdownMenuItem asChild className="hover:bg-white/[0.05] cursor-pointer">
+                      <Link href="/admin" className="flex items-center gap-2">
+                        <ShieldAlert className="size-3.5 text-primary" />
+                        <span className="text-[12px] font-semibold text-tier-2">Admin Console</span>
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem onClick={handleSignOut} className="hover:bg-rose-500/10 text-rose-400 cursor-pointer focus:text-rose-400">
                     <LogOut className="size-3.5 mr-2" />
                     <span className="text-[12px] font-semibold">Terminate Session</span>
