@@ -141,12 +141,12 @@ export default function CommandCenter() {
           <Badge variant="outline" className="bg-emerald-500/5 text-emerald-400 border-emerald-500/20 text-[9px] font-bold uppercase tracking-widest px-3 py-1">System Live</Badge>
         </div>
 
-        {/* Executive Stats Strip */}
-        <div className="bg-white/[0.02] border border-white/[0.05] rounded-2xl p-6 flex items-center justify-between divide-x divide-white/[0.05] shadow-xl backdrop-blur-sm">
+        {/* Executive Stats Strip - Slim High-Fidelity Rail */}
+        <div className="bg-white/[0.015] border border-white/[0.05] rounded-2xl p-4 flex items-center justify-between divide-x divide-white/[0.04] shadow-xl backdrop-blur-sm">
           <StatModule label="Tracked Units" value={data.kpis.trackedOpps} />
           <StatModule label="In Review" value={data.kpis.inReview} />
           <StatModule label="Live" value={data.kpis.livePartnerships} highlight />
-          <StatModule label="Active Conversations" value={data.kpis.activeConversations} />
+          <StatModule label="Active Conv." value={data.kpis.activeConversations} />
           <StatModule label="Response Rate" value={`${data.kpis.responseRate}%`} />
           <StatModule label="This Week %" value="+12.5%" color="text-emerald-400" />
         </div>
@@ -181,7 +181,7 @@ export default function CommandCenter() {
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
         
-        {/* Units by Category */}
+        {/* Units by Category - Row Based List */}
         <div className="lg:col-span-5 flex flex-col gap-6">
           <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4 px-1">Units by Category</h3>
           <div className="flex flex-col gap-3">
@@ -208,27 +208,33 @@ export default function CommandCenter() {
           </div>
         </div>
 
-        {/* This Week Progress */}
+        {/* This Week Progress - Improved High-Fidelity Card */}
         <div className="lg:col-span-4 flex flex-col gap-6">
           <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4 px-1">This Week Progress</h3>
-          <div className="premium-panel p-8 rounded-2xl flex flex-col gap-8 h-full bg-gradient-to-br from-primary/5 via-transparent to-transparent">
-            <div className="grid grid-cols-2 gap-x-8 gap-y-10">
-              <ProgressMetric label="New Leads" value={data.momentum.newLeadsThisWeek} />
-              <ProgressMetric label="Replies Received" value={data.momentum.repliesReceived} />
-              <ProgressMetric label="Moved Forward" value={data.momentum.movedStages} />
-              <ProgressMetric label="Wins" value={data.momentum.wins} color="text-emerald-400" />
+          <div className="premium-panel rounded-2xl flex flex-col h-full overflow-hidden border-white/[0.05]">
+            {/* Technical Metric Grid */}
+            <div className="grid grid-cols-2 divide-x divide-y divide-white/[0.04] border-b border-white/[0.04]">
+              <MetricCell label="New Leads" value={data.momentum.newLeadsThisWeek} />
+              <MetricCell label="Replies" value={data.momentum.repliesReceived} />
+              <MetricCell label="Moved" value={data.momentum.movedStages} />
+              <MetricCell label="Wins" value={data.momentum.wins} color="text-emerald-400" />
             </div>
 
-            <div className="flex flex-col gap-4 mt-auto pt-8 border-t border-white/[0.03]">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold text-tier-4 uppercase tracking-widest">Growth Velocity</span>
-                <Badge variant="outline" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-[10px] font-bold">
-                  +12.5% WoW
-                </Badge>
+            {/* Velocity & Focus Tray */}
+            <div className="p-6 flex flex-col gap-5 mt-auto bg-white/[0.01]">
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-[9px] font-bold text-tier-4 uppercase tracking-[0.2em]">Growth Velocity</span>
+                  <span className="text-[11px] font-bold text-emerald-400">+12.5% WoW</span>
+                </div>
+                <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                  <div className="h-full bg-emerald-500/40 w-[65%] rounded-full shadow-[0_0_8px_rgba(16,185,129,0.2)]" />
+                </div>
               </div>
-              <div className="flex items-center gap-3 px-4 py-3 bg-white/[0.02] border border-white/[0.04] rounded-xl">
-                <div className="size-2 rounded-full bg-primary animate-pulse" />
-                <span className="text-[11px] font-semibold text-tier-2 uppercase tracking-wide">Focus Area: <span className="text-tier-1">{data.bottlenecks.stalledCategory || "Schools"}</span></span>
+              
+              <div className="flex items-center gap-3 px-4 py-2.5 bg-white/[0.02] border border-white/[0.04] rounded-xl group hover:border-primary/20 transition-all">
+                <div className="size-1.5 rounded-full bg-primary animate-pulse" />
+                <span className="text-[11px] font-medium text-tier-3">Priority Area: <span className="text-tier-1">{data.bottlenecks.stalledCategory || "Schools"}</span></span>
               </div>
             </div>
           </div>
@@ -280,21 +286,21 @@ function StatModule({ label, value, highlight, color }: { label: string, value: 
   return (
     <div className="flex-1 flex flex-col items-center justify-center gap-1.5 px-4 first:pl-0 last:pr-0">
       <span className={cn(
-        "text-lg font-bold tracking-tight",
+        "text-[15px] font-bold tracking-tight",
         color ? color : highlight ? "text-primary" : "text-tier-1"
       )}>
         {value}
       </span>
-      <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-tier-4 whitespace-nowrap">{label}</span>
+      <span className="text-[8px] font-bold uppercase tracking-[0.2em] text-tier-4 whitespace-nowrap">{label}</span>
     </div>
   );
 }
 
-function ProgressMetric({ label, value, color }: { label: string, value: number, color?: string }) {
+function MetricCell({ label, value, color }: { label: string, value: number, color?: string }) {
   return (
-    <div className="flex flex-col gap-2">
-      <span className="text-[9px] font-bold uppercase tracking-widest text-tier-4">{label}</span>
-      <span className={cn("text-3xl font-bold tracking-tight", color || "text-tier-1")}>{value}</span>
+    <div className="p-6 flex flex-col gap-1.5 hover:bg-white/[0.01] transition-colors group">
+      <span className="text-[9px] font-bold uppercase tracking-[0.15em] text-tier-4 group-hover:text-tier-3 transition-colors">{label}</span>
+      <span className={cn("text-2xl font-bold tracking-tight", color || "text-tier-1")}>{value}</span>
     </div>
   );
 }
