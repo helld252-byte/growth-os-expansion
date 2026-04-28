@@ -127,32 +127,43 @@ export default function CommandCenter() {
   return (
     <div className="max-w-[1400px] mx-auto flex flex-col gap-10 animate-in fade-in duration-700">
       
-      {/* Header */}
-      <header className="flex flex-col gap-2">
-        <div className="flex items-center gap-3">
-          <div className="size-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20">
-            <Activity className="size-4 text-primary" />
+      {/* Header & Compact KPI Rail */}
+      <div className="flex flex-col gap-8">
+        <header className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20 shadow-lg active-glow">
+              <Activity className="size-5 text-primary" />
+            </div>
+            <div className="flex flex-col">
+              <h1 className="text-2xl font-bold tracking-tight text-tier-1 leading-none">Command Center</h1>
+              <p className="text-tier-4 text-[11px] font-bold uppercase tracking-[0.2em] mt-1.5">Operational Intelligence Synchronized</p>
+            </div>
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-tier-1">Executive Dashboard</h1>
-        </div>
-        <p className="text-tier-3 text-[13px] font-medium tracking-tight px-1">Mission progress and pipeline velocity across all active verticals.</p>
-      </header>
+          <div className="hidden lg:flex items-center gap-3">
+             <Badge variant="outline" className="bg-emerald-500/5 text-emerald-400 border-emerald-500/20 text-[9px] font-bold uppercase tracking-widest px-3 py-1">System Integrity: 100%</Badge>
+             <span className="text-[10px] font-bold text-tier-4 uppercase tracking-[0.1em]">{new Date().toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+          </div>
+        </header>
 
-      {/* KPI Row */}
-      <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
-        <ExecutiveKPI label="Tracked Opps" value={data.kpis.trackedOpps} />
-        <ExecutiveKPI label="Active Convos" value={data.kpis.activeConversations} color="text-blue-400" />
-        <ExecutiveKPI label="In Review" value={data.kpis.inReview} color="text-amber-400" />
-        <ExecutiveKPI label="Approved" value={data.kpis.approvedCount} color="text-violet-400" />
-        <ExecutiveKPI label="Live Units" value={data.kpis.livePartnerships} color="text-emerald-400" />
-        <ExecutiveKPI label="Response Rate" value={`${data.kpis.responseRate}%`} color="text-primary" />
+        {/* Compact KPI Row */}
+        <div className="flex flex-wrap items-center gap-px bg-white/[0.04] border border-white/[0.06] rounded-2xl overflow-hidden shadow-2xl">
+          <ExecutiveMetric label="Tracked Units" value={data.kpis.trackedOpps} />
+          <ExecutiveMetric label="Active Convos" value={data.kpis.activeConversations} color="text-blue-400" />
+          <ExecutiveMetric label="In Review" value={data.kpis.inReview} color="text-amber-400" />
+          <ExecutiveMetric label="Approved" value={data.kpis.approvedCount} color="text-violet-400" />
+          <ExecutiveMetric label="Live Systems" value={data.kpis.livePartnerships} color="text-emerald-400" />
+          <ExecutiveMetric label="Response Rate" value={`${data.kpis.responseRate}%`} color="text-primary" isLast />
+        </div>
       </div>
 
       {/* Funnel Section */}
-      <section className="flex flex-col gap-5">
+      <section className="flex flex-col gap-6">
         <div className="flex items-center justify-between px-1">
-          <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4">Expansion Funnel Velocity</h3>
-          <span className="text-[10px] font-bold text-primary uppercase tracking-widest">Active Pipeline</span>
+          <h3 className="text-[10px] font-bold uppercase tracking-[0.3em] text-tier-4">Expansion Funnel Velocity</h3>
+          <div className="flex items-center gap-2">
+            <div className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-[10px] font-bold text-tier-3 uppercase tracking-widest">Real-time Stream</span>
+          </div>
         </div>
         <div className="grid grid-cols-5 gap-4">
           {data.stages.map((stage, i) => (
@@ -181,9 +192,9 @@ export default function CommandCenter() {
         {/* Left: Vertical Breakdown */}
         <div className="lg:col-span-5 flex flex-col gap-6">
           <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4 px-1">Vertical Saturation</h3>
-          <div className="flex flex-col gap-px bg-white/[0.02] border border-white/[0.05] rounded-2xl overflow-hidden">
+          <div className="flex flex-col gap-px bg-white/[0.02] border border-white/[0.05] rounded-2xl overflow-hidden shadow-xl">
             {data.verticals.map((v) => (
-              <Link key={v.label} href={v.path} className="px-6 py-4 bg-background/40 flex items-center justify-between hover:bg-white/[0.02] transition-all group">
+              <Link key={v.label} href={v.path} className="px-6 py-4 bg-background/40 flex items-center justify-between hover:bg-white/[0.02] transition-all group border-b border-white/[0.02] last:border-0">
                 <div className="flex items-center gap-4">
                   <v.icon className="size-4 text-tier-3 group-hover:text-primary transition-colors" />
                   <span className="text-[13px] font-semibold text-tier-2 group-hover:text-tier-1 transition-colors">{v.label}</span>
@@ -199,36 +210,36 @@ export default function CommandCenter() {
 
         {/* Middle: Momentum & WoW */}
         <div className="lg:col-span-4 flex flex-col gap-6">
-          <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4 px-1">Weekly Momentum</h3>
-          <div className="premium-panel p-6 rounded-2xl flex flex-col gap-6 h-full justify-between">
+          <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4 px-1">Growth Momentum</h3>
+          <div className="premium-panel p-8 rounded-2xl flex flex-col gap-8 h-full justify-between bg-gradient-to-br from-primary/5 via-transparent to-transparent">
             <div className="grid grid-cols-2 gap-8">
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-1.5">
                 <span className="text-[9px] font-bold uppercase tracking-widest text-tier-4">New Leads</span>
-                <span className="text-2xl font-bold text-tier-1">+{data.momentum.newLeadsThisWeek}</span>
+                <span className="text-3xl font-bold text-tier-1">+{data.momentum.newLeadsThisWeek}</span>
               </div>
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-1.5">
                 <span className="text-[9px] font-bold uppercase tracking-widest text-tier-4">Stage Shifts</span>
-                <span className="text-2xl font-bold text-tier-1">{data.momentum.movedStages}</span>
+                <span className="text-3xl font-bold text-tier-1">{data.momentum.movedStages}</span>
               </div>
             </div>
-            <div className="flex flex-col gap-2 pt-4 border-t border-white/[0.03]">
+            <div className="flex flex-col gap-3 pt-6 border-t border-white/[0.03]">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold text-tier-3 uppercase tracking-tighter">Week-over-Week</span>
+                <span className="text-[11px] font-bold text-tier-3 uppercase tracking-tighter">Week-over-Week Velocity</span>
                 <span className="text-[11px] font-bold text-emerald-400">↑ 12.5%</span>
               </div>
               <div className="h-1 bg-emerald-500/10 rounded-full overflow-hidden">
                 <div className="h-full w-2/3 bg-emerald-500" />
               </div>
             </div>
-            <p className="text-[11px] text-tier-3 font-medium leading-relaxed italic">
-              "Growth velocity is steady. Focus on moving Approved units to Live to hit EOM targets."
+            <p className="text-[12px] text-tier-3 font-medium leading-relaxed italic opacity-80">
+              "Expansion velocity remains optimized. Priority: converting In-Review units to Live status."
             </p>
           </div>
         </div>
 
         {/* Right: Bottlenecks */}
         <div className="lg:col-span-3 flex flex-col gap-6">
-          <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4 px-1">Attention Required</h3>
+          <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4 px-1">Strategic Attention</h3>
           <div className="flex flex-col gap-3">
             <AttentionCard 
               label="Oldest Pending" 
@@ -255,9 +266,9 @@ export default function CommandCenter() {
       <section className="flex flex-col gap-6">
         <div className="flex items-center justify-between px-1">
           <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4">Strategic Activity Log</h3>
-          <Link href="/reports" className="text-[9px] font-bold text-tier-4 uppercase tracking-[0.2em] hover:text-primary transition-colors">Historical Intelligence</Link>
+          <Link href="/reports" className="text-[10px] font-bold text-primary uppercase tracking-[0.2em] hover:opacity-80 transition-colors">View All Intel</Link>
         </div>
-        <div className="flex flex-col gap-px bg-white/[0.02] border border-white/[0.05] rounded-2xl overflow-hidden">
+        <div className="flex flex-col gap-px bg-white/[0.02] border border-white/[0.05] rounded-2xl overflow-hidden shadow-xl">
           {data.recentActivity.map((item) => (
             <ActivityRow key={item.id} item={item} />
           ))}
@@ -268,9 +279,12 @@ export default function CommandCenter() {
   );
 }
 
-function ExecutiveKPI({ label, value, color }: any) {
+function ExecutiveMetric({ label, value, color, isLast }: any) {
   return (
-    <div className="premium-panel p-4 rounded-xl flex flex-col gap-1 border-white/[0.03] hover:border-primary/20 transition-all cursor-default group">
+    <div className={cn(
+      "flex-1 min-w-[120px] px-6 py-4 bg-background/40 flex flex-col gap-1 transition-all hover:bg-white/[0.02] group",
+      !isLast && "border-r border-white/[0.04]"
+    )}>
       <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-tier-4 group-hover:text-tier-3 transition-colors">{label}</span>
       <span className={cn("text-xl font-bold tracking-tight", color || "text-tier-1")}>{value}</span>
     </div>
@@ -280,12 +294,12 @@ function ExecutiveKPI({ label, value, color }: any) {
 function AttentionCard({ label, value, sub, urgent }: any) {
   return (
     <div className={cn(
-      "p-4 rounded-xl border flex flex-col gap-1 transition-all",
+      "p-5 rounded-2xl border flex flex-col gap-1 transition-all shadow-lg",
       urgent ? "bg-rose-500/[0.03] border-rose-500/20" : "bg-white/[0.015] border-white/[0.05]"
     )}>
-      <span className={cn("text-[9px] font-bold uppercase tracking-widest", urgent ? "text-rose-400" : "text-tier-4")}>{label}</span>
-      <span className="text-[13px] font-bold text-tier-2 truncate">{value}</span>
-      <span className="text-[10px] font-medium text-tier-4">{sub}</span>
+      <span className={cn("text-[9px] font-bold uppercase tracking-widest mb-0.5", urgent ? "text-rose-400" : "text-tier-4")}>{label}</span>
+      <span className="text-[14px] font-bold text-tier-2 truncate">{value}</span>
+      <span className="text-[11px] font-medium text-tier-4">{sub}</span>
     </div>
   );
 }
@@ -294,21 +308,21 @@ function ActivityRow({ item }: { item: any }) {
   const date = item.updatedAt?.toDate ? item.updatedAt.toDate() : new Date(item.updatedAt || item.createdAt || 0);
   
   return (
-    <div className="px-6 py-3.5 bg-background/40 flex items-center justify-between hover:bg-white/[0.02] transition-colors group border-b border-white/[0.03] last:border-0">
-      <div className="flex items-center gap-4">
-        <div className="size-1.5 rounded-full bg-primary/30 group-hover:bg-primary transition-colors" />
+    <div className="px-6 py-4 bg-background/40 flex items-center justify-between hover:bg-white/[0.02] transition-colors group border-b border-white/[0.03] last:border-0">
+      <div className="flex items-center gap-5">
+        <div className="size-2 rounded-full bg-primary/20 group-hover:bg-primary transition-all shadow-[0_0_8px_rgba(168,85,247,0)] group-hover:shadow-[0_0_8px_rgba(168,85,247,0.4)]" />
         <div className="flex flex-col">
-          <span className="text-[13px] font-semibold text-tier-2 group-hover:text-tier-1 transition-colors">{item.name}</span>
-          <span className="text-[10px] text-tier-4 font-medium uppercase tracking-tighter">
-            System parameter synced to {item.currentStage || item.status}
+          <span className="text-[14px] font-semibold text-tier-2 group-hover:text-tier-1 transition-colors leading-none">{item.name}</span>
+          <span className="text-[11px] text-tier-4 font-medium uppercase tracking-tighter mt-1.5">
+            System parameter synced to <span className="text-tier-3 font-bold">{item.currentStage || item.status}</span>
           </span>
         </div>
       </div>
-      <div className="flex items-center gap-6">
-        <Badge variant="outline" className="h-4 px-1.5 text-[8px] uppercase tracking-widest font-bold border-white/5 bg-white/[0.03] text-tier-4">
+      <div className="flex items-center gap-8">
+        <Badge variant="outline" className="h-5 px-2 text-[9px] uppercase tracking-widest font-bold border-white/5 bg-white/[0.03] text-tier-4 group-hover:border-primary/20 group-hover:text-tier-3 transition-all">
           {item.currentStage ? "Platform" : "Vertical"}
         </Badge>
-        <span className="text-[10px] font-bold text-tier-4 uppercase w-20 text-right">{date.toLocaleDateString([], { month: 'short', day: 'numeric' })}</span>
+        <span className="text-[11px] font-bold text-tier-4 uppercase w-20 text-right">{date.toLocaleDateString([], { month: 'short', day: 'numeric' })}</span>
       </div>
     </div>
   );
