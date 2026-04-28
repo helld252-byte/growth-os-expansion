@@ -211,10 +211,10 @@ export default function CommandCenter() {
               <Link key={v.label} href={v.path} className="px-6 py-4 bg-background/40 flex items-center justify-between hover:bg-white/[0.02] transition-all group border-b border-white/[0.02] last:border-0">
                 <div className="flex items-center gap-4">
                   <v.icon className="size-4 text-tier-3 group-hover:text-primary transition-colors" />
-                  <span className="text-[13px] font-semibold text-tier-2 group-hover:text-tier-1 transition-colors">{v.label}</span>
+                  <span className="text-[13px] font-medium text-tier-2 group-hover:text-tier-1 transition-colors">{v.label}</span>
                 </div>
                 <div className="flex items-center gap-4">
-                  <span className="text-[13px] font-bold text-tier-1">{v.count}</span>
+                  <span className="text-[13px] font-medium text-tier-1">{v.count}</span>
                   <ChevronRight className="size-3.5 text-tier-4 group-hover:translate-x-0.5 transition-transform" />
                 </div>
               </Link>
