@@ -2,7 +2,7 @@
 
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/layout/AppSidebar";
-import { Search, Bell, ChevronDown, Command, Zap, ChevronRight, LogOut } from "lucide-react";
+import { Search, Bell, ChevronDown, Command, Zap, ChevronRight, LogOut, ShieldAlert } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
