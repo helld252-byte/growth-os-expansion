@@ -184,16 +184,24 @@ export default function CommandCenter() {
         {/* Units by Category */}
         <div className="lg:col-span-5 flex flex-col gap-6">
           <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4 px-1">Units by Category</h3>
-          <div className="flex flex-col gap-px bg-white/[0.02] border border-white/[0.05] rounded-2xl overflow-hidden shadow-xl">
+          <div className="flex flex-col gap-3">
             {data.verticals.map((v) => (
-              <Link key={v.label} href={v.path} className="px-6 py-4.5 bg-background/40 flex items-center justify-between hover:bg-white/[0.02] transition-all group border-b border-white/[0.02] last:border-0">
+              <Link 
+                key={v.label} 
+                href={v.path} 
+                className="premium-panel px-5 py-4 rounded-xl flex items-center justify-between hover:border-primary/40 group transition-all"
+              >
                 <div className="flex items-center gap-4">
-                  <v.icon className="size-4 text-tier-3 group-hover:text-primary transition-colors" />
+                  <div className="size-8 rounded-lg bg-white/[0.03] border border-white/[0.05] flex items-center justify-center text-tier-3 group-hover:text-primary group-hover:bg-primary/5 transition-all">
+                    <v.icon className="size-4" />
+                  </div>
                   <span className="text-[13px] font-medium text-tier-2 group-hover:text-tier-1 transition-colors">{v.label}</span>
                 </div>
                 <div className="flex items-center gap-4">
-                  <span className="text-[13px] font-medium text-tier-1">{v.count}</span>
-                  <ChevronRight className="size-3.5 text-tier-4 group-hover:translate-x-0.5 transition-transform" />
+                  <span className="text-[14px] font-medium text-tier-1">{v.count}</span>
+                  <div className="size-6 rounded-full flex items-center justify-center bg-white/[0.02] border border-white/[0.05] group-hover:bg-primary/10 group-hover:border-primary/30 transition-all">
+                    <ChevronRight className="size-3.5 text-tier-4 group-hover:text-primary" />
+                  </div>
                 </div>
               </Link>
             ))}
