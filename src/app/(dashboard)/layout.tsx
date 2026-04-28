@@ -2,9 +2,8 @@
 
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/layout/AppSidebar";
-import { Search, Bell, ChevronDown, Command, Zap, ChevronRight, LogOut, ShieldAlert } from "lucide-react";
+import { Search, Bell, ChevronDown, Command, Zap, LogOut, ShieldAlert } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
-import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { 
   Dialog, 
@@ -23,8 +22,7 @@ import {
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { useUser, useAuth, useDoc, useMemoFirebase } from "@/firebase";
-import { doc } from "firebase/firestore";
-import { getFirestore } from "firebase/firestore";
+import { doc, getFirestore } from "firebase/firestore";
 
 export default function DashboardLayout({
   children,

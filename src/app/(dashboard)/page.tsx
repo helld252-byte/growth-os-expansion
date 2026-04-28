@@ -2,27 +2,14 @@
 
 import { useMemo } from "react";
 import { 
-  Zap, 
-  Clock, 
-  CheckCircle2, 
-  AlertCircle, 
-  ChevronRight, 
-  Layers, 
-  ArrowUpRight,
-  TrendingUp,
-  Target,
-  LayoutGrid,
-  Loader2,
-  Calendar,
-  Star,
   Activity,
-  ArrowRight,
-  Filter,
-  Users2,
-  Coffee,
+  ChevronRight, 
+  Loader2,
+  Globe,
   GraduationCap,
+  Coffee,
   Handshake,
-  Globe
+  Users2
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useCollection, useMemoFirebase } from "@/firebase";
@@ -51,7 +38,6 @@ export default function CommandCenter() {
     const trackedOpps = opportunities.length + partners.length;
     const activeConversations = opportunities.filter(o => o.commStatus && o.commStatus !== 'No outreach').length;
     const inReview = opportunities.filter(o => o.currentStage === 'In Review').length;
-    const approvedCount = opportunities.filter(o => o.currentStage === 'Approved').length;
     const livePartnerships = opportunities.filter(o => o.currentStage === 'Live').length + 
                             partners.filter(p => p.status === 'Live' || p.status === 'Active').length;
     
@@ -117,7 +103,7 @@ export default function CommandCenter() {
       .slice(0, 5);
 
     return { 
-      kpis: { trackedOpps, activeConversations, inReview, approvedCount, livePartnerships, responseRate },
+      kpis: { trackedOpps, activeConversations, inReview, livePartnerships, responseRate },
       stages,
       verticals,
       momentum: { newLeadsThisWeek, movedStages, repliesReceived, wins },
@@ -138,11 +124,11 @@ export default function CommandCenter() {
   if (!data) return null;
 
   return (
-    <div className="max-w-[1400px] mx-auto flex flex-col gap-14 animate-in fade-in duration-700">
+    <div className="max-w-[1400px] mx-auto flex flex-col gap-12 animate-in fade-in duration-700">
       
-      {/* Header & Executive Strip */}
-      <div className="flex flex-col gap-10">
-        <header className="flex items-center justify-between">
+      {/* Executive Header */}
+      <header className="flex flex-col gap-8">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20 shadow-lg active-glow">
               <Activity className="size-5 text-primary" />
@@ -152,12 +138,10 @@ export default function CommandCenter() {
               <p className="text-tier-4 text-[11px] font-bold uppercase tracking-[0.2em] mt-1.5">Today’s growth priorities</p>
             </div>
           </div>
-          <div className="hidden lg:flex items-center gap-3">
-             <Badge variant="outline" className="bg-emerald-500/5 text-emerald-400 border-emerald-500/20 text-[9px] font-bold uppercase tracking-widest px-3 py-1">System Live</Badge>
-          </div>
-        </header>
+          <Badge variant="outline" className="bg-emerald-500/5 text-emerald-400 border-emerald-500/20 text-[9px] font-bold uppercase tracking-widest px-3 py-1">System Live</Badge>
+        </div>
 
-        {/* Slim Executive Stats Strip */}
+        {/* Executive Stats Strip */}
         <div className="bg-white/[0.02] border border-white/[0.05] rounded-2xl p-6 flex items-center justify-between divide-x divide-white/[0.05] shadow-xl backdrop-blur-sm">
           <StatModule label="Tracked Units" value={data.kpis.trackedOpps} />
           <StatModule label="In Review" value={data.kpis.inReview} />
@@ -166,7 +150,7 @@ export default function CommandCenter() {
           <StatModule label="Response Rate" value={`${data.kpis.responseRate}%`} />
           <StatModule label="This Week %" value="+12.5%" color="text-emerald-400" />
         </div>
-      </div>
+      </header>
 
       {/* Growth Pipeline Section */}
       <section className="flex flex-col gap-8">

@@ -67,7 +67,7 @@ export function AppSidebar({ isAdmin }: AppSidebarProps) {
           className={cn(
             "h-10 rounded-lg transition-all duration-200 px-3 relative group overflow-hidden",
             isActive 
-              ? "bg-primary/10 text-primary font-semibold" 
+              ? "bg-primary/10 text-primary font-semibold shadow-[inset_0_0_0_1px_rgba(255,255,255,0.02)]" 
               : "text-tier-3 hover:bg-white/[0.03] hover:text-tier-1 font-medium"
           )}
         >
