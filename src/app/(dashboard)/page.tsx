@@ -82,7 +82,21 @@ export default function CommandCenter() {
     // 4. Momentum
     const newLeadsThisWeek = opportunities.filter(o => new Date(o.createdAt || 0) >= sevenDaysAgo).length +
                              partners.filter(p => new Date(p.createdAt || 0) >= sevenDaysAgo).length;
+    
     const movedStages = opportunities.filter(o => new Date(o.updatedAt || 0) >= sevenDaysAgo && o.currentStage !== 'Not Started').length;
+    
+    const repliesReceived = opportunities.filter(o => 
+      new Date(o.updatedAt || 0) >= sevenDaysAgo && 
+      ['In discussion', 'Approved', 'Rejected'].includes(o.commStatus || '')
+    ).length;
+
+    const wins = opportunities.filter(o => 
+      new Date(o.updatedAt || 0) >= sevenDaysAgo && 
+      ['Approved', 'Live'].includes(o.currentStage)
+    ).length + partners.filter(p => 
+      new Date(p.updatedAt || p.createdAt || 0) >= sevenDaysAgo && 
+      ['Active', 'Live', 'Approved'].includes(p.status)
+    ).length;
     
     // 5. Bottlenecks
     const needsFollowUp = opportunities.filter(o => o.commStatus === 'Waiting reply').sort((a, b) => 
@@ -108,7 +122,7 @@ export default function CommandCenter() {
       kpis: { trackedOpps, activeConversations, inReview, approvedCount, livePartnerships, responseRate, pendingRepliesCount },
       stages,
       verticals,
-      momentum: { newLeadsThisWeek, movedStages },
+      momentum: { newLeadsThisWeek, movedStages, repliesReceived, wins },
       bottlenecks: { oldestPending, needsFollowUp, stalledCategory },
       recentActivity
     };
@@ -224,29 +238,38 @@ export default function CommandCenter() {
         {/* Middle: Weekly Progress */}
         <div className="lg:col-span-4 flex flex-col gap-6">
           <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4 px-1">This Week Progress</h3>
-          <div className="premium-panel p-8 rounded-2xl flex flex-col gap-8 h-full justify-between bg-gradient-to-br from-primary/5 via-transparent to-transparent">
-            <div className="grid grid-cols-2 gap-8">
-              <div className="flex flex-col gap-1.5">
+          <div className="premium-panel p-8 rounded-2xl flex flex-col gap-8 h-full bg-gradient-to-br from-primary/5 via-transparent to-transparent">
+            <div className="grid grid-cols-2 gap-x-8 gap-y-10">
+              <div className="flex flex-col gap-2">
                 <span className="text-[9px] font-bold uppercase tracking-widest text-tier-4">New Leads</span>
-                <span className="text-3xl font-bold text-tier-1">+{data.momentum.newLeadsThisWeek}</span>
+                <span className="text-3xl font-bold text-tier-1">{data.momentum.newLeadsThisWeek}</span>
               </div>
-              <div className="flex flex-col gap-1.5">
-                <span className="text-[9px] font-bold uppercase tracking-widest text-tier-4">Stage Shifts</span>
+              <div className="flex flex-col gap-2">
+                <span className="text-[9px] font-bold uppercase tracking-widest text-tier-4">Replies Received</span>
+                <span className="text-3xl font-bold text-tier-1">{data.momentum.repliesReceived}</span>
+              </div>
+              <div className="flex flex-col gap-2">
+                <span className="text-[9px] font-bold uppercase tracking-widest text-tier-4">Moved Forward</span>
                 <span className="text-3xl font-bold text-tier-1">{data.momentum.movedStages}</span>
               </div>
+              <div className="flex flex-col gap-2">
+                <span className="text-[9px] font-bold uppercase tracking-widest text-tier-4">Wins</span>
+                <span className="text-3xl font-bold text-emerald-400">{data.momentum.wins}</span>
+              </div>
             </div>
-            <div className="flex flex-col gap-3 pt-6 border-t border-white/[0.03]">
+
+            <div className="flex flex-col gap-4 mt-auto pt-8 border-t border-white/[0.03]">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold text-tier-3 uppercase tracking-tighter">Weekly Change</span>
-                <span className="text-[11px] font-bold text-emerald-400">↑ 12.5%</span>
+                <span className="text-[10px] font-bold text-tier-4 uppercase tracking-widest">Growth Velocity</span>
+                <Badge variant="outline" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-[10px] font-bold">
+                  +12.5% WoW
+                </Badge>
               </div>
-              <div className="h-1 bg-emerald-500/10 rounded-full overflow-hidden">
-                <div className="h-full w-2/3 bg-emerald-500" />
+              <div className="flex items-center gap-3 px-4 py-3 bg-white/[0.02] border border-white/[0.04] rounded-xl">
+                <div className="size-2 rounded-full bg-primary animate-pulse" />
+                <span className="text-[11px] font-semibold text-tier-2 uppercase tracking-wide">Focus Area: <span className="text-tier-1">{data.bottlenecks.stalledCategory || "Schools"}</span></span>
               </div>
             </div>
-            <p className="text-[12px] text-tier-3 font-medium leading-relaxed italic opacity-80">
-              "Growth is steady. Focus: moving items to Live status."
-            </p>
           </div>
         </div>
 
