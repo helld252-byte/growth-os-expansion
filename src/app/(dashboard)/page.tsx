@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useMemo } from "react";
@@ -96,7 +95,7 @@ export default function CommandCenter() {
 
     const stalledCategory = verticals.sort((a, b) => b.count - a.count)[0]?.label;
 
-    // 6. Recent Strategic Activity
+    // 6. Recent Updates only
     const recentActivity = [...opportunities, ...partners]
       .sort((a, b) => {
         const dateA = a.updatedAt?.toDate ? a.updatedAt.toDate() : new Date(a.updatedAt || a.createdAt || 0);
@@ -129,7 +128,7 @@ export default function CommandCenter() {
   return (
     <div className="max-w-[1400px] mx-auto flex flex-col gap-10 animate-in fade-in duration-700">
       
-      {/* Header & Intelligence Rails */}
+      {/* Header & Metric Row */}
       <div className="flex flex-col gap-8">
         <header className="flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -138,7 +137,7 @@ export default function CommandCenter() {
             </div>
             <div className="flex flex-col">
               <h1 className="text-2xl font-bold tracking-tight text-tier-1 leading-none">Command Center</h1>
-              <p className="text-tier-4 text-[11px] font-bold uppercase tracking-[0.2em] mt-1.5">Executive growth dashboard</p>
+              <p className="text-tier-4 text-[11px] font-bold uppercase tracking-[0.2em] mt-1.5">Your business growth summary</p>
             </div>
           </div>
           <div className="hidden lg:flex items-center gap-3">
@@ -147,7 +146,7 @@ export default function CommandCenter() {
           </div>
         </header>
 
-        {/* Intelligence Panels */}
+        {/* Summary Panels */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <IntelligencePanel title="Pipeline Status" icon={Layers}>
             <MetricItem label="Tracked Units" value={data.kpis.trackedOpps} />
@@ -162,21 +161,21 @@ export default function CommandCenter() {
             <MetricItem label="Pending Replies" value={data.kpis.pendingRepliesCount} color="text-amber-400" />
           </IntelligencePanel>
 
-          <IntelligencePanel title="Growth Momentum" icon={TrendingUp}>
+          <IntelligencePanel title="This Week Progress" icon={TrendingUp}>
             <MetricItem label="New Leads" value={data.momentum.newLeadsThisWeek} trend="+7d" />
             <MetricItem label="Stage Shifts" value={data.momentum.movedStages} />
-            <MetricItem label="Week-over-Week" value="12.5%" color="text-emerald-400" />
+            <MetricItem label="Weekly Change" value="12.5%" color="text-emerald-400" />
           </IntelligencePanel>
         </div>
       </div>
 
-      {/* Funnel Section */}
+      {/* Pipeline Section */}
       <section className="flex flex-col gap-6">
         <div className="flex items-center justify-between px-1">
-          <h3 className="text-[10px] font-bold uppercase tracking-[0.3em] text-tier-4">Expansion Funnel Velocity</h3>
+          <h3 className="text-[10px] font-bold uppercase tracking-[0.3em] text-tier-4">Growth Pipeline</h3>
           <div className="flex items-center gap-2">
             <div className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-[10px] font-bold text-tier-3 uppercase tracking-widest">Real-time Stream</span>
+            <span className="text-[10px] font-bold text-tier-3 uppercase tracking-widest">Live Updates</span>
           </div>
         </div>
         <div className="grid grid-cols-5 gap-4">
@@ -203,9 +202,9 @@ export default function CommandCenter() {
       {/* Main Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
-        {/* Left: Vertical Breakdown */}
+        {/* Left: Units by Category */}
         <div className="lg:col-span-5 flex flex-col gap-6">
-          <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4 px-1">Vertical Saturation</h3>
+          <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4 px-1">Units by Category</h3>
           <div className="flex flex-col gap-px bg-white/[0.02] border border-white/[0.05] rounded-2xl overflow-hidden shadow-xl">
             {data.verticals.map((v) => (
               <Link key={v.label} href={v.path} className="px-6 py-4 bg-background/40 flex items-center justify-between hover:bg-white/[0.02] transition-all group border-b border-white/[0.02] last:border-0">
@@ -222,9 +221,9 @@ export default function CommandCenter() {
           </div>
         </div>
 
-        {/* Middle: Momentum & WoW */}
+        {/* Middle: Weekly Progress */}
         <div className="lg:col-span-4 flex flex-col gap-6">
-          <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4 px-1">Growth Momentum</h3>
+          <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4 px-1">This Week Progress</h3>
           <div className="premium-panel p-8 rounded-2xl flex flex-col gap-8 h-full justify-between bg-gradient-to-br from-primary/5 via-transparent to-transparent">
             <div className="grid grid-cols-2 gap-8">
               <div className="flex flex-col gap-1.5">
@@ -238,7 +237,7 @@ export default function CommandCenter() {
             </div>
             <div className="flex flex-col gap-3 pt-6 border-t border-white/[0.03]">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold text-tier-3 uppercase tracking-tighter">Week-over-Week Velocity</span>
+                <span className="text-[11px] font-bold text-tier-3 uppercase tracking-tighter">Weekly Change</span>
                 <span className="text-[11px] font-bold text-emerald-400">↑ 12.5%</span>
               </div>
               <div className="h-1 bg-emerald-500/10 rounded-full overflow-hidden">
@@ -246,14 +245,14 @@ export default function CommandCenter() {
               </div>
             </div>
             <p className="text-[12px] text-tier-3 font-medium leading-relaxed italic opacity-80">
-              "Expansion velocity remains optimized. Priority: converting In-Review units to Live status."
+              "Growth is steady. Focus: moving items to Live status."
             </p>
           </div>
         </div>
 
-        {/* Right: Bottlenecks */}
+        {/* Right: Needs Attention */}
         <div className="lg:col-span-3 flex flex-col gap-6">
-          <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4 px-1">Strategic Attention</h3>
+          <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4 px-1">Needs Attention</h3>
           <div className="flex flex-col gap-3">
             <AttentionCard 
               label="Oldest Pending" 
@@ -269,18 +268,18 @@ export default function CommandCenter() {
             <AttentionCard 
               label="Stalled Category" 
               value={data.bottlenecks.stalledCategory} 
-              sub="Low velocity detected"
+              sub="Low activity detected"
             />
           </div>
         </div>
 
       </div>
 
-      {/* Recent Strategic Activity */}
+      {/* Recent Updates */}
       <section className="flex flex-col gap-6">
         <div className="flex items-center justify-between px-1">
-          <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4">Strategic Activity Log</h3>
-          <Link href="/reports" className="text-[10px] font-bold text-primary uppercase tracking-[0.2em] hover:opacity-80 transition-colors">View All Intel</Link>
+          <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4">Recent Updates</h3>
+          <Link href="/reports" className="text-[10px] font-bold text-primary uppercase tracking-[0.2em] hover:opacity-80 transition-colors">View All Reports</Link>
         </div>
         <div className="flex flex-col gap-px bg-white/[0.02] border border-white/[0.05] rounded-2xl overflow-hidden shadow-xl">
           {data.recentActivity.map((item) => (
@@ -342,9 +341,9 @@ function ActivityRow({ item }: { item: any }) {
       <div className="flex items-center gap-5">
         <div className="size-2 rounded-full bg-primary/20 group-hover:bg-primary transition-all shadow-[0_0_8px_rgba(168,85,247,0)] group-hover:shadow-[0_0_8px_rgba(168,85,247,0.4)]" />
         <div className="flex flex-col">
-          <span className="text-[14px] font-semibold text-tier-2 group-hover:text-tier-1 transition-colors leading-none">{item.name}</span>
+          <span className="text-[14px] font-semibold text-tier-1 group-hover:text-primary transition-colors leading-none">{item.name}</span>
           <span className="text-[11px] text-tier-4 font-medium uppercase tracking-tighter mt-1.5">
-            System parameter synced to <span className="text-tier-3 font-bold">{item.currentStage || item.status}</span>
+            Status updated to <span className="text-tier-3 font-bold">{item.currentStage || item.status}</span>
           </span>
         </div>
       </div>
