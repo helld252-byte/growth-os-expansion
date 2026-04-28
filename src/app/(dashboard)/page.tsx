@@ -56,6 +56,8 @@ export default function CommandCenter() {
     const livePartnerships = opportunities.filter(o => o.currentStage === 'Live').length + 
                             partners.filter(p => p.status === 'Live' || p.status === 'Active').length;
     
+    const pendingRepliesCount = opportunities.filter(o => o.commStatus === 'Waiting reply').length;
+
     const contacted = opportunities.filter(o => o.commStatus && o.commStatus !== 'No outreach');
     const responded = contacted.filter(o => ['In discussion', 'Approved', 'Waiting reply'].includes(o.commStatus || ''));
     const responseRate = contacted.length > 0 ? Math.round((responded.length / contacted.length) * 100) : 0;
@@ -104,7 +106,7 @@ export default function CommandCenter() {
       .slice(0, 5);
 
     return { 
-      kpis: { trackedOpps, activeConversations, inReview, approvedCount, livePartnerships, responseRate },
+      kpis: { trackedOpps, activeConversations, inReview, approvedCount, livePartnerships, responseRate, pendingRepliesCount },
       stages,
       verticals,
       momentum: { newLeadsThisWeek, movedStages },
@@ -127,7 +129,7 @@ export default function CommandCenter() {
   return (
     <div className="max-w-[1400px] mx-auto flex flex-col gap-10 animate-in fade-in duration-700">
       
-      {/* Header & Compact KPI Rail */}
+      {/* Header & Intelligence Rails */}
       <div className="flex flex-col gap-8">
         <header className="flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -136,23 +138,35 @@ export default function CommandCenter() {
             </div>
             <div className="flex flex-col">
               <h1 className="text-2xl font-bold tracking-tight text-tier-1 leading-none">Command Center</h1>
-              <p className="text-tier-4 text-[11px] font-bold uppercase tracking-[0.2em] mt-1.5">Operational Intelligence Synchronized</p>
+              <p className="text-tier-4 text-[11px] font-bold uppercase tracking-[0.2em] mt-1.5">Executive growth dashboard</p>
             </div>
           </div>
           <div className="hidden lg:flex items-center gap-3">
-             <Badge variant="outline" className="bg-emerald-500/5 text-emerald-400 border-emerald-500/20 text-[9px] font-bold uppercase tracking-widest px-3 py-1">System Integrity: 100%</Badge>
+             <Badge variant="outline" className="bg-emerald-500/5 text-emerald-400 border-emerald-500/20 text-[9px] font-bold uppercase tracking-widest px-3 py-1">Live Sync Active</Badge>
              <span className="text-[10px] font-bold text-tier-4 uppercase tracking-[0.1em]">{new Date().toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })}</span>
           </div>
         </header>
 
-        {/* Compact KPI Row */}
-        <div className="flex flex-wrap items-center gap-px bg-white/[0.04] border border-white/[0.06] rounded-2xl overflow-hidden shadow-2xl">
-          <ExecutiveMetric label="Tracked Units" value={data.kpis.trackedOpps} />
-          <ExecutiveMetric label="Active Convos" value={data.kpis.activeConversations} color="text-blue-400" />
-          <ExecutiveMetric label="In Review" value={data.kpis.inReview} color="text-amber-400" />
-          <ExecutiveMetric label="Approved" value={data.kpis.approvedCount} color="text-violet-400" />
-          <ExecutiveMetric label="Live Systems" value={data.kpis.livePartnerships} color="text-emerald-400" />
-          <ExecutiveMetric label="Response Rate" value={`${data.kpis.responseRate}%`} color="text-primary" isLast />
+        {/* Intelligence Panels */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <IntelligencePanel title="Pipeline Status" icon={Layers}>
+            <MetricItem label="Tracked Units" value={data.kpis.trackedOpps} />
+            <MetricItem label="In Review" value={data.kpis.inReview} color="text-amber-400" />
+            <MetricItem label="Approved" value={data.kpis.approvedCount} color="text-violet-400" />
+            <MetricItem label="Live Partnerships" value={data.kpis.livePartnerships} color="text-emerald-400" />
+          </IntelligencePanel>
+
+          <IntelligencePanel title="Outreach Health" icon={Zap}>
+            <MetricItem label="Active Conversations" value={data.kpis.activeConversations} color="text-blue-400" />
+            <MetricItem label="Response Rate" value={`${data.kpis.responseRate}%`} color="text-primary" />
+            <MetricItem label="Pending Replies" value={data.kpis.pendingRepliesCount} color="text-amber-400" />
+          </IntelligencePanel>
+
+          <IntelligencePanel title="Growth Momentum" icon={TrendingUp}>
+            <MetricItem label="New Leads" value={data.momentum.newLeadsThisWeek} trend="+7d" />
+            <MetricItem label="Stage Shifts" value={data.momentum.movedStages} />
+            <MetricItem label="Week-over-Week" value="12.5%" color="text-emerald-400" />
+          </IntelligencePanel>
         </div>
       </div>
 
@@ -279,14 +293,30 @@ export default function CommandCenter() {
   );
 }
 
-function ExecutiveMetric({ label, value, color, isLast }: any) {
+function IntelligencePanel({ title, icon: Icon, children }: { title: string, icon: any, children: React.ReactNode }) {
   return (
-    <div className={cn(
-      "flex-1 min-w-[120px] px-6 py-4 bg-background/40 flex flex-col gap-1 transition-all hover:bg-white/[0.02] group",
-      !isLast && "border-r border-white/[0.04]"
-    )}>
-      <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-tier-4 group-hover:text-tier-3 transition-colors">{label}</span>
-      <span className={cn("text-xl font-bold tracking-tight", color || "text-tier-1")}>{value}</span>
+    <div className="premium-panel p-6 rounded-2xl flex flex-col gap-5 bg-white/[0.015] border border-white/[0.05] shadow-xl h-full group hover:border-primary/20 transition-all">
+      <div className="flex items-center gap-3">
+        <div className="size-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary/20 transition-all">
+          <Icon className="size-4 text-primary" />
+        </div>
+        <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-tier-4">{title}</h3>
+      </div>
+      <div className="grid grid-cols-2 gap-y-5 gap-x-4">
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function MetricItem({ label, value, color, trend }: { label: string, value: string | number, color?: string, trend?: string }) {
+  return (
+    <div className="flex flex-col gap-1">
+      <div className="flex items-baseline gap-1.5">
+        <span className={cn("text-xl font-bold tracking-tight leading-none", color || "text-tier-1")}>{value}</span>
+        {trend && <span className="text-[9px] font-bold text-emerald-500">{trend}</span>}
+      </div>
+      <span className="text-[9px] font-bold uppercase tracking-widest text-tier-4 leading-tight">{label}</span>
     </div>
   );
 }
