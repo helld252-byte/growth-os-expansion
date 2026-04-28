@@ -55,8 +55,6 @@ export default function CommandCenter() {
     const livePartnerships = opportunities.filter(o => o.currentStage === 'Live').length + 
                             partners.filter(p => p.status === 'Live' || p.status === 'Active').length;
     
-    const pendingRepliesCount = opportunities.filter(o => o.commStatus === 'Waiting reply').length;
-
     const contacted = opportunities.filter(o => o.commStatus && o.commStatus !== 'No outreach');
     const responded = contacted.filter(o => ['In discussion', 'Approved', 'Waiting reply'].includes(o.commStatus || ''));
     const responseRate = contacted.length > 0 ? Math.round((responded.length / contacted.length) * 100) : 0;
@@ -119,7 +117,7 @@ export default function CommandCenter() {
       .slice(0, 5);
 
     return { 
-      kpis: { trackedOpps, activeConversations, inReview, approvedCount, livePartnerships, responseRate, pendingRepliesCount },
+      kpis: { trackedOpps, activeConversations, inReview, approvedCount, livePartnerships, responseRate },
       stages,
       verticals,
       momentum: { newLeadsThisWeek, movedStages, repliesReceived, wins },
@@ -140,10 +138,10 @@ export default function CommandCenter() {
   if (!data) return null;
 
   return (
-    <div className="max-w-[1400px] mx-auto flex flex-col gap-10 animate-in fade-in duration-700">
+    <div className="max-w-[1400px] mx-auto flex flex-col gap-14 animate-in fade-in duration-700">
       
-      {/* Header & Metric Row */}
-      <div className="flex flex-col gap-8">
+      {/* Header & Executive Strip */}
+      <div className="flex flex-col gap-10">
         <header className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20 shadow-lg active-glow">
@@ -151,55 +149,38 @@ export default function CommandCenter() {
             </div>
             <div className="flex flex-col">
               <h1 className="text-2xl font-bold tracking-tight text-tier-1 leading-none">Command Center</h1>
-              <p className="text-tier-4 text-[11px] font-bold uppercase tracking-[0.2em] mt-1.5">Your business growth summary</p>
+              <p className="text-tier-4 text-[11px] font-bold uppercase tracking-[0.2em] mt-1.5">Today’s growth priorities</p>
             </div>
           </div>
           <div className="hidden lg:flex items-center gap-3">
-             <Badge variant="outline" className="bg-emerald-500/5 text-emerald-400 border-emerald-500/20 text-[9px] font-bold uppercase tracking-widest px-3 py-1">Live Sync Active</Badge>
-             <span className="text-[10px] font-bold text-tier-4 uppercase tracking-[0.1em]">{new Date().toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+             <Badge variant="outline" className="bg-emerald-500/5 text-emerald-400 border-emerald-500/20 text-[9px] font-bold uppercase tracking-widest px-3 py-1">System Live</Badge>
           </div>
         </header>
 
-        {/* Summary Panels */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <IntelligencePanel title="Pipeline Status" icon={Layers}>
-            <MetricItem label="Tracked Units" value={data.kpis.trackedOpps} />
-            <MetricItem label="In Review" value={data.kpis.inReview} color="text-amber-400" />
-            <MetricItem label="Approved" value={data.kpis.approvedCount} color="text-violet-400" />
-            <MetricItem label="Live Partnerships" value={data.kpis.livePartnerships} color="text-emerald-400" />
-          </IntelligencePanel>
-
-          <IntelligencePanel title="Outreach Health" icon={Zap}>
-            <MetricItem label="Active Conversations" value={data.kpis.activeConversations} color="text-blue-400" />
-            <MetricItem label="Response Rate" value={`${data.kpis.responseRate}%`} color="text-primary" />
-            <MetricItem label="Pending Replies" value={data.kpis.pendingRepliesCount} color="text-amber-400" />
-          </IntelligencePanel>
-
-          <IntelligencePanel title="This Week Progress" icon={TrendingUp}>
-            <MetricItem label="New Leads" value={data.momentum.newLeadsThisWeek} trend="+7d" />
-            <MetricItem label="Stage Shifts" value={data.momentum.movedStages} />
-            <MetricItem label="Weekly Change" value="12.5%" color="text-emerald-400" />
-          </IntelligencePanel>
+        {/* Slim Executive Stats Strip */}
+        <div className="bg-white/[0.02] border border-white/[0.05] rounded-2xl p-6 flex items-center justify-between divide-x divide-white/[0.05] shadow-xl backdrop-blur-sm">
+          <StatModule label="Tracked Units" value={data.kpis.trackedOpps} />
+          <StatModule label="In Review" value={data.kpis.inReview} />
+          <StatModule label="Live" value={data.kpis.livePartnerships} highlight />
+          <StatModule label="Active Conversations" value={data.kpis.activeConversations} />
+          <StatModule label="Response Rate" value={`${data.kpis.responseRate}%`} />
+          <StatModule label="This Week %" value="+12.5%" color="text-emerald-400" />
         </div>
       </div>
 
-      {/* Pipeline Section */}
-      <section className="flex flex-col gap-6">
+      {/* Growth Pipeline Section */}
+      <section className="flex flex-col gap-8">
         <div className="flex items-center justify-between px-1">
           <h3 className="text-[10px] font-bold uppercase tracking-[0.3em] text-tier-4">Growth Pipeline</h3>
-          <div className="flex items-center gap-2">
-            <div className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-[10px] font-bold text-tier-3 uppercase tracking-widest">Live Updates</span>
-          </div>
         </div>
-        <div className="grid grid-cols-5 gap-4">
+        <div className="grid grid-cols-5 gap-6">
           {data.stages.map((stage, i) => (
-            <div key={stage.label} className="flex flex-col gap-3 group">
+            <div key={stage.label} className="flex flex-col gap-3.5 group">
               <div className="flex items-end justify-between px-1">
-                <span className="text-[11px] font-bold text-tier-2 group-hover:text-primary transition-colors">{stage.label}</span>
-                <span className="text-lg font-bold text-tier-1">{stage.count}</span>
+                <span className="text-[11px] font-medium text-tier-3 group-hover:text-tier-1 transition-colors uppercase tracking-widest">{stage.label}</span>
+                <span className="text-xl font-bold text-tier-1">{stage.count}</span>
               </div>
-              <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+              <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
                 <div 
                   className={cn(
                     "h-full transition-all duration-1000",
@@ -213,15 +194,15 @@ export default function CommandCenter() {
         </div>
       </section>
 
-      {/* Main Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
         
-        {/* Left: Units by Category */}
+        {/* Units by Category */}
         <div className="lg:col-span-5 flex flex-col gap-6">
           <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4 px-1">Units by Category</h3>
           <div className="flex flex-col gap-px bg-white/[0.02] border border-white/[0.05] rounded-2xl overflow-hidden shadow-xl">
             {data.verticals.map((v) => (
-              <Link key={v.label} href={v.path} className="px-6 py-4 bg-background/40 flex items-center justify-between hover:bg-white/[0.02] transition-all group border-b border-white/[0.02] last:border-0">
+              <Link key={v.label} href={v.path} className="px-6 py-4.5 bg-background/40 flex items-center justify-between hover:bg-white/[0.02] transition-all group border-b border-white/[0.02] last:border-0">
                 <div className="flex items-center gap-4">
                   <v.icon className="size-4 text-tier-3 group-hover:text-primary transition-colors" />
                   <span className="text-[13px] font-medium text-tier-2 group-hover:text-tier-1 transition-colors">{v.label}</span>
@@ -235,27 +216,15 @@ export default function CommandCenter() {
           </div>
         </div>
 
-        {/* Middle: Weekly Progress */}
+        {/* This Week Progress */}
         <div className="lg:col-span-4 flex flex-col gap-6">
           <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4 px-1">This Week Progress</h3>
           <div className="premium-panel p-8 rounded-2xl flex flex-col gap-8 h-full bg-gradient-to-br from-primary/5 via-transparent to-transparent">
             <div className="grid grid-cols-2 gap-x-8 gap-y-10">
-              <div className="flex flex-col gap-2">
-                <span className="text-[9px] font-bold uppercase tracking-widest text-tier-4">New Leads</span>
-                <span className="text-3xl font-bold text-tier-1">{data.momentum.newLeadsThisWeek}</span>
-              </div>
-              <div className="flex flex-col gap-2">
-                <span className="text-[9px] font-bold uppercase tracking-widest text-tier-4">Replies Received</span>
-                <span className="text-3xl font-bold text-tier-1">{data.momentum.repliesReceived}</span>
-              </div>
-              <div className="flex flex-col gap-2">
-                <span className="text-[9px] font-bold uppercase tracking-widest text-tier-4">Moved Forward</span>
-                <span className="text-3xl font-bold text-tier-1">{data.momentum.movedStages}</span>
-              </div>
-              <div className="flex flex-col gap-2">
-                <span className="text-[9px] font-bold uppercase tracking-widest text-tier-4">Wins</span>
-                <span className="text-3xl font-bold text-emerald-400">{data.momentum.wins}</span>
-              </div>
+              <ProgressMetric label="New Leads" value={data.momentum.newLeadsThisWeek} />
+              <ProgressMetric label="Replies Received" value={data.momentum.repliesReceived} />
+              <ProgressMetric label="Moved Forward" value={data.momentum.movedStages} />
+              <ProgressMetric label="Wins" value={data.momentum.wins} color="text-emerald-400" />
             </div>
 
             <div className="flex flex-col gap-4 mt-auto pt-8 border-t border-white/[0.03]">
@@ -273,10 +242,10 @@ export default function CommandCenter() {
           </div>
         </div>
 
-        {/* Right: Needs Attention */}
+        {/* Needs Attention */}
         <div className="lg:col-span-3 flex flex-col gap-6">
           <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4 px-1">Needs Attention</h3>
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-4">
             <AttentionCard 
               label="Oldest Pending" 
               value={data.bottlenecks.oldestPending?.name || "None"} 
@@ -315,30 +284,25 @@ export default function CommandCenter() {
   );
 }
 
-function IntelligencePanel({ title, icon: Icon, children }: { title: string, icon: any, children: React.ReactNode }) {
+function StatModule({ label, value, highlight, color }: { label: string, value: string | number, highlight?: boolean, color?: string }) {
   return (
-    <div className="premium-panel p-6 rounded-2xl flex flex-col gap-5 bg-white/[0.015] border border-white/[0.05] shadow-xl h-full group hover:border-primary/20 transition-all">
-      <div className="flex items-center gap-3">
-        <div className="size-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary/20 transition-all">
-          <Icon className="size-4 text-primary" />
-        </div>
-        <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-tier-4">{title}</h3>
-      </div>
-      <div className="grid grid-cols-2 gap-y-5 gap-x-4">
-        {children}
-      </div>
+    <div className="flex-1 flex flex-col items-center justify-center gap-1.5 px-4 first:pl-0 last:pr-0">
+      <span className={cn(
+        "text-lg font-bold tracking-tight",
+        color ? color : highlight ? "text-primary" : "text-tier-1"
+      )}>
+        {value}
+      </span>
+      <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-tier-4 whitespace-nowrap">{label}</span>
     </div>
   );
 }
 
-function MetricItem({ label, value, color, trend }: { label: string, value: string | number, color?: string, trend?: string }) {
+function ProgressMetric({ label, value, color }: { label: string, value: number, color?: string }) {
   return (
-    <div className="flex flex-col gap-1">
-      <div className="flex items-baseline gap-1.5">
-        <span className={cn("text-xl font-bold tracking-tight leading-none", color || "text-tier-1")}>{value}</span>
-        {trend && <span className="text-[9px] font-bold text-emerald-500">{trend}</span>}
-      </div>
-      <span className="text-[9px] font-bold uppercase tracking-widest text-tier-4 leading-tight">{label}</span>
+    <div className="flex flex-col gap-2">
+      <span className="text-[9px] font-bold uppercase tracking-widest text-tier-4">{label}</span>
+      <span className={cn("text-3xl font-bold tracking-tight", color || "text-tier-1")}>{value}</span>
     </div>
   );
 }
@@ -346,7 +310,7 @@ function MetricItem({ label, value, color, trend }: { label: string, value: stri
 function AttentionCard({ label, value, sub, urgent }: any) {
   return (
     <div className={cn(
-      "p-5 rounded-2xl border flex flex-col gap-1 transition-all shadow-lg",
+      "p-5 rounded-2xl border flex flex-col gap-1.5 transition-all shadow-lg",
       urgent ? "bg-rose-500/[0.03] border-rose-500/20" : "bg-white/[0.015] border-white/[0.05]"
     )}>
       <span className={cn("text-[9px] font-bold uppercase tracking-widest mb-0.5", urgent ? "text-rose-400" : "text-tier-4")}>{label}</span>
@@ -362,7 +326,7 @@ function ActivityRow({ item }: { item: any }) {
   return (
     <div className="px-6 py-4 bg-background/40 flex items-center justify-between hover:bg-white/[0.02] transition-colors group border-b border-white/[0.03] last:border-0">
       <div className="flex items-center gap-5">
-        <div className="size-2 rounded-full bg-primary/20 group-hover:bg-primary transition-all shadow-[0_0_8px_rgba(168,85,247,0)] group-hover:shadow-[0_0_8px_rgba(168,85,247,0.4)]" />
+        <div className="size-2 rounded-full bg-primary/20 group-hover:bg-primary transition-all" />
         <div className="flex flex-col">
           <span className="text-[14px] font-semibold text-tier-1 group-hover:text-primary transition-colors leading-none">{item.name}</span>
           <span className="text-[11px] text-tier-4 font-medium uppercase tracking-tighter mt-1.5">
