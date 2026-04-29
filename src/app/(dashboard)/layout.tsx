@@ -87,7 +87,6 @@ export default function DashboardLayout({
     if (path.startsWith("/communities")) return "Community Vertical";
     if (path.startsWith("/tasks")) return "Operational Tasks";
     if (path.startsWith("/hub")) return "Intelligence Hub";
-    if (path.startsWith("/reports")) return "Performance Intel";
     if (path.startsWith("/settings")) return "System Config";
     if (path.startsWith("/admin")) return "Admin Console";
     return "Operations";

@@ -7,7 +7,6 @@ import {
   Layers, 
   CheckSquare, 
   Library, 
-  BarChart3, 
   Settings,
   Zap,
   GraduationCap,
@@ -44,10 +43,6 @@ const growthItems = [
 const operationsItems = [
   { icon: CheckSquare, label: "Operational Tasks", path: "/tasks" },
   { icon: Library, label: "Intelligence Hub", path: "/hub" },
-];
-
-const analyticsItems = [
-  { icon: BarChart3, label: "Performance Intel", path: "/reports" },
 ];
 
 interface AppSidebarProps {
@@ -127,13 +122,6 @@ export function AppSidebar({ isAdmin }: AppSidebarProps) {
             </SidebarMenu>
           </SidebarGroup>
         )}
-
-        <SidebarGroup className="mt-4">
-          <SidebarGroupLabel className="px-3 text-[10px] uppercase font-bold tracking-[0.2em] text-tier-4 mb-3">Analysis</SidebarGroupLabel>
-          <SidebarMenu className="gap-1">
-            {analyticsItems.map(renderMenuItem)}
-          </SidebarMenu>
-        </SidebarGroup>
       </SidebarContent>
 
       <SidebarFooter className="p-7">

@@ -269,7 +269,6 @@ export default function CommandCenter() {
       <section className="flex flex-col gap-6">
         <div className="flex items-center justify-between px-1">
           <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4">Recent Updates</h3>
-          <Link href="/reports" className="text-[10px] font-bold text-primary uppercase tracking-[0.2em] hover:opacity-80 transition-colors">View All Reports</Link>
         </div>
         <div className="flex flex-col gap-px bg-white/[0.02] border border-white/[0.05] rounded-2xl overflow-hidden shadow-xl">
           {data.recentActivity.map((item) => (
