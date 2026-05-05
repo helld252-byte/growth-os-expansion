@@ -107,12 +107,14 @@ export function AppSidebar({ isAdmin }: AppSidebarProps) {
           </SidebarMenu>
         </SidebarGroup>
 
-        <SidebarGroup className="mt-4">
-          <SidebarGroupLabel className="px-3 text-[10px] uppercase font-bold tracking-[0.2em] text-tier-4 mb-3">Operations</SidebarGroupLabel>
-          <SidebarMenu className="gap-1">
-            {operationsItems.map(renderMenuItem)}
-          </SidebarMenu>
-        </SidebarGroup>
+        {isAdmin && (
+          <SidebarGroup className="mt-4">
+            <SidebarGroupLabel className="px-3 text-[10px] uppercase font-bold tracking-[0.2em] text-tier-4 mb-3">Operations</SidebarGroupLabel>
+            <SidebarMenu className="gap-1">
+              {operationsItems.map(renderMenuItem)}
+            </SidebarMenu>
+          </SidebarGroup>
+        )}
 
         {isAdmin && (
           <SidebarGroup className="mt-4">
@@ -125,16 +127,18 @@ export function AppSidebar({ isAdmin }: AppSidebarProps) {
       </SidebarContent>
 
       <SidebarFooter className="p-7">
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild className="h-10 rounded-lg hover:bg-white/[0.03] transition-colors px-3 group">
-              <Link href="/settings">
-                <Settings className="size-4.5 text-tier-3/40 group-hover:text-tier-1 transition-transform duration-700 group-hover:rotate-90" />
-                <span className="font-medium tracking-tight ml-3.5 text-[13px] text-tier-2 group-hover:text-tier-1">System Config</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
+        {isAdmin && (
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild className="h-10 rounded-lg hover:bg-white/[0.03] transition-colors px-3 group">
+                <Link href="/settings">
+                  <Settings className="size-4.5 text-tier-3/40 group-hover:text-tier-1 transition-transform duration-700 group-hover:rotate-90" />
+                  <span className="font-medium tracking-tight ml-3.5 text-[13px] text-tier-2 group-hover:text-tier-1">System Config</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        )}
         
         <div className="mt-6 flex flex-col gap-2.5 px-3">
           <div className="flex items-center justify-between text-[9px] font-bold uppercase tracking-[0.25em] text-tier-4">

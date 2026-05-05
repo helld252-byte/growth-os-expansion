@@ -159,12 +159,14 @@ export default function DashboardLayout({
                     <span className="text-[10px] text-tier-3 font-medium truncate">{user.email}</span>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator className="bg-white/[0.05]" />
-                  <DropdownMenuItem asChild className="hover:bg-white/[0.05] cursor-pointer">
-                    <Link href="/settings" className="flex items-center gap-2">
-                      <Zap className="size-3.5 text-primary" />
-                      <span className="text-[12px] font-semibold text-tier-2">Profile Intel</span>
-                    </Link>
-                  </DropdownMenuItem>
+                  {isAdmin && (
+                    <DropdownMenuItem asChild className="hover:bg-white/[0.05] cursor-pointer">
+                      <Link href="/settings" className="flex items-center gap-2">
+                        <Zap className="size-3.5 text-primary" />
+                        <span className="text-[12px] font-semibold text-tier-2">Profile Intel</span>
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
                   {isAdmin && (
                     <DropdownMenuItem asChild className="hover:bg-white/[0.05] cursor-pointer">
                       <Link href="/admin" className="flex items-center gap-2">
