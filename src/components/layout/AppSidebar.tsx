@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -13,7 +14,8 @@ import {
   Coffee,
   Handshake,
   Users2,
-  ShieldAlert
+  ShieldAlert,
+  BarChart3
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { 
@@ -38,6 +40,10 @@ const growthItems = [
   { icon: Coffee, label: "Cafes", path: "/cafes" },
   { icon: Handshake, label: "Partnerships", path: "/partnerships" },
   { icon: Users2, label: "Communities", path: "/communities" },
+];
+
+const intelligenceItems = [
+  { icon: BarChart3, label: "Financial Intelligence", path: "/finance" },
 ];
 
 const operationsItems = [
@@ -109,6 +115,15 @@ export function AppSidebar({ isAdmin }: AppSidebarProps) {
 
         {isAdmin && (
           <SidebarGroup className="mt-4">
+            <SidebarGroupLabel className="px-3 text-[10px] uppercase font-bold tracking-[0.2em] text-tier-4 mb-3">Intelligence</SidebarGroupLabel>
+            <SidebarMenu className="gap-1">
+              {intelligenceItems.map(renderMenuItem)}
+            </SidebarMenu>
+          </SidebarGroup>
+        )}
+
+        {isAdmin && (
+          <SidebarGroup className="mt-4">
             <SidebarGroupLabel className="px-3 text-[10px] uppercase font-bold tracking-[0.2em] text-tier-4 mb-3">Operations</SidebarGroupLabel>
             <SidebarMenu className="gap-1">
               {operationsItems.map(renderMenuItem)}
@@ -143,7 +158,7 @@ export function AppSidebar({ isAdmin }: AppSidebarProps) {
         <div className="mt-6 flex flex-col gap-2.5 px-3">
           <div className="flex items-center justify-between text-[9px] font-bold uppercase tracking-[0.25em] text-tier-4">
             <span>Version</span>
-            <span>2.6.0-B</span>
+            <span>2.7.0-B</span>
           </div>
           <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
             <div className="w-1/3 h-full bg-primary/40 rounded-full" />

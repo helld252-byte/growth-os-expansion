@@ -42,6 +42,40 @@
         "email"
       ]
     },
+    "MonthlySales": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "MonthlySales",
+      "type": "object",
+      "description": "Financial data for a specific platform in a given month.",
+      "properties": {
+        "id": { "type": "string" },
+        "month": { "type": "string", "description": "Format: YYYY-MM" },
+        "platform": { "type": "string" },
+        "orders": { "type": "number" },
+        "grossSales": { "type": "number" },
+        "discounts": { "type": "number" },
+        "refunds": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["month", "platform"]
+    },
+    "Expense": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Expense",
+      "type": "object",
+      "description": "Detailed business expense entry.",
+      "properties": {
+        "id": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "description": { "type": "string" },
+        "amount": { "type": "number" },
+        "category": { "type": "string" },
+        "platform": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["date", "amount", "category"]
+    },
     "GrowthOpportunity": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "GrowthOpportunity",
@@ -221,6 +255,22 @@
           "entityName": "CompanyResource",
           "schema": { "$ref": "#/backend/entities/CompanyResource" },
           "description": "Intelligence Hub assets."
+        }
+      },
+      {
+        "path": "/monthly_sales/{id}",
+        "definition": {
+          "entityName": "MonthlySales",
+          "schema": { "$ref": "#/backend/entities/MonthlySales" },
+          "description": "Platform sales records by month."
+        }
+      },
+      {
+        "path": "/expenses/{id}",
+        "definition": {
+          "entityName": "Expense",
+          "schema": { "$ref": "#/backend/entities/Expense" },
+          "description": "Business expense entries."
         }
       }
     ]
