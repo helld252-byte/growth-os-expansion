@@ -86,7 +86,6 @@ export default function DashboardLayout({
     if (path.startsWith("/hub")) return "Intelligence Hub";
     if (path.startsWith("/settings")) return "System Config";
     if (path.startsWith("/admin")) return "Admin Console";
-    if (path.startsWith("/finance")) return "Financial Intelligence";
     return "Operations";
   };
 

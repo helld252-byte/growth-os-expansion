@@ -10,8 +10,7 @@ import {
   Library, 
   Settings,
   Zap,
-  ShieldAlert,
-  BarChart3
+  ShieldAlert
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { 
@@ -32,10 +31,6 @@ const commandItems = [
 
 const growthItems = [
   { icon: Layers, label: "Platforms", path: "/channels" },
-];
-
-const intelligenceItems = [
-  { icon: BarChart3, label: "Financial Intelligence", path: "/finance" },
 ];
 
 const operationsItems = [
@@ -104,15 +99,6 @@ export function AppSidebar({ isAdmin }: AppSidebarProps) {
             {growthItems.map(renderMenuItem)}
           </SidebarMenu>
         </SidebarGroup>
-
-        {isAdmin && (
-          <SidebarGroup className="mt-4">
-            <SidebarGroupLabel className="px-3 text-[10px] uppercase font-bold tracking-[0.2em] text-tier-4 mb-3">Intelligence</SidebarGroupLabel>
-            <SidebarMenu className="gap-1">
-              {intelligenceItems.map(renderMenuItem)}
-            </SidebarMenu>
-          </SidebarGroup>
-        )}
 
         {isAdmin && (
           <SidebarGroup className="mt-4">
