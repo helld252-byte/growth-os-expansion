@@ -39,6 +39,8 @@ export interface Platform {
   contactRole?: string;
   contactEmail?: string;
   notes?: string;
+  rejectionReason?: string;
+  rejectionLessons?: string;
   requirements?: string[];
   completedRequirements?: string[];
   journal?: {
@@ -46,7 +48,6 @@ export interface Platform {
     user: string;
     content: string;
   }[];
-  rejectionReason?: string;
 }
 
 export type TaskStatus = 'Open' | 'In Progress' | 'Completed' | 'Overdue';

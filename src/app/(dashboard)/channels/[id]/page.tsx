@@ -1,3 +1,4 @@
+
 "use client";
 
 import { use, useState, useMemo } from "react";
@@ -22,7 +23,9 @@ import {
   CheckCircle2,
   History,
   FileText,
-  Upload
+  Upload,
+  AlertCircle,
+  Lightbulb
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -125,7 +128,9 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
       contactRole: platform.contactRole || "",
       lastContactDate: platform.lastContactDate || "",
       commStatus: platform.commStatus || "No outreach",
-      notes: platform.notes || ""
+      notes: platform.notes || "",
+      rejectionReason: platform.rejectionReason || "",
+      rejectionLessons: platform.rejectionLessons || ""
     });
     setIsAddOpen(true);
   };
@@ -183,6 +188,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
       case 'In Review': return "bg-amber-500/10 text-amber-400 border-amber-500/20";
       case 'Approved': return "bg-violet-500/10 text-violet-400 border-violet-500/20";
       case 'Research': return "bg-slate-500/20 text-slate-300 border-slate-500/30";
+      case 'Rejected': return "bg-rose-500/10 text-rose-400 border-rose-500/20";
       default: return "bg-blue-500/10 text-blue-400 border-blue-500/20";
     }
   };
@@ -238,6 +244,34 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <div className="lg:col-span-8 flex flex-col gap-10">
+          
+          {platform.currentStage === 'Rejected' && (
+            <div className="premium-panel p-8 rounded-3xl border-rose-500/20 bg-rose-500/5 flex flex-col gap-6 animate-in slide-in-from-top-4 duration-500">
+              <div className="flex items-center gap-3 text-rose-400">
+                <AlertCircle className="size-5" />
+                <h3 className="text-[11px] font-bold uppercase tracking-[0.25em]">Rejection Post-Mortem</h3>
+              </div>
+              <div className="grid gap-6">
+                <div className="flex flex-col gap-2">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-tier-4">Reason for Rejection</span>
+                  <p className="text-[15px] font-medium text-tier-2 leading-relaxed italic">
+                    "{platform.rejectionReason || "No specific reason recorded."}"
+                  </p>
+                </div>
+                <Separator className="bg-rose-500/10" />
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-center gap-2 text-emerald-400">
+                    <Lightbulb className="size-4" />
+                    <span className="text-[10px] font-bold uppercase tracking-widest">Key Learnings</span>
+                  </div>
+                  <p className="text-[14px] font-medium text-tier-2 leading-relaxed">
+                    {platform.rejectionLessons || "Waiting for team analysis on how to optimize future outreach strategy."}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="premium-panel p-8 rounded-3xl border-primary/20 bg-gradient-to-br from-primary/5 via-transparent to-transparent shadow-2xl relative overflow-hidden group">
             <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
               <Zap className="size-16 text-primary" />
@@ -496,13 +530,36 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {['Not Started', 'Research', 'Applied', 'In Review', 'Approved', 'Onboarding', 'Live'].map(s => (
+                      {['Not Started', 'Research', 'Applied', 'In Review', 'Approved', 'Rejected', 'Onboarding', 'Live'].map(s => (
                         <SelectItem key={s} value={s}>{s}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
               </div>
+
+              {editData.currentStage === 'Rejected' && (
+                <div className="grid gap-4 p-4 border border-rose-500/20 bg-rose-500/5 rounded-xl">
+                  <div className="grid gap-2">
+                    <Label className="text-[10px] uppercase tracking-widest text-rose-400 font-bold">Reason for Rejection</Label>
+                    <Input 
+                      value={editData.rejectionReason}
+                      onChange={(e) => setEditData({...editData, rejectionReason: e.target.value})}
+                      placeholder="e.g. Category saturation, logistics constraints..."
+                      className="bg-white/[0.03] border-white/[0.08] h-11 rounded-xl text-tier-1"
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label className="text-[10px] uppercase tracking-widest text-rose-400 font-bold">Lessons Learned</Label>
+                    <Textarea 
+                      value={editData.rejectionLessons}
+                      onChange={(e) => setEditData({...editData, rejectionLessons: e.target.value})}
+                      placeholder="What can we optimize for future attempts?"
+                      className="bg-white/[0.03] border-white/[0.08] min-h-[80px] rounded-xl text-tier-1 p-4"
+                    />
+                  </div>
+                </div>
+              )}
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">

@@ -110,6 +110,8 @@
         "contactRole": { "type": "string" },
         "contactEmail": { "type": "string", "format": "email" },
         "notes": { "type": "string" },
+        "rejectionReason": { "type": "string", "description": "Why the application was rejected." },
+        "rejectionLessons": { "type": "string", "description": "What we learned from this rejection." },
         "requirements": {
           "type": "array",
           "items": { "type": "string" }
