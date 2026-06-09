@@ -1,3 +1,4 @@
+
 'use client';
 
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
@@ -81,14 +82,11 @@ export default function DashboardLayout({
   const getSectionLabel = (path: string) => {
     if (path === "/") return "Command Center";
     if (path.startsWith("/channels")) return "Platforms";
-    if (path.startsWith("/schools")) return "School Vertical";
-    if (path.startsWith("/cafes")) return "Cafe Vertical";
-    if (path.startsWith("/partnerships")) return "Strategic Partnerships";
-    if (path.startsWith("/communities")) return "Community Vertical";
     if (path.startsWith("/tasks")) return "Operational Tasks";
     if (path.startsWith("/hub")) return "Intelligence Hub";
     if (path.startsWith("/settings")) return "System Config";
     if (path.startsWith("/admin")) return "Admin Console";
+    if (path.startsWith("/finance")) return "Financial Intelligence";
     return "Operations";
   };
 
@@ -134,7 +132,7 @@ export default function DashboardLayout({
                   className="hidden sm:flex items-center bg-white/[0.03] border border-white/[0.08] rounded-lg px-3 py-1.5 gap-3 cursor-pointer hover:bg-white/[0.06] hover:border-white/20 transition-all group"
                 >
                   <Search className="size-3.5 text-tier-3 group-hover:text-primary transition-colors" />
-                  <span className="text-[11px] font-medium tracking-tight text-tier-3 group-hover:text-primary pr-6 transition-colors">Search Strategic Assets</span>
+                  <span className="text-[11px] font-medium tracking-tight text-tier-3 group-hover:text-primary pr-6 transition-colors">Search Platforms & Tasks</span>
                   <span className="text-[9px] font-medium text-tier-2 tracking-widest bg-white/5 px-1.5 py-0.5 rounded border border-white/10">⌘K</span>
                 </div>
 
@@ -193,13 +191,13 @@ export default function DashboardLayout({
       <Dialog open={isSearchOpen} onOpenChange={setIsSearchOpen}>
         <DialogContent className="sm:max-w-[550px] p-0 border-white/[0.1] bg-[#0A0A0B]/95 backdrop-blur-2xl rounded-2xl overflow-hidden shadow-[0_0_50px_-12px_rgba(0,0,0,0.8)]">
           <DialogTitle className="px-4 pt-4 text-[10px] font-bold uppercase tracking-[0.25em] text-primary">Global Tactical Search</DialogTitle>
-          <DialogDescription className="px-4 pb-2 text-[11px] text-tier-3">Quickly locate channels, verticals, and strategic intelligence.</DialogDescription>
+          <DialogDescription className="px-4 pb-2 text-[11px] text-tier-3">Quickly locate platforms and operational intelligence.</DialogDescription>
           <div className="flex flex-col">
             <div className="flex items-center gap-3 px-4 py-4 border-b border-white/[0.05]">
               <Search className="size-5 text-primary" />
               <Input 
                 autoFocus
-                placeholder="Search platforms, schools, cafes..." 
+                placeholder="Search platforms, tasks..." 
                 className="border-0 bg-transparent focus-visible:ring-0 text-base placeholder:text-tier-3 h-auto p-0 text-tier-1"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -215,7 +213,7 @@ export default function DashboardLayout({
               </div>
               <div className="flex flex-col gap-1">
                 <p className="text-[13px] font-medium text-tier-2">Search the Operations Unit</p>
-                <p className="text-[11px] text-tier-3">Find platforms, tasks, and strategic intel instantly.</p>
+                <p className="text-[11px] text-tier-3">Find platforms and strategic intel instantly.</p>
               </div>
             </div>
             
@@ -230,7 +228,7 @@ export default function DashboardLayout({
                   <div className="bg-white/5 border border-white/10 rounded px-1.5 text-[9px] text-tier-2">↑↓</div>
                 </div>
               </div>
-              <span className="text-[10px] font-bold text-tier-3 uppercase tracking-[0.15em]">Growth OS v2.6.0</span>
+              <span className="text-[10px] font-bold text-tier-3 uppercase tracking-[0.15em]">Growth OS v2.7.0</span>
             </div>
           </div>
         </DialogContent>

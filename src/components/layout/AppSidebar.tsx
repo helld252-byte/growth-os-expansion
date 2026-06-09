@@ -10,10 +10,6 @@ import {
   Library, 
   Settings,
   Zap,
-  GraduationCap,
-  Coffee,
-  Handshake,
-  Users2,
   ShieldAlert,
   BarChart3
 } from "lucide-react";
@@ -36,10 +32,6 @@ const commandItems = [
 
 const growthItems = [
   { icon: Layers, label: "Platforms", path: "/channels" },
-  { icon: GraduationCap, label: "Schools", path: "/schools" },
-  { icon: Coffee, label: "Cafes", path: "/cafes" },
-  { icon: Handshake, label: "Partnerships", path: "/partnerships" },
-  { icon: Users2, label: "Communities", path: "/communities" },
 ];
 
 const intelligenceItems = [

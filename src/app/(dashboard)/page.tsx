@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useMemo } from "react";
@@ -5,11 +6,7 @@ import {
   Activity,
   ChevronRight, 
   Loader2,
-  Globe,
-  GraduationCap,
-  Coffee,
-  Handshake,
-  Users2
+  Globe
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useCollection, useMemoFirebase } from "@/firebase";
@@ -21,25 +18,19 @@ export default function CommandCenter() {
   const firestore = getFirestore();
   
   const opportunitiesRef = useMemoFirebase(() => collection(firestore, 'growth_opportunities'), [firestore]);
-  const { data: opportunities, isLoading: opLoading } = useCollection(opportunitiesRef);
-
-  const partnersRef = useMemoFirebase(() => collection(firestore, 'partners'), [firestore]);
-  const { data: partners, isLoading: pLoading } = useCollection(partnersRef);
-
-  const isLoading = opLoading || pLoading;
+  const { data: opportunities, isLoading } = useCollection(opportunitiesRef);
 
   const data = useMemo(() => {
-    if (!opportunities || !partners) return null;
+    if (!opportunities) return null;
 
     const now = new Date();
     const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
-    // 1. KPIs
-    const trackedOpps = opportunities.length + partners.length;
+    // 1. KPIs (Focused on Platforms only)
+    const trackedOpps = opportunities.length;
     const activeConversations = opportunities.filter(o => o.commStatus && o.commStatus !== 'No outreach').length;
     const inReview = opportunities.filter(o => o.currentStage === 'In Review').length;
-    const livePartnerships = opportunities.filter(o => o.currentStage === 'Live').length + 
-                            partners.filter(p => p.status === 'Live' || p.status === 'Active').length;
+    const livePartnerships = opportunities.filter(o => o.currentStage === 'Live').length;
     
     const contacted = opportunities.filter(o => o.commStatus && o.commStatus !== 'No outreach');
     const responded = contacted.filter(o => ['In discussion', 'Approved', 'Waiting reply'].includes(o.commStatus || ''));
@@ -54,32 +45,21 @@ export default function CommandCenter() {
       { label: 'Live', count: opportunities.filter(o => o.currentStage === 'Live').length },
     ];
 
-    // 3. Verticals
+    // 3. Verticals (Pruned)
     const verticals = [
       { label: 'Platforms', count: opportunities.length, icon: Globe, path: '/channels' },
-      { label: 'Schools', count: partners.filter(p => p.type === 'School').length, icon: GraduationCap, path: '/schools' },
-      { label: 'Cafes', count: partners.filter(p => p.type === 'Cafe' || p.partnerType === 'Cafe').length, icon: Coffee, path: '/cafes' },
-      { label: 'Partnerships', count: partners.filter(p => ["Milk Brand", "Co-branding", "Event", "Influencer"].includes(p.type)).length, icon: Handshake, path: '/partnerships' },
-      { label: 'Communities', count: partners.filter(p => ["Forum", "Blog", "Review Site"].includes(p.type)).length, icon: Users2, path: '/communities' },
     ];
 
     // 4. Momentum
-    const newLeadsThisWeek = opportunities.filter(o => new Date(o.createdAt || 0) >= sevenDaysAgo).length +
-                             partners.filter(p => new Date(p.createdAt || 0) >= sevenDaysAgo).length;
-    
+    const newLeadsThisWeek = opportunities.filter(o => new Date(o.createdAt || 0) >= sevenDaysAgo).length;
     const movedStages = opportunities.filter(o => new Date(o.updatedAt || 0) >= sevenDaysAgo && o.currentStage !== 'Not Started').length;
-    
     const repliesReceived = opportunities.filter(o => 
       new Date(o.updatedAt || 0) >= sevenDaysAgo && 
       ['In discussion', 'Approved', 'Rejected'].includes(o.commStatus || '')
     ).length;
-
     const wins = opportunities.filter(o => 
       new Date(o.updatedAt || 0) >= sevenDaysAgo && 
       ['Approved', 'Live'].includes(o.currentStage)
-    ).length + partners.filter(p => 
-      new Date(p.updatedAt || p.createdAt || 0) >= sevenDaysAgo && 
-      ['Active', 'Live', 'Approved'].includes(p.status)
     ).length;
     
     // 5. Bottlenecks
@@ -91,10 +71,8 @@ export default function CommandCenter() {
       new Date(a.lastContactDate || 0).getTime() - new Date(b.lastContactDate || 0).getTime()
     )[0];
 
-    const stalledCategory = verticals.sort((a, b) => b.count - a.count)[0]?.label;
-
     // 6. Recent Updates
-    const recentActivity = [...opportunities, ...partners]
+    const recentActivity = opportunities
       .sort((a, b) => {
         const dateA = a.updatedAt?.toDate ? a.updatedAt.toDate() : new Date(a.updatedAt || a.createdAt || 0);
         const dateB = b.updatedAt?.toDate ? b.updatedAt.toDate() : new Date(b.updatedAt || b.createdAt || 0);
@@ -107,10 +85,10 @@ export default function CommandCenter() {
       stages,
       verticals,
       momentum: { newLeadsThisWeek, movedStages, repliesReceived, wins },
-      bottlenecks: { oldestPending, needsFollowUp, stalledCategory },
+      bottlenecks: { oldestPending, needsFollowUp },
       recentActivity
     };
-  }, [opportunities, partners]);
+  }, [opportunities]);
 
   if (isLoading) {
     return (
@@ -141,9 +119,9 @@ export default function CommandCenter() {
           <Badge variant="outline" className="bg-emerald-500/5 text-emerald-400 border-emerald-500/20 text-[9px] font-bold uppercase tracking-widest px-3 py-1">System Live</Badge>
         </div>
 
-        {/* Executive Stats Strip - Slim High-Fidelity Rail */}
+        {/* Executive Stats Strip */}
         <div className="bg-white/[0.015] border border-white/[0.05] rounded-2xl p-4 flex items-center justify-between divide-x divide-white/[0.04] shadow-xl backdrop-blur-sm">
-          <StatModule label="Tracked Units" value={data.kpis.trackedOpps} />
+          <StatModule label="Tracked Platforms" value={data.kpis.trackedOpps} />
           <StatModule label="In Review" value={data.kpis.inReview} />
           <StatModule label="Live" value={data.kpis.livePartnerships} highlight />
           <StatModule label="Active Conv." value={data.kpis.activeConversations} />
@@ -155,7 +133,7 @@ export default function CommandCenter() {
       {/* Growth Pipeline Section */}
       <section className="flex flex-col gap-8">
         <div className="flex items-center justify-between px-1">
-          <h3 className="text-[10px] font-bold uppercase tracking-[0.3em] text-tier-4">Growth Pipeline</h3>
+          <h3 className="text-[10px] font-bold uppercase tracking-[0.3em] text-tier-4">Platform Growth Pipeline</h3>
         </div>
         <div className="grid grid-cols-5 gap-6">
           {data.stages.map((stage, i) => (
@@ -181,9 +159,9 @@ export default function CommandCenter() {
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
         
-        {/* Units by Category - Row Based List */}
+        {/* Units by Category */}
         <div className="lg:col-span-5 flex flex-col gap-6">
-          <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4 px-1">Units by Category</h3>
+          <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4 px-1">Active Verticals</h3>
           <div className="flex flex-col gap-3">
             {data.verticals.map((v) => (
               <Link 
@@ -208,11 +186,10 @@ export default function CommandCenter() {
           </div>
         </div>
 
-        {/* This Week Progress - Improved High-Fidelity Card */}
+        {/* This Week Progress */}
         <div className="lg:col-span-4 flex flex-col gap-6">
-          <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4 px-1">This Week Progress</h3>
+          <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4 px-1">Weekly Velocity</h3>
           <div className="premium-panel rounded-2xl flex flex-col h-full overflow-hidden border-white/[0.05]">
-            {/* Technical Metric Grid */}
             <div className="grid grid-cols-2 divide-x divide-y divide-white/[0.04] border-b border-white/[0.04]">
               <MetricCell label="New Leads" value={data.momentum.newLeadsThisWeek} />
               <MetricCell label="Replies" value={data.momentum.repliesReceived} />
@@ -220,7 +197,6 @@ export default function CommandCenter() {
               <MetricCell label="Wins" value={data.momentum.wins} color="text-emerald-400" />
             </div>
 
-            {/* Velocity & Focus Tray */}
             <div className="p-6 flex flex-col gap-5 mt-auto bg-white/[0.01]">
               <div className="flex flex-col gap-3">
                 <div className="flex items-center justify-between">
@@ -234,7 +210,7 @@ export default function CommandCenter() {
               
               <div className="flex items-center gap-3 px-4 py-2.5 bg-white/[0.02] border border-white/[0.04] rounded-xl group hover:border-primary/20 transition-all">
                 <div className="size-1.5 rounded-full bg-primary animate-pulse" />
-                <span className="text-[11px] font-medium text-tier-3">Priority Area: <span className="text-tier-1">{data.bottlenecks.stalledCategory || "Schools"}</span></span>
+                <span className="text-[11px] font-medium text-tier-3">Priority: <span className="text-tier-1">Platform Onboarding</span></span>
               </div>
             </div>
           </div>
@@ -255,11 +231,6 @@ export default function CommandCenter() {
               sub="Waiting on reply"
               urgent
             />
-            <AttentionCard 
-              label="Stalled Category" 
-              value={data.bottlenecks.stalledCategory} 
-              sub="Low activity detected"
-            />
           </div>
         </div>
 
@@ -268,7 +239,7 @@ export default function CommandCenter() {
       {/* Recent Updates */}
       <section className="flex flex-col gap-6">
         <div className="flex items-center justify-between px-1">
-          <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4">Recent Updates</h3>
+          <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4">Platform Activity</h3>
         </div>
         <div className="flex flex-col gap-px bg-white/[0.02] border border-white/[0.05] rounded-2xl overflow-hidden shadow-xl">
           {data.recentActivity.map((item) => (
@@ -333,7 +304,7 @@ function ActivityRow({ item }: { item: any }) {
       </div>
       <div className="flex items-center gap-8">
         <Badge variant="outline" className="h-5 px-2 text-[9px] uppercase tracking-widest font-bold border-white/5 bg-white/[0.03] text-tier-4 group-hover:border-primary/20 group-hover:text-tier-3 transition-all">
-          {item.currentStage ? "Platform" : "Vertical"}
+          Platform
         </Badge>
         <span className="text-[11px] font-bold text-tier-4 uppercase w-20 text-right">{date.toLocaleDateString([], { month: 'short', day: 'numeric' })}</span>
       </div>
