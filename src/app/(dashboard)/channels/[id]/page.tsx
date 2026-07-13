@@ -1,3 +1,4 @@
+
 "use client";
 
 import { use, useState, useMemo } from "react";
@@ -155,8 +156,6 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
 
   const handleAddNote = () => {
     if (!docRef || !newNote || !user) return;
-    
-    // Extract first name for personalized touch
     const firstName = user.displayName?.split(' ')[0] || "Operator";
 
     const journalEntry = {
@@ -194,7 +193,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
   const getStageStyles = (stage: string) => {
     switch (stage) {
       case 'Live': return "bg-emerald-500/10 text-emerald-500 border-emerald-500/20";
-      case 'In Review': return "bg-amber-500/10 text-amber-500 border-amber-500/20";
+      case 'In Review': return "bg-amber-500/10 text-amber-400 border-amber-500/20";
       case 'Approved': return "bg-violet-500/10 text-violet-500 border-violet-500/20";
       case 'Research': return "bg-slate-500/10 text-slate-500 border-slate-500/20";
       case 'Rejected': return "bg-rose-500/10 text-rose-500 border-rose-500/20";
@@ -237,7 +236,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
           <Button 
             variant="ghost" 
             onClick={handleOpenEdit}
-            className="h-10 px-4 rounded-xl border border-border text-tier-2 hover:text-tier-1 text-[12px] font-semibold uppercase tracking-wider"
+            className="h-10 px-4 rounded-xl border border-border text-tier-2 hover:bg-secondary/50 hover:text-tier-1 text-[12px] font-semibold uppercase tracking-wider transition-all"
           >
             <Edit3 className="size-4 mr-2" /> Recalibrate
           </Button>
@@ -320,7 +319,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
               </div>
               <Dialog open={isNoteOpen} onOpenChange={setIsNoteOpen}>
                 <DialogTrigger asChild>
-                  <Button variant="ghost" className="h-8 text-[10px] font-bold uppercase tracking-wider text-tier-3 hover:text-primary">
+                  <Button variant="ghost" className="h-8 text-[10px] font-bold uppercase tracking-wider text-tier-3 hover:bg-secondary/50 hover:text-primary transition-all">
                     <Plus className="size-3.5 mr-2" /> New Field Note
                   </Button>
                 </DialogTrigger>
@@ -383,7 +382,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
                 {platform.requirements.map((req: string, i: number) => {
                   const isChecked = (platform.completedRequirements || []).includes(req);
                   return (
-                    <div key={i} className="flex items-center gap-4 py-2 group cursor-pointer" onClick={() => handleToggleRequirement(req)}>
+                    <div key={i} className="flex items-center gap-4 py-3 px-4 rounded-xl border border-transparent hover:bg-secondary/50 hover:border-border transition-all cursor-pointer group" onClick={() => handleToggleRequirement(req)}>
                       <Checkbox 
                         checked={isChecked} 
                         className="size-5 rounded-md border-border data-[state=checked]:bg-primary data-[state=checked]:border-primary transition-all" 
@@ -472,7 +471,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
             <div className="grid grid-cols-2 gap-3 pt-2">
               <Button 
                 variant="outline" 
-                className="h-10 rounded-xl border-border bg-background text-[10px] font-bold uppercase tracking-widest hover:bg-primary/10 hover:text-primary transition-all"
+                className="h-10 rounded-xl border-border bg-background text-[10px] font-bold uppercase tracking-widest hover:bg-secondary transition-all"
                 onClick={() => {
                   if (platform.website) window.open(platform.website.startsWith('http') ? platform.website : `https://${platform.website}`, '_blank');
                 }}
@@ -481,7 +480,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
               </Button>
               <Button 
                 variant="outline" 
-                className="h-10 rounded-xl border-border bg-background text-[10px] font-bold uppercase tracking-widest hover:bg-primary/10 hover:text-primary transition-all"
+                className="h-10 rounded-xl border-border bg-background text-[10px] font-bold uppercase tracking-widest hover:bg-secondary transition-all"
                 onClick={() => {
                   if (platform.supportEmail) window.location.href = `mailto:${platform.supportEmail}`;
                 }}
@@ -511,7 +510,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
             </div>
             
             <div className="flex flex-col gap-3">
-              <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/30 border border-border group hover:border-primary/20 transition-all cursor-pointer">
+              <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/30 border border-border group hover:bg-secondary/50 hover:border-border transition-all cursor-pointer">
                 <div className="size-8 rounded-lg bg-primary/5 flex items-center justify-center text-primary group-hover:bg-primary/10">
                   <FileText className="size-4" />
                 </div>
@@ -699,7 +698,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
                 </div>
                 <div className="flex flex-col gap-2 pt-2">
                   {editData.requirements.map((req: string, idx: number) => (
-                    <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-secondary/30 border border-border group">
+                    <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-secondary/30 border border-border group hover:bg-secondary/50 transition-all">
                       <span className="text-[13px] font-medium text-tier-2">{req}</span>
                       <Button 
                         variant="ghost" 
@@ -752,12 +751,10 @@ function ContactField({ label, value, icon: Icon, link }: { label: string, value
 }
 
 function TimelineEntry({ date, user, content, type }: { date: string, user: string, content: string, type: 'note' | 'task' }) {
-  // Only show first name if Mikhail
   const displayUser = (user === "Mikhail" || user.startsWith("Mikhail ")) ? "Mikhail" : user;
 
   return (
     <div className="flex flex-col gap-2 pl-8 relative">
-      {/* Minimal Stylish Marker Design */}
       <div className="absolute left-0 top-1.5 size-[23px] flex items-center justify-center">
         <div className="size-full rounded-full bg-background border border-border absolute inset-0 shadow-sm" />
         <div className={cn(

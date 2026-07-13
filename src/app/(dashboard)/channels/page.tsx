@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -54,11 +55,9 @@ export default function PlatformsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isAddOpen, setIsAddOpen] = useState(false);
 
-  // Firestore Collection
   const opportunitiesRef = useMemoFirebase(() => collection(firestore, 'growth_opportunities'), [firestore]);
   const { data: opportunities, isLoading } = useCollection(opportunitiesRef);
 
-  // New Opportunity State
   const [newOp, setNewOp] = useState({
     name: "",
     type: "Wholesale",
@@ -130,7 +129,6 @@ export default function PlatformsPage() {
 
   return (
     <div className="max-w-[1400px] mx-auto flex gap-12 animate-in fade-in duration-700">
-      {/* Operations Sidebar */}
       <aside className="w-64 shrink-0 flex flex-col gap-10">
         <Link 
           href="/" 
@@ -200,7 +198,7 @@ export default function PlatformsPage() {
         <div className="mt-auto">
           <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
             <DialogTrigger asChild>
-              <Button className="w-full bg-primary/20 hover:bg-primary text-tier-1 font-semibold text-[11px] uppercase tracking-wider h-11 rounded-xl transition-all shadow-lg border border-primary/20">
+              <Button className="w-full bg-secondary hover:bg-secondary/80 text-tier-1 font-semibold text-[11px] uppercase tracking-wider h-11 rounded-xl transition-all shadow-sm border border-border">
                 <Plus className="size-4 mr-2" /> Add Platform
               </Button>
             </DialogTrigger>
@@ -259,7 +257,6 @@ export default function PlatformsPage() {
         </div>
       </aside>
 
-      {/* Main Content */}
       <main className="flex-1 flex flex-col gap-10">
         <header className="flex items-center justify-between">
           <div className="flex flex-col gap-2.5">
@@ -314,12 +311,12 @@ function FilterButton({ icon: Icon, label, count, active, onClick }: any) {
       className={cn(
         "h-11 justify-start gap-4 px-4 rounded-xl transition-all relative group",
         active 
-          ? "bg-primary/10 text-primary shadow-[inset_0_0_0_1px_rgba(var(--primary),0.1)]" 
-          : "text-tier-3 hover:bg-white/[0.03] hover:text-tier-1"
+          ? "bg-secondary text-tier-1 shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.05)]" 
+          : "text-tier-3 hover:bg-secondary/50 hover:text-tier-1"
       )}
     >
       <Icon className={cn("size-4.5", active ? "text-primary" : "text-tier-3 group-hover:text-tier-2")} />
-      <span className={cn("text-[13px] tracking-tight font-medium", active ? "text-primary" : "")}>{label}</span>
+      <span className={cn("text-[13px] tracking-tight font-medium", active ? "text-tier-1" : "")}>{label}</span>
       <span className={cn(
         "ml-auto text-[11px] font-bold tabular-nums",
         active ? "text-primary" : "text-tier-4"
@@ -356,9 +353,9 @@ function PlatformListItem({ platform }: { platform: any }) {
   };
 
   return (
-    <div className="premium-panel p-6 rounded-2xl flex items-center justify-between group hover:border-primary/30 cursor-pointer transition-all active:scale-[0.995]">
+    <div className="premium-panel p-6 rounded-2xl flex items-center justify-between group hover:bg-secondary/30 hover:border-border cursor-pointer transition-all active:scale-[0.995]">
       <div className="flex items-center gap-7">
-        <div className="size-12 rounded-xl bg-white/[0.02] border border-border flex items-center justify-center text-tier-3 group-hover:text-primary group-hover:bg-primary/5 transition-all">
+        <div className="size-12 rounded-xl bg-white/[0.02] border border-border flex items-center justify-center text-tier-3 group-hover:text-tier-1 group-hover:bg-secondary/50 transition-all">
           <Globe className="size-6" />
         </div>
         
@@ -399,7 +396,7 @@ function PlatformListItem({ platform }: { platform: any }) {
           </span>
         </div>
         
-        <div className="size-10 rounded-full flex items-center justify-center bg-white/[0.015] border border-border group-hover:border-primary/50 group-hover:bg-primary/10 transition-all">
+        <div className="size-10 rounded-full flex items-center justify-center bg-white/[0.015] border border-border group-hover:border-border group-hover:bg-secondary/80 transition-all">
           <ChevronRight className="size-5 text-tier-3 group-hover:text-tier-1" />
         </div>
       </div>

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { 
@@ -116,13 +117,13 @@ export default function TasksPage() {
       case 'Overdue': return "bg-rose-500/10 text-rose-400 border-rose-500/20";
       case 'In Progress': return "bg-amber-500/10 text-amber-400 border-amber-500/20";
       case 'Completed': return "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
-      default: return "bg-white/[0.03] text-tier-1 border-white/[0.12]";
+      default: return "bg-secondary text-tier-1 border-border";
     }
   };
 
   return (
     <div className="max-w-[1440px] mx-auto flex flex-col gap-10 animate-in slide-in-from-right-4 duration-500">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-8 border-b border-white/[0.03]">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-8 border-b border-border/50">
         <div className="flex items-center gap-5">
           <div className="size-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center shadow-lg active-glow">
             <Flag className="size-6 text-primary" />
@@ -141,7 +142,7 @@ export default function TasksPage() {
               <Plus className="size-4" /> Quick Add Task
             </Button>
           </DialogTrigger>
-          <DialogContent className="bg-background/95 backdrop-blur-2xl border-white/[0.1] rounded-2xl sm:max-w-[500px]">
+          <DialogContent className="bg-background/95 backdrop-blur-2xl border-border rounded-2xl sm:max-w-[500px]">
             <DialogHeader>
               <DialogTitle className="text-xl font-bold tracking-tight text-tier-1">New Tactical Task</DialogTitle>
             </DialogHeader>
@@ -152,14 +153,14 @@ export default function TasksPage() {
                   value={newTask.title}
                   onChange={(e) => setNewTask({...newTask, title: e.target.value})}
                   placeholder="e.g. Upload VAT ID to Amazon EU" 
-                  className="bg-white/[0.03] border-white/[0.08] h-12 rounded-xl text-tier-1"
+                  className="bg-secondary/50 border-border h-12 rounded-xl text-tier-1"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
                   <Label className="text-[10px] uppercase tracking-widest text-tier-3">Priority</Label>
                   <Select value={newTask.priority} onValueChange={(v) => setNewTask({...newTask, priority: v})}>
-                    <SelectTrigger className="bg-white/[0.03] border-white/[0.08] h-12 rounded-xl text-tier-1">
+                    <SelectTrigger className="bg-secondary/50 border-border h-12 rounded-xl text-tier-1">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -177,7 +178,7 @@ export default function TasksPage() {
               <div className="grid gap-2">
                 <Label className="text-[10px] uppercase tracking-widest text-tier-3">Linked Platform (Optional)</Label>
                 <Select value={newTask.growthOpportunityId} onValueChange={(v) => setNewTask({...newTask, growthOpportunityId: v})}>
-                  <SelectTrigger className="bg-white/[0.03] border-white/[0.08] h-12 rounded-xl text-tier-1">
+                  <SelectTrigger className="bg-secondary/50 border-border h-12 rounded-xl text-tier-1">
                     <SelectValue placeholder="Select platform..." />
                   </SelectTrigger>
                   <SelectContent>
@@ -210,21 +211,21 @@ export default function TasksPage() {
               placeholder="Filter tasks..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-11 h-11 bg-white/[0.02] border-white/[0.06] rounded-xl text-[13px] font-medium placeholder:text-tier-3 text-tier-1 focus-visible:ring-primary/20" 
+              className="pl-11 h-11 bg-white/[0.02] border-border rounded-xl text-[13px] font-medium placeholder:text-tier-3 text-tier-1 focus-visible:ring-primary/20" 
             />
           </div>
 
           <div className="flex flex-col gap-1.5">
             <h3 className="text-[9px] font-bold uppercase tracking-[0.25em] text-tier-4 mb-3 ml-3">Timeline Filter</h3>
-            <Button variant="ghost" className="justify-start gap-4 h-10 px-4 bg-primary/10 hover:bg-primary/20 text-primary hover:text-primary rounded-lg font-medium text-[13px] transition-all relative">
-              <Clock className="size-4.5" /> Active Missions
-              <span className="ml-auto bg-primary/20 text-primary text-[10px] font-bold px-2 py-0.5 rounded-md">{activeTasks.length}</span>
+            <Button variant="ghost" className="justify-start gap-4 h-10 px-4 bg-secondary text-tier-1 rounded-lg font-medium text-[13px] transition-all relative border border-border/50">
+              <Clock className="size-4.5 text-primary" /> Active Missions
+              <span className="ml-auto bg-secondary text-tier-3 text-[10px] font-bold px-2 py-0.5 rounded-md border border-border">{activeTasks.length}</span>
               <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-primary rounded-full" />
             </Button>
-            <Button variant="ghost" className="justify-start gap-4 h-10 px-4 text-tier-2 hover:bg-white/[0.03] hover:text-tier-1 rounded-lg font-medium text-[13px] transition-all">
+            <Button variant="ghost" className="justify-start gap-4 h-10 px-4 text-tier-2 hover:bg-secondary/50 hover:text-tier-1 rounded-lg font-medium text-[13px] transition-all">
               <Layers className="size-4.5 text-tier-3" /> Upcoming
             </Button>
-            <Button variant="ghost" className="justify-start gap-4 h-10 px-4 text-rose-400 hover:bg-rose-500/10 rounded-lg font-medium text-[13px] transition-all">
+            <Button variant="ghost" className="justify-start gap-4 h-10 px-4 text-rose-400 hover:bg-rose-500/5 rounded-lg font-medium text-[13px] transition-all">
               <Flag className="size-4.5 text-rose-500/60" /> Overdue
               <span className="ml-auto bg-rose-500/10 text-rose-400 text-[10px] font-bold px-2 py-0.5 rounded-md">
                 {activeTasks.filter(t => t.status === 'Overdue').length}
@@ -234,8 +235,8 @@ export default function TasksPage() {
         </div>
 
         <div className="lg:col-span-3 flex flex-col gap-12">
-          <div className="premium-panel rounded-2xl border border-white/[0.06] overflow-hidden shadow-2xl">
-            <div className="px-8 py-5 border-b border-white/[0.04] bg-white/[0.01] flex items-center justify-between">
+          <div className="premium-panel rounded-2xl border-border overflow-hidden shadow-sm">
+            <div className="px-8 py-5 border-b border-border bg-secondary/20 flex items-center justify-between">
               <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4">Active Missions</span>
               <span className="text-[12px] font-medium text-tier-3">{activeTasks.length} pending execution</span>
             </div>
@@ -265,7 +266,7 @@ export default function TasksPage() {
               <h2 className="text-[11px] font-bold uppercase tracking-[0.25em] text-tier-4">Completed History</h2>
             </div>
             
-            <div className="premium-panel rounded-2xl border border-white/[0.06] overflow-hidden shadow-xl opacity-80 hover:opacity-100 transition-opacity">
+            <div className="premium-panel rounded-2xl border-border overflow-hidden shadow-sm opacity-80 hover:opacity-100 transition-opacity">
               <div className="flex flex-col">
                 {!isLoading && completedTasks.length > 0 ? (
                   completedTasks.map((task) => (
@@ -287,11 +288,11 @@ export default function TasksPage() {
 
 function TaskRow({ task, getStatusStyles, onToggle }: { task: any, getStatusStyles: (s: string) => string, onToggle: () => void }) {
   return (
-    <div className="px-8 py-6 flex items-start gap-6 hover:bg-white/[0.015] transition-all group border-b border-white/[0.03] last:border-0">
+    <div className="px-8 py-6 flex items-start gap-6 hover:bg-secondary/30 transition-all group border-b border-border/50 last:border-0">
       <Checkbox 
         checked={task.status === 'Completed'}
         onClick={onToggle}
-        className="mt-1 size-5 rounded-md border-white/10 data-[state=checked]:bg-primary data-[state=checked]:border-primary transition-all" 
+        className="mt-1 size-5 rounded-md border-border data-[state=checked]:bg-primary data-[state=checked]:border-primary transition-all" 
       />
       
       <div className="flex-1 flex flex-col gap-4">
@@ -300,7 +301,7 @@ function TaskRow({ task, getStatusStyles, onToggle }: { task: any, getStatusStyl
             <h4 className={cn(
               "font-semibold text-[15px] leading-tight tracking-tight transition-colors",
               task.status === "Overdue" ? "text-rose-400" : 
-              task.status === "Completed" ? "text-tier-3 line-through" : "text-tier-1 group-hover:text-primary"
+              task.status === "Completed" ? "text-tier-3 line-through" : "text-tier-1 group-hover:text-tier-1"
             )}>
               {task.title}
             </h4>
@@ -336,7 +337,7 @@ function TaskRow({ task, getStatusStyles, onToggle }: { task: any, getStatusStyl
         </div>
       </div>
 
-      <Button variant="ghost" size="icon" className="size-9 shrink-0 opacity-0 group-hover:opacity-100 transition-all text-tier-3 hover:text-tier-1 hover:bg-white/[0.05]">
+      <Button variant="ghost" size="icon" className="size-9 shrink-0 opacity-0 group-hover:opacity-100 transition-all text-tier-3 hover:text-tier-1 hover:bg-secondary">
         <MoreVertical className="size-5" />
       </Button>
     </div>

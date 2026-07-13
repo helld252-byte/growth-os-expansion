@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useMemo } from "react";
@@ -165,18 +166,18 @@ export default function CommandCenter() {
               <Link 
                 key={v.label} 
                 href={v.path} 
-                className="premium-panel px-5 py-4 rounded-xl flex items-center justify-between hover:border-primary/40 group transition-all"
+                className="premium-panel px-5 py-4 rounded-xl flex items-center justify-between hover:bg-secondary/30 hover:border-border group transition-all"
               >
                 <div className="flex items-center gap-4">
-                  <div className="size-8 rounded-lg bg-secondary border border-border flex items-center justify-center text-tier-3 group-hover:text-primary group-hover:bg-primary/5 transition-all">
+                  <div className="size-8 rounded-lg bg-secondary border border-border flex items-center justify-center text-tier-3 group-hover:text-tier-1 group-hover:bg-secondary/50 transition-all">
                     <v.icon className="size-4" />
                   </div>
                   <span className="text-[13px] font-medium text-tier-2 group-hover:text-tier-1 transition-colors">{v.label}</span>
                 </div>
                 <div className="flex items-center gap-4">
                   <span className="text-[14px] font-medium text-tier-1">{v.count}</span>
-                  <div className="size-6 rounded-full flex items-center justify-center bg-secondary border border-border group-hover:bg-primary/10 group-hover:border-primary/30 transition-all">
-                    <ChevronRight className="size-3.5 text-tier-4 group-hover:text-primary" />
+                  <div className="size-6 rounded-full flex items-center justify-center bg-secondary border border-border group-hover:bg-secondary group-hover:border-border transition-all">
+                    <ChevronRight className="size-3.5 text-tier-4 group-hover:text-tier-1" />
                   </div>
                 </div>
               </Link>
@@ -187,7 +188,7 @@ export default function CommandCenter() {
         {/* This Week Progress */}
         <div className="lg:col-span-4 flex flex-col gap-6">
           <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4 px-1">This Week Progress</h3>
-          <div className="premium-panel rounded-2xl flex flex-col h-full overflow-hidden">
+          <div className="premium-panel rounded-2xl flex flex-col h-full overflow-hidden border-border bg-card shadow-sm">
             <div className="grid grid-cols-2 divide-x divide-y divide-border border-b border-border">
               <MetricCell label="New Leads" value={data.momentum.newLeadsThisWeek} />
               <MetricCell label="Replies Received" value={data.momentum.repliesReceived} />
@@ -195,7 +196,7 @@ export default function CommandCenter() {
               <MetricCell label="Wins" value={data.momentum.wins} color="text-emerald-500" />
             </div>
 
-            <div className="p-6 flex flex-col gap-5 mt-auto bg-secondary/10">
+            <div className="p-6 flex flex-col gap-5 mt-auto bg-secondary/20 border-t border-border/50">
               <div className="flex flex-col gap-3">
                 <div className="flex items-center justify-between">
                   <span className="text-[9px] font-bold text-tier-4 uppercase tracking-[0.2em]">Velocity</span>
@@ -206,7 +207,7 @@ export default function CommandCenter() {
                 </div>
               </div>
               
-              <div className="flex items-center gap-3 px-4 py-2.5 bg-background border border-border rounded-xl group hover:border-primary/20 transition-all">
+              <div className="flex items-center gap-3 px-4 py-2.5 bg-background border border-border rounded-xl hover:bg-secondary/50 transition-all cursor-default">
                 <div className="size-1.5 rounded-full bg-primary animate-pulse" />
                 <span className="text-[11px] font-medium text-tier-3">Focus area this week: <span className="text-tier-1">Platform Onboarding</span></span>
               </div>
@@ -266,7 +267,7 @@ function StatModule({ label, value, highlight, color }: { label: string, value: 
 
 function MetricCell({ label, value, color }: { label: string, value: number, color?: string }) {
   return (
-    <div className="p-6 flex flex-col gap-1.5 hover:bg-secondary/20 transition-colors group">
+    <div className="p-6 flex flex-col gap-1.5 hover:bg-secondary/50 transition-colors group cursor-default">
       <span className="text-[9px] font-bold uppercase tracking-[0.15em] text-tier-4 group-hover:text-tier-3 transition-colors">{label}</span>
       <span className={cn("text-2xl font-bold tracking-tight", color || "text-tier-1")}>{value}</span>
     </div>
@@ -276,8 +277,8 @@ function MetricCell({ label, value, color }: { label: string, value: number, col
 function AttentionCard({ label, value, sub, urgent }: any) {
   return (
     <div className={cn(
-      "p-5 rounded-2xl border flex flex-col gap-1.5 transition-all shadow-lg",
-      urgent ? "bg-rose-500/[0.03] border-rose-500/20" : "bg-card border-border"
+      "p-5 rounded-2xl border flex flex-col gap-1.5 transition-all shadow-lg hover:bg-secondary/30",
+      urgent ? "bg-rose-500/[0.03] border-rose-500/20" : "bg-card border-border shadow-sm"
     )}>
       <span className={cn("text-[9px] font-bold uppercase tracking-widest mb-0.5", urgent ? "text-rose-500" : "text-tier-4")}>{label}</span>
       <span className="text-[14px] font-bold text-tier-2 truncate">{value}</span>
@@ -290,18 +291,18 @@ function ActivityRow({ item }: { item: any }) {
   const date = item.updatedAt?.toDate ? item.updatedAt.toDate() : new Date(item.updatedAt || item.createdAt || 0);
   
   return (
-    <div className="px-6 py-4 bg-background flex items-center justify-between hover:bg-secondary/30 transition-colors group border-b border-border last:border-0">
+    <div className="px-6 py-4 bg-background flex items-center justify-between hover:bg-secondary/50 transition-colors group border-b border-border last:border-0">
       <div className="flex items-center gap-5">
         <div className="size-2 rounded-full bg-primary/20 group-hover:bg-primary transition-all" />
         <div className="flex flex-col">
-          <span className="text-[14px] font-semibold text-tier-1 group-hover:text-primary transition-colors leading-none">{item.name}</span>
+          <span className="text-[14px] font-semibold text-tier-1 group-hover:text-tier-1 transition-colors leading-none">{item.name}</span>
           <span className="text-[11px] text-tier-4 font-medium uppercase tracking-tighter mt-1.5">
             Status updated to <span className="text-tier-3 font-bold">{item.currentStage || item.status}</span>
           </span>
         </div>
       </div>
       <div className="flex items-center gap-8">
-        <Badge variant="outline" className="h-5 px-2 text-[9px] uppercase tracking-widest font-bold border-border bg-secondary/50 text-tier-4 group-hover:border-primary/20 group-hover:text-tier-3 transition-all">
+        <Badge variant="outline" className="h-5 px-2 text-[9px] uppercase tracking-widest font-bold border-border bg-secondary/50 text-tier-4 group-hover:bg-secondary group-hover:border-border transition-all">
           Platform
         </Badge>
         <span className="text-[11px] font-bold text-tier-4 uppercase w-20 text-right">{date.toLocaleDateString([], { month: 'short', day: 'numeric' })}</span>
