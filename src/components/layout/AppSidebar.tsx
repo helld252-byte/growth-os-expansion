@@ -6,7 +6,6 @@ import { usePathname } from "next/navigation";
 import { 
   LayoutGrid, 
   Layers, 
-  BarChart3, 
   Library, 
   CheckSquare, 
   Settings,
@@ -32,7 +31,6 @@ const mainItems = [
 ];
 
 const adminMainItems = [
-  { icon: BarChart3, label: "Analytics", path: "/reports" },
   { icon: Library, label: "Resources", path: "/hub" },
 ];
 
