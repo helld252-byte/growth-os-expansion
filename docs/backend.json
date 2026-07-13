@@ -85,6 +85,7 @@
         "id": { "type": "string" },
         "name": { "type": "string" },
         "type": { "type": "string" },
+        "businessModel": { "type": "string", "enum": ["Wholesale", "B2B", "Dropshipping", "BTC", "B2B + Dropshipping", "Marketplace", "Partnership"] },
         "source": { "type": "string", "description": "Where the platform was discovered (RangeMe, Google, AI, etc.)" },
         "market": { "type": "string" },
         "website": { "type": "string", "format": "uri" },
@@ -137,7 +138,6 @@
       },
       "required": [
         "name",
-        "type",
         "ownerId",
         "currentStage"
       ]

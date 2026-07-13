@@ -16,7 +16,8 @@ import {
   SquareCheck,
   CheckCircle2,
   X,
-  Shield
+  Shield,
+  Target
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,8 +44,11 @@ import { collection, getFirestore, serverTimestamp } from "firebase/firestore";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
+import { DatePicker } from "@/components/ui/date-picker";
 
 type FilterStatus = 'all' | 'rangeme' | 'applied' | 'waiting' | 'approved' | 'rejected' | 'high-priority';
+
+const BUSINESS_MODELS = ["Wholesale", "B2B", "Dropshipping", "BTC", "B2B + Dropshipping", "Marketplace", "Partnership"];
 
 export default function PlatformsPage() {
   const { toast } = useToast();
@@ -59,12 +63,13 @@ export default function PlatformsPage() {
 
   const [newOp, setNewOp] = useState({
     name: "",
-    type: "Wholesale",
+    businessModel: "Wholesale",
     source: "Google",
     market: "Global",
     priority: "Medium",
     currentStage: "Not Started",
     nextStep: "Initial Outreach",
+    dueDate: "",
     notes: ""
   });
 
@@ -86,8 +91,12 @@ export default function PlatformsPage() {
       productsUploaded: false,
       salesStarted: false,
       blockers: "",
-      contactPerson: "N/A",
-      contactEmail: "N/A",
+      contactPerson: "",
+      contactRole: "",
+      contactEmail: "",
+      website: "",
+      portalUrl: "",
+      supportEmail: "",
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
       estimatedValue: 0,
@@ -99,12 +108,13 @@ export default function PlatformsPage() {
     setIsAddOpen(false);
     setNewOp({
       name: "",
-      type: "Wholesale",
+      businessModel: "Wholesale",
       source: "Google",
       market: "Global",
       priority: "Medium",
       currentStage: "Not Started",
       nextStep: "Initial Outreach",
+      dueDate: "",
       notes: ""
     });
     toast({
@@ -232,7 +242,7 @@ export default function PlatformsPage() {
                   <Plus className="size-4 mr-2" /> Add Platform
                 </Button>
               </DialogTrigger>
-              <DialogContent className="bg-background/95 backdrop-blur-2xl border-border rounded-2xl sm:max-w-[500px]">
+              <DialogContent className="bg-background/95 backdrop-blur-2xl border-border rounded-2xl sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle className="text-xl font-bold tracking-tight text-tier-1">New Strategic Platform</DialogTitle>
                 </DialogHeader>
@@ -248,16 +258,15 @@ export default function PlatformsPage() {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="grid gap-2">
-                      <Label className="text-[10px] uppercase tracking-widest text-tier-3">Type</Label>
-                      <Select value={newOp.type} onValueChange={(v) => setNewOp({...newOp, type: v})}>
+                      <Label className="text-[10px] uppercase tracking-widest text-tier-3">Business Model</Label>
+                      <Select value={newOp.businessModel} onValueChange={(v) => setNewOp({...newOp, businessModel: v})}>
                         <SelectTrigger className="bg-secondary/50 border-border h-12 rounded-xl text-tier-1">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent className="bg-popover/95 backdrop-blur-xl border-border">
-                          <SelectItem value="Wholesale">Wholesale</SelectItem>
-                          <SelectItem value="Dropshipping">Dropshipping</SelectItem>
-                          <SelectItem value="Marketplace">Marketplace</SelectItem>
-                          <SelectItem value="Partnership">Partnership</SelectItem>
+                          {BUSINESS_MODELS.map(m => (
+                            <SelectItem key={m} value={m}>{m}</SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                     </div>
@@ -278,21 +287,50 @@ export default function PlatformsPage() {
                       </Select>
                     </div>
                   </div>
-                  <div className="grid gap-2">
-                    <Label className="text-[10px] uppercase tracking-widest text-tier-3">Target Market</Label>
-                    <Input 
-                      value={newOp.market}
-                      onChange={(e) => setNewOp({...newOp, market: e.target.value})}
-                      placeholder="e.g. EU, US" 
-                      className="bg-secondary/50 border-border h-12 rounded-xl text-tier-1"
-                    />
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="grid gap-2">
+                      <Label className="text-[10px] uppercase tracking-widest text-tier-3">Target Market</Label>
+                      <Input 
+                        value={newOp.market}
+                        onChange={(e) => setNewOp({...newOp, market: e.target.value})}
+                        placeholder="e.g. EU, US" 
+                        className="bg-secondary/50 border-border h-12 rounded-xl text-tier-1"
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label className="text-[10px] uppercase tracking-widest text-tier-3">Priority</Label>
+                      <Select value={newOp.priority} onValueChange={(v) => setNewOp({...newOp, priority: v})}>
+                        <SelectTrigger className="bg-secondary/50 border-border h-12 rounded-xl text-tier-1">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="High">High</SelectItem>
+                          <SelectItem value="Medium">Medium</SelectItem>
+                          <SelectItem value="Low">Low</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="grid gap-2">
+                      <Label className="text-[10px] uppercase tracking-widest text-tier-3">Objective</Label>
+                      <Input 
+                        value={newOp.nextStep}
+                        onChange={(e) => setNewOp({...newOp, nextStep: e.target.value})}
+                        className="bg-secondary/50 border-border h-12 rounded-xl text-tier-1"
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label className="text-[10px] uppercase tracking-widest text-tier-3">Target Date</Label>
+                      <DatePicker value={newOp.dueDate} onChange={(v) => setNewOp({...newOp, dueDate: v})} />
+                    </div>
                   </div>
                   <div className="grid gap-2">
                     <Label className="text-[10px] uppercase tracking-widest text-tier-3">About / Description</Label>
                     <Textarea 
                       value={newOp.notes}
                       onChange={(e) => setNewOp({...newOp, notes: e.target.value})}
-                      placeholder="Enter strategic overview or internal info..." 
+                      placeholder="Enter strategic overview..." 
                       className="bg-secondary/50 border-border min-h-[100px] rounded-xl text-tier-1 p-4"
                     />
                   </div>
@@ -396,7 +434,7 @@ function PlatformListItem({ platform }: { platform: any }) {
             </h3>
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-medium uppercase tracking-[0.12em] text-tier-2 px-2.5 py-0.5 border border-border rounded-md bg-secondary/30">
-                {platform.type}
+                {platform.businessModel || platform.type}
               </span>
               {platform.source && (
                 <span className="text-[9px] font-bold uppercase tracking-widest text-primary px-2 py-0.5 border border-primary/20 rounded-md bg-primary/5">

@@ -21,11 +21,13 @@ import {
   FileText,
   Upload,
   Target,
-  Trash2
+  Trash2,
+  Briefcase,
+  User,
+  Phone
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -53,6 +55,8 @@ import { notFound, useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { DatePicker } from "@/components/ui/date-picker";
 
+const BUSINESS_MODELS = ["Wholesale", "B2B", "Dropshipping", "BTC", "B2B + Dropshipping", "Marketplace", "Partnership"];
+
 export default function PlatformDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const { toast } = useToast();
@@ -64,7 +68,6 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
   const [isNoteOpen, setIsNoteOpen] = useState(false);
   const [newNote, setNewNote] = useState("");
   
-  // Note Date/Time State
   const [noteDate, setNoteDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [noteTime, setNoteTime] = useState<string>(new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }));
 
@@ -125,21 +128,18 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
     setEditData({
       name: platform.name,
       currentStage: platform.currentStage,
+      businessModel: platform.businessModel || "Wholesale",
       priority: platform.priority,
       nextStep: platform.nextStep,
       dueDate: platform.dueDate || "",
-      requirements: platform.requirements || [],
       website: platform.website || "",
       portalUrl: platform.portalUrl || "",
       supportEmail: platform.supportEmail || "",
       contactPerson: platform.contactPerson || "",
       contactRole: platform.contactRole || "",
-      lastContactDate: platform.lastContactDate || "",
-      commStatus: platform.commStatus || "No outreach",
-      notes: platform.notes || "",
+      contactEmail: platform.contactEmail || "",
       source: platform.source || "Google",
-      rejectionReason: platform.rejectionReason || "",
-      rejectionLessons: platform.rejectionLessons || ""
+      notes: platform.notes || ""
     });
     setIsAddOpen(true);
   };
@@ -216,19 +216,17 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
                   {platform.currentStage}
                 </Badge>
                 <Badge variant="outline" className="px-3 py-0.5 text-[10px] font-medium uppercase tracking-wider rounded-lg border-accent/20 text-accent/80 bg-accent/5">
+                  {platform.businessModel || platform.type}
+                </Badge>
+                <Badge variant="outline" className="px-3 py-0.5 text-[10px] font-medium uppercase tracking-wider rounded-lg border-primary/20 text-primary bg-primary/5">
                   {platform.priority} Priority
                 </Badge>
-                {platform.source && (
-                  <Badge className="bg-primary/5 text-primary border-primary/10 text-[9px] uppercase tracking-widest font-bold px-2.5 py-0.5 rounded-lg">
-                    {platform.source} Source
-                  </Badge>
-                )}
               </div>
             </div>
             <div className="flex items-center gap-4 text-[13px] font-medium text-tier-3">
               <span className="flex items-center gap-1.5"><Globe className="size-4" /> {platform.market} Region</span>
               <span className="text-tier-4">•</span>
-              <span className="uppercase tracking-wider text-[11px] font-bold text-primary">{platform.type}</span>
+              <span className="uppercase tracking-wider text-[11px] font-bold text-primary">{platform.source || 'Direct'} Source</span>
             </div>
           </div>
         </div>
@@ -332,7 +330,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
             <div className="flex flex-col gap-5">
               <ContactField label="Official Website" value={platform.website} icon={Globe} link={platform.website} />
               <ContactField label="Supplier Portal" value={platform.portalUrl} icon={Link2} link={platform.portalUrl} />
-              <ContactField label="Discovery Source" value={platform.source || "Google"} icon={Target} />
+              <ContactField label="Support Email" value={platform.supportEmail} icon={Mail} link={`mailto:${platform.supportEmail}`} />
               <Separator className="bg-border" />
               {platform.contactPerson && (
                 <div className="flex flex-col gap-3 p-4 rounded-2xl bg-secondary/30 border border-border">
@@ -344,6 +342,11 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
                       <span className="text-[11px] text-tier-3">{platform.contactRole || 'Decision Maker'}</span>
                     </div>
                   </div>
+                  {platform.contactEmail && (
+                    <a href={`mailto:${platform.contactEmail}`} className="text-[11px] font-medium text-primary hover:underline flex items-center gap-2 mt-1">
+                      <Mail className="size-3" /> {platform.contactEmail}
+                    </a>
+                  )}
                 </div>
               )}
             </div>
@@ -360,7 +363,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
 
       {editData && (
         <Dialog open={isEditOpen} onOpenChange={setIsAddOpen}>
-          <DialogContent className="bg-background/95 backdrop-blur-2xl border-border rounded-2xl sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+          <DialogContent className="bg-background/95 backdrop-blur-2xl border-border rounded-2xl sm:max-w-[650px] max-h-[90vh] overflow-y-auto custom-scrollbar">
             <DialogHeader><DialogTitle className="text-xl font-bold tracking-tight text-tier-1">Mission Calibration</DialogTitle></DialogHeader>
             <div className="grid gap-6 py-4">
               <div className="grid grid-cols-2 gap-4">
@@ -368,9 +371,32 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
                 <div className="grid gap-2"><Label className="text-[10px] uppercase tracking-widest text-tier-3">Stage</Label><Select value={editData.currentStage} onValueChange={(v) => setEditData({...editData, currentStage: v})}><SelectTrigger className="bg-secondary/50 border-border h-11 rounded-xl"><SelectValue /></SelectTrigger><SelectContent>{['Not Started', 'Research', 'Applied', 'In Review', 'Approved', 'Rejected', 'Onboarding', 'Live'].map(s => (<SelectItem key={s} value={s}>{s}</SelectItem>))}</SelectContent></Select></div>
               </div>
               <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2"><Label className="text-[10px] uppercase tracking-widest text-tier-3">Business Model</Label><Select value={editData.businessModel} onValueChange={(v) => setEditData({...editData, businessModel: v})}><SelectTrigger className="bg-secondary/50 border-border h-11 rounded-xl"><SelectValue /></SelectTrigger><SelectContent>{BUSINESS_MODELS.map(m => (<SelectItem key={m} value={m}>{m}</SelectItem>))}</SelectContent></Select></div>
                 <div className="grid gap-2"><Label className="text-[10px] uppercase tracking-widest text-tier-3">Source</Label><Select value={editData.source} onValueChange={(v) => setEditData({...editData, source: v})}><SelectTrigger className="bg-secondary/50 border-border h-11 rounded-xl"><SelectValue /></SelectTrigger><SelectContent>{['RangeMe', 'Google', 'AI', 'LinkedIn', 'Referral', 'Other'].map(s => (<SelectItem key={s} value={s}>{s}</SelectItem>))}</SelectContent></Select></div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2"><Label className="text-[10px] uppercase tracking-widest text-tier-3">Tactical Objective</Label><Input value={editData.nextStep} onChange={(e) => setEditData({...editData, nextStep: e.target.value})} className="bg-secondary/50 border-border h-11 rounded-xl" /></div>
                 <div className="grid gap-2"><Label className="text-[10px] uppercase tracking-widest text-tier-3">Target Date</Label><DatePicker value={editData.dueDate} onChange={(v) => setEditData({...editData, dueDate: v})} /></div>
               </div>
+
+              <Separator className="my-2 bg-border/50" />
+              <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Operational Hub</h4>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2"><Label className="text-[10px] uppercase tracking-widest text-tier-3">Official Website</Label><Input value={editData.website} onChange={(e) => setEditData({...editData, website: e.target.value})} placeholder="https://..." className="bg-secondary/50 border-border h-11 rounded-xl" /></div>
+                <div className="grid gap-2"><Label className="text-[10px] uppercase tracking-widest text-tier-3">Supplier Portal</Label><Input value={editData.portalUrl} onChange={(e) => setEditData({...editData, portalUrl: e.target.value})} placeholder="https://..." className="bg-secondary/50 border-border h-11 rounded-xl" /></div>
+              </div>
+              <div className="grid gap-2"><Label className="text-[10px] uppercase tracking-widest text-tier-3">Support Email</Label><Input value={editData.supportEmail} onChange={(e) => setEditData({...editData, supportEmail: e.target.value})} placeholder="support@..." className="bg-secondary/50 border-border h-11 rounded-xl" /></div>
+
+              <Separator className="my-2 bg-border/50" />
+              <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Contact Intelligence</h4>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2"><Label className="text-[10px] uppercase tracking-widest text-tier-3">Contact Person</Label><Input value={editData.contactPerson} onChange={(e) => setEditData({...editData, contactPerson: e.target.value})} className="bg-secondary/50 border-border h-11 rounded-xl" /></div>
+                <div className="grid gap-2"><Label className="text-[10px] uppercase tracking-widest text-tier-3">Contact Role</Label><Input value={editData.contactRole} onChange={(e) => setEditData({...editData, contactRole: e.target.value})} className="bg-secondary/50 border-border h-11 rounded-xl" /></div>
+              </div>
+              <div className="grid gap-2"><Label className="text-[10px] uppercase tracking-widest text-tier-3">Contact Email</Label><Input value={editData.contactEmail} onChange={(e) => setEditData({...editData, contactEmail: e.target.value})} className="bg-secondary/50 border-border h-11 rounded-xl" /></div>
+
               <div className="grid gap-2"><Label className="text-[10px] uppercase tracking-widest text-tier-3">About / Description</Label><Textarea value={editData.notes} onChange={(e) => setEditData({...editData, notes: e.target.value})} className="bg-secondary/50 border-border min-h-[100px] rounded-xl" /></div>
             </div>
             <DialogFooter><Button onClick={handleUpdate} className="w-full bg-primary text-white h-12 rounded-xl font-bold uppercase tracking-widest">Synchronize Mission</Button></DialogFooter>
@@ -386,8 +412,8 @@ function ContactField({ label, value, icon: Icon, link }: { label: string, value
   return (
     <div className="flex items-center justify-between gap-4 group">
       <div className="flex items-center gap-2.5 text-tier-3"><Icon className="size-3.5" /><span className="text-[10px] font-bold uppercase tracking-widest">{label}</span></div>
-      {link ? (
-        <a href={link.startsWith('http') ? link : `https://${link}`} target="_blank" rel="noopener noreferrer" className="text-[12px] font-semibold text-primary hover:underline truncate max-w-[150px]">{value || 'Link'}</a>
+      {link && value ? (
+        <a href={link.startsWith('http') || link.startsWith('mailto') ? link : `https://${link}`} target={link.startsWith('mailto') ? undefined : "_blank"} rel={link.startsWith('mailto') ? undefined : "noopener noreferrer"} className="text-[12px] font-semibold text-primary hover:underline truncate max-w-[150px]">{value}</a>
       ) : (
         <span className="text-[12px] font-semibold text-tier-1">{value || 'N/A'}</span>
       )}

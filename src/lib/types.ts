@@ -10,11 +10,13 @@ export type PlatformStage =
   | 'Live';
 
 export type Priority = 'High' | 'Medium' | 'Low';
+export type BusinessModel = 'Wholesale' | 'B2B' | 'Dropshipping' | 'BTC' | 'B2B + Dropshipping' | 'Marketplace' | 'Partnership';
 
 export interface Platform {
   id: string;
   name: string;
   type: string;
+  businessModel: BusinessModel;
   source?: string;
   market: string;
   website?: string;
