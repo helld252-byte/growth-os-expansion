@@ -47,28 +47,7 @@ export default function CommandCenter() {
       { label: 'Live', count: opportunities.filter(o => o.currentStage === 'Live').length },
     ];
 
-    // 3. This Week Progress (Real Momentum)
-    const newLeadsThisWeek = opportunities.filter(o => {
-      const created = o.createdAt?.toDate ? o.createdAt.toDate() : new Date(o.createdAt || 0);
-      return created >= sevenDaysAgo;
-    }).length;
-
-    const movedStages = opportunities.filter(o => {
-      const updated = o.updatedAt?.toDate ? o.updatedAt.toDate() : new Date(o.updatedAt || 0);
-      return updated >= sevenDaysAgo && o.currentStage !== 'Not Started';
-    }).length;
-
-    const repliesReceived = opportunities.filter(o => {
-      const updated = o.updatedAt?.toDate ? o.updatedAt.toDate() : new Date(o.updatedAt || 0);
-      return updated >= sevenDaysAgo && ['In discussion', 'Approved', 'Rejected'].includes(o.commStatus || '');
-    }).length;
-
-    const wins = opportunities.filter(o => {
-      const updated = o.updatedAt?.toDate ? o.updatedAt.toDate() : new Date(o.updatedAt || 0);
-      return updated >= sevenDaysAgo && ['Approved', 'Live'].includes(o.currentStage);
-    }).length;
-    
-    // 4. Needs Attention (Bottlenecks)
+    // 3. Needs Attention (Bottlenecks)
     const urgentFollowUps = opportunities
       .filter(o => o.commStatus === 'Waiting reply' || o.priority === 'High')
       .sort((a, b) => {
@@ -76,21 +55,20 @@ export default function CommandCenter() {
         const dateB = b.updatedAt?.toDate ? b.updatedAt.toDate() : new Date(b.updatedAt || 0);
         return dateA.getTime() - dateB.getTime();
       })
-      .slice(0, 3);
+      .slice(0, 5);
 
-    // 5. Recent Updates
+    // 4. Recent Updates
     const recentActivity = opportunities
       .sort((a, b) => {
         const dateA = a.updatedAt?.toDate ? a.updatedAt.toDate() : new Date(a.updatedAt || a.createdAt || 0);
         const dateB = b.updatedAt?.toDate ? b.updatedAt.toDate() : new Date(b.updatedAt || b.createdAt || 0);
         return dateB.getTime() - dateA.getTime();
       })
-      .slice(0, 5);
+      .slice(0, 6);
 
     return { 
       kpis: { trackedOpps, inReview, livePartnerships, responseRate },
       stages,
-      momentum: { newLeadsThisWeek, movedStages, repliesReceived, wins },
       urgentFollowUps,
       recentActivity
     };
@@ -130,7 +108,7 @@ export default function CommandCenter() {
           <StatModule label="In Review" value={data.kpis.inReview} />
           <StatModule label="Live" value={data.kpis.livePartnerships} highlight />
           <StatModule label="Response Rate" value={`${data.kpis.responseRate}%`} />
-          <StatModule label="This Week %" value="+12.5%" color="text-emerald-500" />
+          <StatModule label="Mission Velocity" value="Stable" color="text-emerald-500" />
         </div>
       </header>
 
@@ -164,9 +142,9 @@ export default function CommandCenter() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
         
         {/* Needs Attention (Priority & Bottlenecks) */}
-        <div className="lg:col-span-5 flex flex-col gap-6">
+        <div className="lg:col-span-8 flex flex-col gap-6">
           <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4 px-1">Needs Attention</h3>
-          <div className="flex flex-col gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {data.urgentFollowUps.length > 0 ? (
               data.urgentFollowUps.map((opp) => (
                 <Link 
@@ -192,7 +170,7 @@ export default function CommandCenter() {
                 </Link>
               ))
             ) : (
-              <div className="h-40 border border-dashed border-border rounded-xl flex flex-col items-center justify-center gap-3 opacity-30">
+              <div className="col-span-full h-40 border border-dashed border-border rounded-xl flex flex-col items-center justify-center gap-3 opacity-30">
                 <Zap className="size-6 text-tier-4" />
                 <span className="text-[10px] font-bold uppercase tracking-widest">No urgent bottlenecks</span>
               </div>
@@ -200,38 +178,8 @@ export default function CommandCenter() {
           </div>
         </div>
 
-        {/* This Week Progress (Velocity Analytics) */}
-        <div className="lg:col-span-4 flex flex-col gap-6">
-          <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4 px-1">This Week Progress</h3>
-          <div className="premium-panel rounded-2xl flex flex-col h-full overflow-hidden border-border bg-card shadow-sm">
-            <div className="grid grid-cols-2 divide-x divide-y divide-border border-b border-border">
-              <MetricCell label="New Leads" value={data.momentum.newLeadsThisWeek} />
-              <MetricCell label="Replies Received" value={data.momentum.repliesReceived} />
-              <MetricCell label="Moved Forward" value={data.momentum.movedStages} />
-              <MetricCell label="Wins" value={data.momentum.wins} color="text-emerald-500" />
-            </div>
-
-            <div className="p-6 flex flex-col gap-5 mt-auto bg-secondary/20 border-t border-border/50">
-              <div className="flex flex-col gap-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-[9px] font-bold text-tier-4 uppercase tracking-[0.2em]">Operational Velocity</span>
-                  <span className="text-[11px] font-bold text-emerald-500">Live Metric</span>
-                </div>
-                <div className="h-1 w-full bg-secondary rounded-full overflow-hidden">
-                  <div className="h-full bg-emerald-500/40 w-[65%] rounded-full shadow-[0_0_8px_rgba(16,185,129,0.2)]" />
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-3 px-4 py-2.5 bg-background border border-border rounded-xl transition-all cursor-default">
-                <div className="size-1.5 rounded-full bg-primary animate-pulse" />
-                <span className="text-[11px] font-medium text-tier-3">Focus area: <span className="text-tier-1">Direct Outreach</span></span>
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* Recent Activity Mini-Feed */}
-        <div className="lg:col-span-3 flex flex-col gap-6">
+        <div className="lg:col-span-4 flex flex-col gap-6">
           <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4 px-1">Recent Updates</h3>
           <div className="flex flex-col gap-3">
             {data.recentActivity.map((item) => (
@@ -239,7 +187,11 @@ export default function CommandCenter() {
                 <div className="size-1.5 rounded-full bg-primary mt-1.5 shrink-0" />
                 <div className="flex flex-col gap-1 overflow-hidden">
                   <span className="text-[12px] font-semibold text-tier-1 truncate">{item.name}</span>
-                  <span className="text-[10px] text-tier-4 font-bold uppercase tracking-widest">{item.currentStage}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-tier-4 font-bold uppercase tracking-widest">{item.currentStage}</span>
+                    <span className="text-[10px] text-tier-4">•</span>
+                    <span className="text-[10px] text-tier-4 font-medium italic">Synchronized</span>
+                  </div>
                 </div>
               </div>
             ))}
@@ -265,15 +217,6 @@ function StatModule({ label, value, highlight, color }: { label: string, value: 
         {value}
       </span>
       <span className="text-[8px] font-bold uppercase tracking-[0.2em] text-tier-4 whitespace-nowrap">{label}</span>
-    </div>
-  );
-}
-
-function MetricCell({ label, value, color }: { label: string, value: number, color?: string }) {
-  return (
-    <div className="p-6 flex flex-col gap-1.5 hover:bg-secondary/50 transition-colors group cursor-default">
-      <span className="text-[9px] font-bold uppercase tracking-[0.15em] text-tier-4 transition-colors">{label}</span>
-      <span className={cn("text-2xl font-bold tracking-tight", color || "text-tier-1")}>{value}</span>
     </div>
   );
 }
