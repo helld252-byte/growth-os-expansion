@@ -95,6 +95,16 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
     return [...journalItems, ...completedTasks].sort((a, b) => b.date.getTime() - a.date.getTime());
   }, [platform, platformTasks]);
 
+  const daysUntil = useMemo(() => {
+    if (!platform?.dueDate) return null;
+    const target = new Date(platform.dueDate);
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    const diffTime = target.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  }, [platform?.dueDate]);
+
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center h-[60vh] gap-4">
@@ -278,10 +288,20 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
                   {platform.nextStep || "Initializing growth protocols."}
                 </h2>
                 <div className="flex flex-col items-start md:items-end gap-1.5 shrink-0">
-                  <span className="text-[10px] font-semibold uppercase tracking-widest text-tier-4">Target Date</span>
-                  <div className="flex items-center gap-2 text-accent font-semibold">
-                    <Calendar className="size-4" />
-                    <span>{platform.dueDate || 'Open Timeline'}</span>
+                  <div className="flex flex-col items-end">
+                    <span className="text-[10px] font-semibold uppercase tracking-widest text-tier-4">Target Date</span>
+                    <div className="flex items-center gap-2 text-tier-1 font-semibold">
+                      <Calendar className="size-4 text-primary" />
+                      <span>{platform.dueDate || 'Open Timeline'}</span>
+                    </div>
+                    {daysUntil !== null && (
+                      <span className={cn(
+                        "text-[11px] font-bold mt-1 uppercase tracking-wider",
+                        daysUntil < 0 ? "text-rose-500" : daysUntil <= 7 ? "text-amber-500" : "text-emerald-500"
+                      )}>
+                        {daysUntil < 0 ? `${Math.abs(daysUntil)} Days Overdue` : daysUntil === 0 ? "Due Today" : `${daysUntil} Days Remaining`}
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>
@@ -291,8 +311,8 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
           <section className="flex flex-col gap-8">
             <div className="flex items-center justify-between px-2">
               <div className="flex flex-col gap-1">
-                <h3 className="text-[11px] font-bold uppercase tracking-[0.25em] text-tier-4">Onboarding History</h3>
-                <span className="text-[13px] text-tier-3 font-medium">Tactical log and verified steps</span>
+                <h3 className="text-[11px] font-bold uppercase tracking-[0.25em] text-tier-4">Activity Timeline</h3>
+                <span className="text-[13px] text-tier-3 font-medium">Historical updates and verified progress logs.</span>
               </div>
               <Dialog open={isNoteOpen} onOpenChange={setIsNoteOpen}>
                 <DialogTrigger asChild>
@@ -730,13 +750,15 @@ function ContactField({ label, value, icon: Icon, link }: { label: string, value
 function TimelineEntry({ date, user, content, type }: { date: string, user: string, content: string, type: 'note' | 'task' }) {
   return (
     <div className="flex flex-col gap-2 pl-8 relative">
-      <div className="absolute left-0 top-1.5 size-[23px] rounded-full bg-background border-2 border-slate-200 dark:border-white/[0.08] flex items-center justify-center shadow-sm">
+      <div className="absolute left-0 top-1.5 size-[23px] rounded-full bg-background border border-border flex items-center justify-center shadow-sm">
         {type === 'task' ? (
-          <div className="size-full rounded-full bg-emerald-500/20 flex items-center justify-center">
-            <CheckCircle2 className="size-3 text-emerald-500" />
+          <div className="size-full rounded-full bg-emerald-500/10 flex items-center justify-center">
+            <CheckCircle2 className="size-3.5 text-emerald-500" />
           </div>
         ) : (
-          <div className="size-1.5 rounded-full bg-primary" />
+          <div className="size-[9px] rounded-full bg-primary/20 flex items-center justify-center">
+            <div className="size-1.5 rounded-full bg-primary shadow-[0_0_8px_hsl(var(--primary)/0.5)]" />
+          </div>
         )}
       </div>
       <div className="flex items-center gap-3">
