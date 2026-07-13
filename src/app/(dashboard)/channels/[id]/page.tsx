@@ -20,7 +20,8 @@ import {
   Link2,
   FileText,
   Upload,
-  Target
+  Target,
+  Trash2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -44,11 +45,11 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
-import { useDoc, useMemoFirebase, useUser, updateDocumentNonBlocking, useCollection } from "@/firebase";
+import { useDoc, useMemoFirebase, useUser, updateDocumentNonBlocking, useCollection, deleteDocumentNonBlocking } from "@/firebase";
 import { doc, getFirestore, serverTimestamp, collection, query, where } from "firebase/firestore";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { DatePicker } from "@/components/ui/date-picker";
 
@@ -56,6 +57,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
   const { id } = use(params);
   const { toast } = useToast();
   const { user } = useUser();
+  const router = useRouter();
   const firestore = getFirestore();
 
   const [isEditOpen, setIsAddOpen] = useState(false);
@@ -75,7 +77,6 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
   const { data: platformTasks } = useCollection(tasksQuery);
 
   const [editData, setEditData] = useState<any>(null);
-  const [reqInput, setReqInput] = useState("");
 
   const historyItems = useMemo(() => {
     if (!platform) return [];
@@ -156,6 +157,18 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
     });
   };
 
+  const handleDelete = () => {
+    if (window.confirm("Are you sure you want to decommission this platform? This action is permanent.")) {
+      deleteDocumentNonBlocking(docRef);
+      router.push('/channels');
+      toast({
+        variant: "destructive",
+        title: "Mission Decommissioned",
+        description: "Platform has been removed from the registry.",
+      });
+    }
+  };
+
   const handleAddNote = () => {
     if (!docRef || !newNote || !user) return;
     const firstName = user.displayName?.split(' ')[0] || "Mikhail";
@@ -176,17 +189,6 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
     setNoteTime(new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }));
     setIsNoteOpen(false);
     toast({ title: "Field Note Recorded" });
-  };
-
-  const handleToggleRequirement = (req: string) => {
-    if (!docRef) return;
-    const currentCompleted = platform.completedRequirements || [];
-    const isCompleted = currentCompleted.includes(req);
-    const newCompleted = isCompleted 
-      ? currentCompleted.filter((r: string) => r !== req)
-      : [...currentCompleted, req];
-    
-    updateDocumentNonBlocking(docRef, { completedRequirements: newCompleted });
   };
 
   const getStageStyles = (stage: string) => {
@@ -233,6 +235,9 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
         <div className="flex items-center gap-3">
           <Button variant="ghost" onClick={handleOpenEdit} className="h-10 px-4 rounded-xl border border-border text-tier-2 hover:bg-secondary/50 hover:text-tier-1 text-[12px] font-semibold uppercase tracking-wider">
             <Edit3 className="size-4 mr-2" /> Recalibrate
+          </Button>
+          <Button variant="ghost" onClick={handleDelete} className="h-10 px-4 rounded-xl border border-rose-500/20 text-rose-500 hover:bg-rose-500/5 text-[12px] font-semibold uppercase tracking-wider">
+            <Trash2 className="size-4 mr-2" /> Decommission
           </Button>
           {platform.website && (
             <Button asChild className="h-10 px-6 rounded-xl bg-primary hover:bg-primary/90 text-white text-[12px] font-semibold uppercase tracking-wider shadow-lg shadow-primary/20">
@@ -343,6 +348,13 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
               )}
             </div>
           </div>
+
+          <section className="flex flex-col gap-4 px-1">
+            <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4">About Platform</h3>
+            <p className="text-[14px] text-tier-2 leading-relaxed font-medium">
+              {platform.notes || "No detailed profile recorded for this opportunity."}
+            </p>
+          </section>
         </div>
       </div>
 
@@ -359,7 +371,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
                 <div className="grid gap-2"><Label className="text-[10px] uppercase tracking-widest text-tier-3">Source</Label><Select value={editData.source} onValueChange={(v) => setEditData({...editData, source: v})}><SelectTrigger className="bg-secondary/50 border-border h-11 rounded-xl"><SelectValue /></SelectTrigger><SelectContent>{['RangeMe', 'Google', 'AI', 'LinkedIn', 'Referral', 'Other'].map(s => (<SelectItem key={s} value={s}>{s}</SelectItem>))}</SelectContent></Select></div>
                 <div className="grid gap-2"><Label className="text-[10px] uppercase tracking-widest text-tier-3">Target Date</Label><DatePicker value={editData.dueDate} onChange={(v) => setEditData({...editData, dueDate: v})} /></div>
               </div>
-              <div className="grid gap-2"><Label className="text-[10px] uppercase tracking-widest text-tier-3">About</Label><Textarea value={editData.notes} onChange={(e) => setEditData({...editData, notes: e.target.value})} className="bg-secondary/50 border-border min-h-[100px] rounded-xl" /></div>
+              <div className="grid gap-2"><Label className="text-[10px] uppercase tracking-widest text-tier-3">About / Description</Label><Textarea value={editData.notes} onChange={(e) => setEditData({...editData, notes: e.target.value})} className="bg-secondary/50 border-border min-h-[100px] rounded-xl" /></div>
             </div>
             <DialogFooter><Button onClick={handleUpdate} className="w-full bg-primary text-white h-12 rounded-xl font-bold uppercase tracking-widest">Synchronize Mission</Button></DialogFooter>
           </DialogContent>

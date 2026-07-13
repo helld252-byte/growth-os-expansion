@@ -37,6 +37,7 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { useCollection, useMemoFirebase, useUser, addDocumentNonBlocking } from "@/firebase";
 import { collection, getFirestore, serverTimestamp } from "firebase/firestore";
 import { cn } from "@/lib/utils";
@@ -63,7 +64,8 @@ export default function PlatformsPage() {
     market: "Global",
     priority: "Medium",
     currentStage: "Not Started",
-    nextStep: "Initial Outreach"
+    nextStep: "Initial Outreach",
+    notes: ""
   });
 
   const handleAddPlatform = () => {
@@ -102,7 +104,8 @@ export default function PlatformsPage() {
       market: "Global",
       priority: "Medium",
       currentStage: "Not Started",
-      nextStep: "Initial Outreach"
+      nextStep: "Initial Outreach",
+      notes: ""
     });
     toast({
       title: "Opportunity Initialized",
@@ -282,6 +285,15 @@ export default function PlatformsPage() {
                       onChange={(e) => setNewOp({...newOp, market: e.target.value})}
                       placeholder="e.g. EU, US" 
                       className="bg-secondary/50 border-border h-12 rounded-xl text-tier-1"
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label className="text-[10px] uppercase tracking-widest text-tier-3">About / Description</Label>
+                    <Textarea 
+                      value={newOp.notes}
+                      onChange={(e) => setNewOp({...newOp, notes: e.target.value})}
+                      placeholder="Enter strategic overview or internal info..." 
+                      className="bg-secondary/50 border-border min-h-[100px] rounded-xl text-tier-1 p-4"
                     />
                   </div>
                 </div>
