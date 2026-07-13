@@ -382,6 +382,16 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
               {ROADMAP_STAGES.map((stage, idx) => {
                 const isCurrent = platform.currentStage === stage;
                 const isCompleted = ROADMAP_STAGES.indexOf(platform.currentStage) > ROADMAP_STAGES.indexOf(stage);
+                
+                let dateLabel = null;
+                if (isCurrent && platform.lastUpdate) {
+                  const date = platform.lastUpdate.toDate ? platform.lastUpdate.toDate() : new Date(platform.lastUpdate);
+                  dateLabel = date.toLocaleDateString();
+                } else if (stage === 'Research' && platform.dateStarted) {
+                  dateLabel = new Date(platform.dateStarted).toLocaleDateString();
+                } else if (isCompleted) {
+                  dateLabel = "Phase Verified";
+                }
 
                 return (
                   <div key={stage} className="flex items-center gap-4 group">
@@ -408,9 +418,9 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
                       )}>
                         {stage}
                       </span>
-                      {isCurrent && (
-                        <span className="text-[10px] font-bold text-tier-4 uppercase tracking-widest mt-0.5">
-                          Active Phase
+                      {dateLabel && (
+                        <span className="text-[9px] font-bold text-tier-4 uppercase tracking-[0.1em] mt-0.5">
+                          {dateLabel}
                         </span>
                       )}
                     </div>
