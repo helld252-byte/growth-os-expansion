@@ -19,7 +19,8 @@ import {
   Frown,
   CheckCircle2,
   Circle,
-  Link2
+  Link2,
+  User
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -257,7 +258,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
           {platform.website && (
             <Button asChild className="h-10 px-6 rounded-xl bg-primary hover:bg-primary/90 text-white text-[12px] font-semibold uppercase tracking-wider shadow-lg shadow-primary/20">
               <a href={platform.website.startsWith('http') ? platform.website : `https://${platform.website}`} target="_blank" rel="noopener noreferrer">
-                <ExternalLink className="size-4 mr-2" /> Visit Site
+                <Globe className="size-4 mr-2" /> Visit Site
               </a>
             </Button>
           )}
@@ -371,7 +372,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
 
         <div className="lg:col-span-4 flex flex-col gap-8">
           
-          {/* Status Overview Card */}
+          {/* Mission Roadmap Card */}
           <section className="premium-panel p-6 rounded-2xl flex flex-col gap-6 bg-white shadow-sm border-border">
             <div className="flex items-center justify-between">
               <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4">Mission Roadmap</h3>
@@ -419,42 +420,52 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
             </div>
           </section>
 
-          <div className="flex flex-col gap-6 px-1">
+          {/* Unified Contact Hub Card */}
+          <section className="premium-panel p-6 rounded-2xl flex flex-col gap-6 bg-white shadow-sm border-border">
             <div className="flex items-center justify-between">
-              <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4">Contact Hub</h3>
+              <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4">Contact Intelligence</h3>
               <Building2 className="size-4 text-tier-3" />
             </div>
+            
             <div className="flex flex-col gap-5">
-              <ContactField label="Official Website" value={platform.website} icon={Globe} link={platform.website} />
-              <ContactField label="Supplier Portal" value={platform.portalUrl} icon={Link2} link={platform.portalUrl} />
-              <ContactField label="Support Email" value={platform.supportEmail} icon={Mail} link={`mailto:${platform.supportEmail}`} />
-              <Separator className="bg-border" />
+              {/* Operational Channels */}
+              <div className="flex flex-col gap-4">
+                <ContactField label="Supplier Portal" value={platform.portalUrl} icon={Link2} link={platform.portalUrl} />
+                <ContactField label="Support Email" value={platform.supportEmail} icon={Mail} link={`mailto:${platform.supportEmail}`} />
+              </div>
+
               {platform.contactPerson && (
-                <div className="flex flex-col gap-3 p-4 rounded-2xl bg-secondary/30 border border-border">
-                  <span className="text-[9px] font-bold uppercase tracking-widest text-tier-4">Primary Contact</span>
-                  <div className="flex items-center gap-3">
-                    <div className="size-9 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-bold text-xs">{platform.contactPerson.charAt(0)}</div>
-                    <div className="flex flex-col">
-                      <span className="text-[13px] font-semibold text-tier-1">{platform.contactPerson}</span>
-                      <span className="text-[11px] text-tier-3">{platform.contactRole || 'Decision Maker'}</span>
+                <>
+                  <Separator className="bg-border" />
+                  <div className="flex flex-col gap-4">
+                    <span className="text-[9px] font-bold uppercase tracking-widest text-tier-4">Primary Contact</span>
+                    <div className="flex items-start gap-3">
+                      <div className="size-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-bold text-sm shrink-0">
+                        {platform.contactPerson.charAt(0)}
+                      </div>
+                      <div className="flex flex-col min-w-0">
+                        <span className="text-[13px] font-bold text-tier-1 truncate">{platform.contactPerson}</span>
+                        <span className="text-[11px] font-medium text-tier-3 truncate">{platform.contactRole || 'Decision Maker'}</span>
+                        {platform.contactEmail && (
+                          <a href={`mailto:${platform.contactEmail}`} className="text-[11px] font-medium text-primary hover:underline flex items-center gap-1.5 mt-1.5 transition-all">
+                            <Mail className="size-3" /> {platform.contactEmail}
+                          </a>
+                        )}
+                      </div>
                     </div>
                   </div>
-                  {platform.contactEmail && (
-                    <a href={`mailto:${platform.contactEmail}`} className="text-[11px] font-medium text-primary hover:underline flex items-center gap-2 mt-1">
-                      <Mail className="size-3" /> {platform.contactEmail}
-                    </a>
-                  )}
-                </div>
+                </>
               )}
             </div>
-          </div>
+          </section>
 
-          <section className="premium-panel p-6 rounded-2xl flex flex-col gap-6 bg-white/[0.01] border-white/[0.05]">
+          {/* About Platform Card */}
+          <section className="premium-panel p-6 rounded-2xl flex flex-col gap-6 bg-white shadow-sm border-border">
             <div className="flex items-center gap-3">
               <div className="size-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
                 <BookOpen className="size-4" />
               </div>
-              <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4">About Platform</h3>
+              <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4">Strategic Profile</h3>
             </div>
             <div className="flex flex-col gap-4">
               <p className="text-[14px] text-tier-2 leading-relaxed font-medium text-justify">
@@ -567,11 +578,14 @@ function ContactField({ label, value, icon: Icon, link }: { label: string, value
   if (!value && !link) return null;
   return (
     <div className="flex items-center justify-between gap-4 group">
-      <div className="flex items-center gap-2.5 text-tier-3"><Icon className="size-3.5" /><span className="text-[10px] font-bold uppercase tracking-widest">{label}</span></div>
+      <div className="flex items-center gap-2.5 text-tier-3 min-w-0">
+        <Icon className="size-3.5 shrink-0" />
+        <span className="text-[10px] font-bold uppercase tracking-widest truncate">{label}</span>
+      </div>
       {link && value ? (
-        <a href={link.startsWith('http') || link.startsWith('mailto') ? link : `https://${link}`} target={link.startsWith('mailto') ? undefined : "_blank"} rel={link.startsWith('mailto') ? undefined : "noopener noreferrer"} className="text-[12px] font-semibold text-primary hover:underline truncate max-w-[150px]">{value}</a>
+        <a href={link.startsWith('http') || link.startsWith('mailto') ? link : `https://${link}`} target={link.startsWith('mailto') ? undefined : "_blank"} rel={link.startsWith('mailto') ? undefined : "noopener noreferrer"} className="text-[12px] font-semibold text-primary hover:underline truncate max-w-[150px] transition-all">{value}</a>
       ) : (
-        <span className="text-[12px] font-semibold text-tier-1">{value || 'N/A'}</span>
+        <span className="text-[12px] font-semibold text-tier-1 truncate max-w-[150px]">{value || 'N/A'}</span>
       )}
     </div>
   );
