@@ -204,7 +204,7 @@ export default function PlatformsPage() {
                 <Plus className="size-4 mr-2" /> Add Platform
               </Button>
             </DialogTrigger>
-            <DialogContent className="bg-background/95 backdrop-blur-2xl border-white/[0.1] rounded-2xl sm:max-w-[500px]">
+            <DialogContent className="bg-background/95 backdrop-blur-2xl border-border rounded-2xl sm:max-w-[500px]">
               <DialogHeader>
                 <DialogTitle className="text-xl font-bold tracking-tight text-tier-1">New Strategic Platform</DialogTitle>
               </DialogHeader>
@@ -215,17 +215,17 @@ export default function PlatformsPage() {
                     value={newOp.name}
                     onChange={(e) => setNewOp({...newOp, name: e.target.value})}
                     placeholder="e.g. Amazon Europe" 
-                    className="bg-white/[0.03] border-white/[0.08] h-12 rounded-xl text-tier-1"
+                    className="bg-secondary/50 border-border h-12 rounded-xl text-tier-1"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
                     <Label className="text-[10px] uppercase tracking-widest text-tier-3">Type</Label>
                     <Select value={newOp.type} onValueChange={(v) => setNewOp({...newOp, type: v})}>
-                      <SelectTrigger className="bg-white/[0.03] border-white/[0.08] h-12 rounded-xl text-tier-1">
+                      <SelectTrigger className="bg-secondary/50 border-border h-12 rounded-xl text-tier-1">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent className="bg-popover/95 backdrop-blur-xl border-white/[0.1]">
+                      <SelectContent className="bg-popover/95 backdrop-blur-xl border-border">
                         <SelectItem value="Wholesale">Wholesale</SelectItem>
                         <SelectItem value="Dropshipping">Dropshipping</SelectItem>
                         <SelectItem value="Marketplace">Marketplace</SelectItem>
@@ -240,7 +240,7 @@ export default function PlatformsPage() {
                       value={newOp.market}
                       onChange={(e) => setNewOp({...newOp, market: e.target.value})}
                       placeholder="e.g. EU, US" 
-                      className="bg-white/[0.03] border-white/[0.08] h-12 rounded-xl text-tier-1"
+                      className="bg-secondary/50 border-border h-12 rounded-xl text-tier-1"
                     />
                   </div>
                 </div>
@@ -276,7 +276,7 @@ export default function PlatformsPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search opportunities..." 
-                className="pl-11 h-11 bg-white/[0.02] border-white/[0.05] rounded-xl font-medium text-[13px] focus-visible:ring-primary/20 placeholder:text-tier-3 transition-all text-tier-1" 
+                className="pl-11 h-11 bg-white/[0.02] border-border rounded-xl font-medium text-[13px] focus-visible:ring-primary/20 placeholder:text-tier-3 transition-all text-tier-1" 
               />
             </div>
           </div>
@@ -289,7 +289,7 @@ export default function PlatformsPage() {
               <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-3">Syncing Cloud Database</span>
             </div>
           ) : filteredPlatforms.length === 0 ? (
-            <div className="h-72 border border-dashed border-white/5 rounded-2xl flex flex-col items-center justify-center gap-4 opacity-30">
+            <div className="h-72 border border-dashed border-border rounded-2xl flex flex-col items-center justify-center gap-4 opacity-30">
               <LayoutGrid className="size-12 text-tier-3" />
               <span className="text-[11px] font-medium uppercase tracking-[0.25em] text-tier-3">No matching opportunities found</span>
             </div>
@@ -319,7 +319,7 @@ function FilterButton({ icon: Icon, label, count, active, onClick }: any) {
       )}
     >
       <Icon className={cn("size-4.5", active ? "text-primary" : "text-tier-3 group-hover:text-tier-2")} />
-      <span className={cn("text-[14px] tracking-tight font-light", active ? "text-primary" : "")}>{label}</span>
+      <span className={cn("text-[13px] tracking-tight font-medium", active ? "text-primary" : "")}>{label}</span>
       <span className={cn(
         "ml-auto text-[11px] font-bold tabular-nums",
         active ? "text-primary" : "text-tier-4"
@@ -358,7 +358,7 @@ function PlatformListItem({ platform }: { platform: any }) {
   return (
     <div className="premium-panel p-6 rounded-2xl flex items-center justify-between group hover:border-primary/30 cursor-pointer transition-all active:scale-[0.995]">
       <div className="flex items-center gap-7">
-        <div className="size-12 rounded-xl bg-white/[0.02] border border-white/[0.05] flex items-center justify-center text-tier-3 group-hover:text-primary group-hover:bg-primary/5 transition-all">
+        <div className="size-12 rounded-xl bg-white/[0.02] border border-border flex items-center justify-center text-tier-3 group-hover:text-primary group-hover:bg-primary/5 transition-all">
           <Globe className="size-6" />
         </div>
         
@@ -367,7 +367,7 @@ function PlatformListItem({ platform }: { platform: any }) {
             <h3 className="text-base font-semibold tracking-tight text-tier-1 group-hover:text-primary transition-colors">
               {platform.name}
             </h3>
-            <span className="text-[10px] font-medium uppercase tracking-[0.12em] text-tier-2 px-2.5 py-0.5 border border-white/[0.1] rounded-md bg-white/[0.05]">
+            <span className="text-[10px] font-medium uppercase tracking-[0.12em] text-tier-2 px-2.5 py-0.5 border border-border rounded-md bg-white/[0.05]">
               {platform.type}
             </span>
           </div>
@@ -399,11 +399,10 @@ function PlatformListItem({ platform }: { platform: any }) {
           </span>
         </div>
         
-        <div className="size-10 rounded-full flex items-center justify-center bg-white/[0.015] border border-white/[0.05] group-hover:border-primary/50 group-hover:bg-primary/10 transition-all">
+        <div className="size-10 rounded-full flex items-center justify-center bg-white/[0.015] border border-border group-hover:border-primary/50 group-hover:bg-primary/10 transition-all">
           <ChevronRight className="size-5 text-tier-3 group-hover:text-tier-1" />
         </div>
       </div>
     </div>
   );
 }
-
