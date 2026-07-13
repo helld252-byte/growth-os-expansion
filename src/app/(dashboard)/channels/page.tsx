@@ -314,12 +314,12 @@ function FilterButton({ icon: Icon, label, count, active, onClick }: any) {
       className={cn(
         "h-11 justify-start gap-4 px-4 rounded-xl transition-all relative group",
         active 
-          ? "bg-primary/10 text-primary font-semibold shadow-[inset_0_0_0_1px_rgba(var(--primary),0.1)]" 
+          ? "bg-primary/10 text-primary shadow-[inset_0_0_0_1px_rgba(var(--primary),0.1)]" 
           : "text-tier-3 hover:bg-white/[0.03] hover:text-tier-1"
       )}
     >
       <Icon className={cn("size-4.5", active ? "text-primary" : "text-tier-3 group-hover:text-tier-2")} />
-      <span className={cn("text-[14px] tracking-tight", active ? "text-primary" : "")}>{label}</span>
+      <span className={cn("text-[14px] tracking-tight font-light", active ? "text-primary" : "")}>{label}</span>
       <span className={cn(
         "ml-auto text-[11px] font-bold tabular-nums",
         active ? "text-primary" : "text-tier-4"
@@ -406,3 +406,4 @@ function PlatformListItem({ platform }: { platform: any }) {
     </div>
   );
 }
+
