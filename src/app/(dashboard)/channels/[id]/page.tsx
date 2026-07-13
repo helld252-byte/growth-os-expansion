@@ -1,4 +1,3 @@
-
 "use client";
 
 import { use, useState, useMemo } from "react";
@@ -12,24 +11,15 @@ import {
   Zap,
   Loader2,
   Mail,
-  ShieldCheck,
   Building2,
-  MessageSquare,
-  AlertCircle,
-  Lightbulb,
-  Link2,
-  FileText,
-  Upload,
+  Briefcase,
   Target,
   Trash2,
-  Briefcase,
-  User,
-  Phone,
   BookOpen,
   Frown,
-  TrendingUp,
   CheckCircle2,
-  Circle
+  Circle,
+  Link2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -391,7 +381,6 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
               {ROADMAP_STAGES.map((stage, idx) => {
                 const isCurrent = platform.currentStage === stage;
                 const isCompleted = ROADMAP_STAGES.indexOf(platform.currentStage) > ROADMAP_STAGES.indexOf(stage);
-                const isRejected = platform.currentStage === 'Rejected';
 
                 return (
                   <div key={stage} className="flex items-center gap-4 group">
@@ -460,7 +449,6 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
             </div>
           </div>
 
-          {/* Improved About Platform Section - Now moved below contacts */}
           <section className="premium-panel p-6 rounded-2xl flex flex-col gap-6 bg-white/[0.01] border-white/[0.05]">
             <div className="flex items-center gap-3">
               <div className="size-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
@@ -469,7 +457,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
               <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4">About Platform</h3>
             </div>
             <div className="flex flex-col gap-4">
-              <p className="text-[14px] text-tier-2 leading-relaxed font-medium">
+              <p className="text-[14px] text-tier-2 leading-relaxed font-medium text-justify">
                 {platform.notes || "No detailed profile recorded for this opportunity."}
               </p>
               <div className="flex flex-col gap-2 pt-2">
@@ -496,7 +484,6 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
                 <div className="grid gap-2"><Label className="text-[10px] uppercase tracking-widest text-tier-3">Stage</Label><Select value={editData.currentStage} onValueChange={(v) => setEditData({...editData, currentStage: v})}><SelectTrigger className="bg-secondary/50 border-border h-11 rounded-xl"><SelectValue /></SelectTrigger><SelectContent>{STAGES.map(s => (<SelectItem key={s} value={s}>{s}</SelectItem>))}</SelectContent></Select></div>
               </div>
 
-              {/* Conditional Rejection Fields */}
               {editData.currentStage === 'Rejected' && (
                 <div className="p-4 rounded-xl bg-rose-500/5 border border-rose-500/20 grid gap-4 animate-in fade-in duration-300">
                    <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-rose-500 flex items-center gap-2"><Frown className="size-3" /> Post-Mortem Intelligence</h4>
@@ -604,8 +591,7 @@ function TimelineEntry({ date, user, content, type }: { date: string, user: stri
         <span className="text-[12px] font-semibold text-tier-2">{user}</span>
         <span className="text-[10px] font-bold uppercase tracking-widest text-tier-4">{date}</span>
       </div>
-      <p className="text-[14px] text-tier-3 leading-relaxed font-medium">{content}</p>
+      <p className="text-[14px] text-tier-3 leading-relaxed font-medium text-justify">{content}</p>
     </div>
   );
 }
-

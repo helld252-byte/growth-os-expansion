@@ -346,7 +346,7 @@ function TimelineEntry({ date, user, content, type }: { date: string, user: stri
         <span className="text-[12px] font-semibold text-tier-2">{user}</span>
         <span className="text-[10px] font-bold uppercase tracking-widest text-tier-4">{date}</span>
       </div>
-      <p className="text-[14px] text-tier-3 leading-relaxed font-medium">{content}</p>
+      <p className="text-[14px] text-tier-3 leading-relaxed font-medium text-justify">{content}</p>
     </div>
   );
 }
