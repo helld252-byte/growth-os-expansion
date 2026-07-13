@@ -1,4 +1,3 @@
-
 "use client";
 
 import { use, useState, useMemo } from "react";
@@ -56,6 +55,19 @@ import { useToast } from "@/hooks/use-toast";
 import { DatePicker } from "@/components/ui/date-picker";
 
 const BUSINESS_MODELS = ["Wholesale", "B2B", "Dropshipping", "BTC", "B2B + Dropshipping", "Marketplace", "Partnership"];
+const BUSINESS_TYPES = [
+  "Marketplace",
+  "Wholesale Marketplace",
+  "Distributor",
+  "Retailer",
+  "Broker",
+  "Buying Group",
+  "Foodservice Distributor",
+  "Sales Agency",
+  "Importer",
+  "Corporate Procurement",
+  "Licensing Partner"
+];
 
 export default function PlatformDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -128,6 +140,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
     setEditData({
       name: platform.name,
       currentStage: platform.currentStage,
+      type: platform.type || "Wholesale Marketplace",
       businessModel: platform.businessModel || "Wholesale",
       priority: platform.priority,
       nextStep: platform.nextStep,
@@ -216,7 +229,10 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
                   {platform.currentStage}
                 </Badge>
                 <Badge variant="outline" className="px-3 py-0.5 text-[10px] font-medium uppercase tracking-wider rounded-lg border-accent/20 text-accent/80 bg-accent/5">
-                  {platform.businessModel || platform.type}
+                  {platform.businessModel}
+                </Badge>
+                <Badge variant="outline" className="px-3 py-0.5 text-[10px] font-medium uppercase tracking-wider rounded-lg border-accent/20 text-accent/80 bg-accent/5">
+                  {platform.type}
                 </Badge>
                 <Badge variant="outline" className="px-3 py-0.5 text-[10px] font-medium uppercase tracking-wider rounded-lg border-primary/20 text-primary bg-primary/5">
                   {platform.priority} Priority
@@ -371,8 +387,36 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
                 <div className="grid gap-2"><Label className="text-[10px] uppercase tracking-widest text-tier-3">Stage</Label><Select value={editData.currentStage} onValueChange={(v) => setEditData({...editData, currentStage: v})}><SelectTrigger className="bg-secondary/50 border-border h-11 rounded-xl"><SelectValue /></SelectTrigger><SelectContent>{['Not Started', 'Research', 'Applied', 'In Review', 'Approved', 'Rejected', 'Onboarding', 'Live'].map(s => (<SelectItem key={s} value={s}>{s}</SelectItem>))}</SelectContent></Select></div>
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2"><Label className="text-[10px] uppercase tracking-widest text-tier-3">Business Model</Label><Select value={editData.businessModel} onValueChange={(v) => setEditData({...editData, businessModel: v})}><SelectTrigger className="bg-secondary/50 border-border h-11 rounded-xl"><SelectValue /></SelectTrigger><SelectContent>{BUSINESS_MODELS.map(m => (<SelectItem key={m} value={m}>{m}</SelectItem>))}</SelectContent></Select></div>
+                <div className="grid gap-2">
+                  <Label className="text-[10px] uppercase tracking-widest text-tier-3">Business Type</Label>
+                  <Select value={editData.type} onValueChange={(v) => setEditData({...editData, type: v})}>
+                    <SelectTrigger className="bg-secondary/50 border-border h-11 rounded-xl">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-popover/95 backdrop-blur-xl border-border">
+                      {BUSINESS_TYPES.map(t => (
+                        <SelectItem key={t} value={t}>{t}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid gap-2">
+                  <Label className="text-[10px] uppercase tracking-widest text-tier-3">Business Model</Label>
+                  <Select value={editData.businessModel} onValueChange={(v) => setEditData({...editData, businessModel: v})}>
+                    <SelectTrigger className="bg-secondary/50 border-border h-11 rounded-xl">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-popover/95 backdrop-blur-xl border-border">
+                      {BUSINESS_MODELS.map(m => (
+                        <SelectItem key={m} value={m}>{m}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2"><Label className="text-[10px] uppercase tracking-widest text-tier-3">Source</Label><Select value={editData.source} onValueChange={(v) => setEditData({...editData, source: v})}><SelectTrigger className="bg-secondary/50 border-border h-11 rounded-xl"><SelectValue /></SelectTrigger><SelectContent>{['RangeMe', 'Google', 'AI', 'LinkedIn', 'Referral', 'Other'].map(s => (<SelectItem key={s} value={s}>{s}</SelectItem>))}</SelectContent></Select></div>
+                <div className="grid gap-2"><Label className="text-[10px] uppercase tracking-widest text-tier-3">Priority</Label><Select value={editData.priority} onValueChange={(v) => setEditData({...editData, priority: v})}><SelectTrigger className="bg-secondary/50 border-border h-11 rounded-xl"><SelectValue /></SelectTrigger><SelectContent>{['High', 'Medium', 'Low'].map(p => (<SelectItem key={p} value={p}>{p}</SelectItem>))}</SelectContent></Select></div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2"><Label className="text-[10px] uppercase tracking-widest text-tier-3">Tactical Objective</Label><Input value={editData.nextStep} onChange={(e) => setEditData({...editData, nextStep: e.target.value})} className="bg-secondary/50 border-border h-11 rounded-xl" /></div>

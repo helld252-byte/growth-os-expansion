@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -49,6 +48,19 @@ import { DatePicker } from "@/components/ui/date-picker";
 type FilterStatus = 'all' | 'rangeme' | 'applied' | 'waiting' | 'approved' | 'rejected' | 'high-priority';
 
 const BUSINESS_MODELS = ["Wholesale", "B2B", "Dropshipping", "BTC", "B2B + Dropshipping", "Marketplace", "Partnership"];
+const BUSINESS_TYPES = [
+  "Marketplace",
+  "Wholesale Marketplace",
+  "Distributor",
+  "Retailer",
+  "Broker",
+  "Buying Group",
+  "Foodservice Distributor",
+  "Sales Agency",
+  "Importer",
+  "Corporate Procurement",
+  "Licensing Partner"
+];
 
 export default function PlatformsPage() {
   const { toast } = useToast();
@@ -63,6 +75,7 @@ export default function PlatformsPage() {
 
   const [newOp, setNewOp] = useState({
     name: "",
+    type: "Wholesale Marketplace",
     businessModel: "Wholesale",
     source: "Google",
     market: "Global",
@@ -108,6 +121,7 @@ export default function PlatformsPage() {
     setIsAddOpen(false);
     setNewOp({
       name: "",
+      type: "Wholesale Marketplace",
       businessModel: "Wholesale",
       source: "Google",
       market: "Global",
@@ -242,7 +256,7 @@ export default function PlatformsPage() {
                   <Plus className="size-4 mr-2" /> Add Platform
                 </Button>
               </DialogTrigger>
-              <DialogContent className="bg-background/95 backdrop-blur-2xl border-border rounded-2xl sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+              <DialogContent className="bg-background/95 backdrop-blur-2xl border-border rounded-2xl sm:max-w-[500px] max-h-[90vh] overflow-y-auto custom-scrollbar">
                 <DialogHeader>
                   <DialogTitle className="text-xl font-bold tracking-tight text-tier-1">New Strategic Platform</DialogTitle>
                 </DialogHeader>
@@ -258,6 +272,19 @@ export default function PlatformsPage() {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="grid gap-2">
+                      <Label className="text-[10px] uppercase tracking-widest text-tier-3">Business Type</Label>
+                      <Select value={newOp.type} onValueChange={(v) => setNewOp({...newOp, type: v})}>
+                        <SelectTrigger className="bg-secondary/50 border-border h-12 rounded-xl text-tier-1">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-popover/95 backdrop-blur-xl border-border">
+                          {BUSINESS_TYPES.map(t => (
+                            <SelectItem key={t} value={t}>{t}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="grid gap-2">
                       <Label className="text-[10px] uppercase tracking-widest text-tier-3">Business Model</Label>
                       <Select value={newOp.businessModel} onValueChange={(v) => setNewOp({...newOp, businessModel: v})}>
                         <SelectTrigger className="bg-secondary/50 border-border h-12 rounded-xl text-tier-1">
@@ -270,6 +297,8 @@ export default function PlatformsPage() {
                         </SelectContent>
                       </Select>
                     </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
                     <div className="grid gap-2">
                       <Label className="text-[10px] uppercase tracking-widest text-tier-3">Discovery Source</Label>
                       <Select value={newOp.source} onValueChange={(v) => setNewOp({...newOp, source: v})}>
@@ -285,17 +314,6 @@ export default function PlatformsPage() {
                           <SelectItem value="Other">Other</SelectItem>
                         </SelectContent>
                       </Select>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="grid gap-2">
-                      <Label className="text-[10px] uppercase tracking-widest text-tier-3">Target Market</Label>
-                      <Input 
-                        value={newOp.market}
-                        onChange={(e) => setNewOp({...newOp, market: e.target.value})}
-                        placeholder="e.g. EU, US" 
-                        className="bg-secondary/50 border-border h-12 rounded-xl text-tier-1"
-                      />
                     </div>
                     <div className="grid gap-2">
                       <Label className="text-[10px] uppercase tracking-widest text-tier-3">Priority</Label>
@@ -313,10 +331,11 @@ export default function PlatformsPage() {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="grid gap-2">
-                      <Label className="text-[10px] uppercase tracking-widest text-tier-3">Objective</Label>
+                      <Label className="text-[10px] uppercase tracking-widest text-tier-3">Target Market</Label>
                       <Input 
-                        value={newOp.nextStep}
-                        onChange={(e) => setNewOp({...newOp, nextStep: e.target.value})}
+                        value={newOp.market}
+                        onChange={(e) => setNewOp({...newOp, market: e.target.value})}
+                        placeholder="e.g. EU, US" 
                         className="bg-secondary/50 border-border h-12 rounded-xl text-tier-1"
                       />
                     </div>
@@ -434,7 +453,10 @@ function PlatformListItem({ platform }: { platform: any }) {
             </h3>
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-medium uppercase tracking-[0.12em] text-tier-2 px-2.5 py-0.5 border border-border rounded-md bg-secondary/30">
-                {platform.businessModel || platform.type}
+                {platform.businessModel}
+              </span>
+              <span className="text-[10px] font-medium uppercase tracking-[0.12em] text-tier-2 px-2.5 py-0.5 border border-border rounded-md bg-secondary/30">
+                {platform.type}
               </span>
               {platform.source && (
                 <span className="text-[9px] font-bold uppercase tracking-widest text-primary px-2 py-0.5 border border-primary/20 rounded-md bg-primary/5">
