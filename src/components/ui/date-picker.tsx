@@ -29,7 +29,7 @@ export function DatePicker({ value, onChange, placeholder = "Select date", class
         <Button
           variant={"outline"}
           className={cn(
-            "w-full justify-start text-left font-medium bg-white/[0.03] border-white/[0.08] h-11 rounded-xl text-tier-1 transition-all hover:bg-white/[0.06] hover:border-white/20 group",
+            "w-full justify-start text-left font-medium bg-secondary/30 border-border h-11 rounded-xl text-tier-1 transition-all hover:bg-secondary/50 hover:border-border group shadow-none",
             !date && "text-tier-3",
             className
           )}
