@@ -1,4 +1,3 @@
-
 'use client';
 
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
@@ -105,10 +104,10 @@ export default function DashboardLayout({
       <div className="flex min-h-screen w-full bg-background text-foreground selection:bg-primary/20">
         <AppSidebar isAdmin={isAdmin} />
         <SidebarInset className="flex flex-col overflow-hidden bg-transparent">
-          <header className="h-14 flex items-center justify-between px-6 bg-background/20 backdrop-blur-xl sticky top-0 z-40 border-b border-white/[0.02]">
+          <header className="h-14 flex items-center justify-between px-6 bg-background/20 backdrop-blur-xl sticky top-0 z-40 border-b border-border/50">
             <div className="flex items-center gap-5">
               <SidebarTrigger className="text-tier-3 hover:text-primary transition-colors" />
-              <div className="h-4 w-px bg-white/5 hidden sm:block" />
+              <div className="h-4 w-px bg-border hidden sm:block" />
               <div className="flex items-center gap-3">
                 <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-tier-3">Unit-01</span>
                 <span className="text-tier-3/20 text-xs">/</span>
@@ -128,11 +127,11 @@ export default function DashboardLayout({
               <div className="flex items-center gap-4">
                 <div 
                   onClick={() => setIsSearchOpen(true)}
-                  className="hidden sm:flex items-center bg-white/[0.03] border border-white/[0.08] rounded-lg px-3 py-1.5 gap-3 cursor-pointer hover:bg-white/[0.06] hover:border-white/20 transition-all group"
+                  className="hidden sm:flex items-center bg-secondary border border-border rounded-lg px-3 py-1.5 gap-3 cursor-pointer hover:bg-secondary/80 transition-all group"
                 >
                   <Search className="size-3.5 text-tier-3 group-hover:text-primary transition-colors" />
                   <span className="text-[11px] font-medium tracking-tight text-tier-3 group-hover:text-primary pr-6 transition-colors">Search Platforms & Tasks</span>
-                  <span className="text-[9px] font-medium text-tier-2 tracking-widest bg-white/5 px-1.5 py-0.5 rounded border border-white/10">⌘K</span>
+                  <span className="text-[9px] font-medium text-tier-4 tracking-widest bg-background px-1.5 py-0.5 rounded border border-border">⌘K</span>
                 </div>
 
                 <div className="relative cursor-pointer text-tier-3 hover:text-primary transition-colors p-1.5">
@@ -141,23 +140,23 @@ export default function DashboardLayout({
                 </div>
               </div>
               
-              <div className="h-4 w-px bg-white/[0.05]" />
+              <div className="h-4 w-px bg-border" />
               
               <DropdownMenu>
                 <DropdownMenuTrigger className="flex items-center gap-3 cursor-pointer group outline-none">
-                  <div className="size-7 rounded-full overflow-hidden border border-white/[0.05] group-hover:border-accent/40 transition-all opacity-90 group-hover:opacity-100">
+                  <div className="size-7 rounded-full overflow-hidden border border-border group-hover:border-accent/40 transition-all opacity-90 group-hover:opacity-100">
                     <img src={user.photoURL || "https://picsum.photos/seed/user/100/100"} alt="Avatar" className="w-full h-full object-cover" />
                   </div>
                   <ChevronDown className="size-3 text-tier-3 group-hover:text-primary transition-colors" />
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56 mt-2 bg-background/95 backdrop-blur-xl border-white/[0.08] rounded-xl shadow-2xl">
+                <DropdownMenuContent align="end" className="w-56 mt-2 bg-background/95 backdrop-blur-xl border-border rounded-xl shadow-2xl">
                   <DropdownMenuLabel className="flex flex-col gap-0.5 py-3">
                     <span className="text-[13px] font-bold text-tier-1">{user.displayName}</span>
                     <span className="text-[10px] text-tier-3 font-medium truncate">{user.email}</span>
                   </DropdownMenuLabel>
-                  <DropdownMenuSeparator className="bg-white/[0.05]" />
+                  <DropdownMenuSeparator className="bg-border" />
                   {isAdmin && (
-                    <DropdownMenuItem asChild className="hover:bg-white/[0.05] cursor-pointer">
+                    <DropdownMenuItem asChild className="hover:bg-secondary cursor-pointer">
                       <Link href="/settings" className="flex items-center gap-2">
                         <Zap className="size-3.5 text-primary" />
                         <span className="text-[12px] font-semibold text-tier-2">Profile Intel</span>
@@ -165,14 +164,14 @@ export default function DashboardLayout({
                     </DropdownMenuItem>
                   )}
                   {isAdmin && (
-                    <DropdownMenuItem asChild className="hover:bg-white/[0.05] cursor-pointer">
+                    <DropdownMenuItem asChild className="hover:bg-secondary cursor-pointer">
                       <Link href="/admin" className="flex items-center gap-2">
                         <ShieldAlert className="size-3.5 text-primary" />
                         <span className="text-[12px] font-semibold text-tier-2">Admin Console</span>
                       </Link>
                     </DropdownMenuItem>
                   )}
-                  <DropdownMenuItem onClick={handleSignOut} className="hover:bg-rose-500/10 text-rose-400 cursor-pointer focus:text-rose-400">
+                  <DropdownMenuItem onClick={handleSignOut} className="hover:bg-rose-500/10 text-rose-600 cursor-pointer focus:text-rose-600">
                     <LogOut className="size-3.5 mr-2" />
                     <span className="text-[12px] font-semibold">Terminate Session</span>
                   </DropdownMenuItem>
@@ -188,11 +187,11 @@ export default function DashboardLayout({
       </div>
 
       <Dialog open={isSearchOpen} onOpenChange={setIsSearchOpen}>
-        <DialogContent className="sm:max-w-[550px] p-0 border-white/[0.1] bg-[#0A0A0B]/95 backdrop-blur-2xl rounded-2xl overflow-hidden shadow-[0_0_50px_-12px_rgba(0,0,0,0.8)]">
+        <DialogContent className="sm:max-w-[550px] p-0 border-border bg-background/95 backdrop-blur-2xl rounded-2xl overflow-hidden shadow-2xl">
           <DialogTitle className="px-4 pt-4 text-[10px] font-bold uppercase tracking-[0.25em] text-primary">Global Tactical Search</DialogTitle>
           <DialogDescription className="px-4 pb-2 text-[11px] text-tier-3">Quickly locate platforms and operational intelligence.</DialogDescription>
           <div className="flex flex-col">
-            <div className="flex items-center gap-3 px-4 py-4 border-b border-white/[0.05]">
+            <div className="flex items-center gap-3 px-4 py-4 border-b border-border">
               <Search className="size-5 text-primary" />
               <Input 
                 autoFocus
@@ -201,13 +200,13 @@ export default function DashboardLayout({
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
-              <div className="flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-md px-2 py-0.5">
+              <div className="flex items-center gap-1.5 bg-secondary border border-border rounded-md px-2 py-0.5">
                 <span className="text-[10px] font-bold text-tier-2 tracking-widest uppercase">Esc</span>
               </div>
             </div>
 
             <div className="p-8 flex flex-col items-center justify-center gap-4 text-center">
-              <div className="size-12 rounded-2xl bg-white/[0.02] border border-white/[0.05] flex items-center justify-center">
+              <div className="size-12 rounded-2xl bg-secondary border border-border flex items-center justify-center">
                 <Command className="size-6 text-tier-3 opacity-40" />
               </div>
               <div className="flex flex-col gap-1">
@@ -216,15 +215,15 @@ export default function DashboardLayout({
               </div>
             </div>
             
-            <div className="px-4 py-3 bg-white/[0.02] border-t border-white/[0.05] flex items-center justify-between">
+            <div className="px-4 py-3 bg-secondary border-t border-border flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-1.5">
                   <span className="text-[10px] text-tier-3 uppercase font-bold tracking-widest">Select</span>
-                  <div className="bg-white/5 border border-white/10 rounded px-1.5 text-[9px] text-tier-2">⏎</div>
+                  <div className="bg-background border border-border rounded px-1.5 text-[9px] text-tier-2">⏎</div>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <span className="text-[10px] text-tier-3 uppercase font-bold tracking-widest">Navigate</span>
-                  <div className="bg-white/5 border border-white/10 rounded px-1.5 text-[9px] text-tier-2">↑↓</div>
+                  <div className="bg-background border border-border rounded px-1.5 text-[9px] text-tier-2">↑↓</div>
                 </div>
               </div>
               <span className="text-[10px] font-bold text-tier-3 uppercase tracking-[0.15em]">Growth OS v2.7.0</span>
