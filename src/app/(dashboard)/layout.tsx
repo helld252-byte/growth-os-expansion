@@ -109,7 +109,7 @@ export default function DashboardLayout({
       <div className="flex min-h-screen w-full bg-background text-foreground selection:bg-primary/20">
         <AppSidebar isAdmin={isAdmin} />
         <SidebarInset className="flex flex-col overflow-hidden bg-transparent">
-          <header className="h-14 flex items-center justify-between px-6 bg-background/20 backdrop-blur-xl sticky top-0 z-40 border-b border-border/50">
+          <header className="h-14 flex items-center justify-between px-6 bg-background/80 backdrop-blur-xl sticky top-0 z-40 border-b border-border/50 shadow-sm">
             <div className="flex items-center gap-5">
               <SidebarTrigger className="text-tier-3 hover:text-tier-1 hover:bg-secondary/50 transition-colors p-2 rounded-lg" />
               <div className="h-4 w-px bg-border hidden sm:block" />
@@ -126,7 +126,7 @@ export default function DashboardLayout({
               <div className="flex items-center gap-4">
                 <div 
                   onClick={() => setIsSearchOpen(true)}
-                  className="hidden sm:flex items-center bg-secondary border border-border rounded-lg px-3 py-1.5 gap-3 cursor-pointer hover:bg-secondary transition-all group"
+                  className="hidden sm:flex items-center bg-secondary/50 border border-border/50 rounded-lg px-3 py-1.5 gap-3 cursor-pointer hover:bg-secondary transition-all group"
                 >
                   <Search className="size-3.5 text-tier-3 group-hover:text-primary transition-colors" />
                   <span className="text-[11px] font-medium tracking-tight text-tier-3 group-hover:text-primary pr-6 transition-colors">Search Platforms & Tasks</span>
