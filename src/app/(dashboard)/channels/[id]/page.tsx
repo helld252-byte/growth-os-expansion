@@ -1,4 +1,3 @@
-
 "use client";
 
 import { use, useState, useMemo } from "react";
@@ -6,7 +5,6 @@ import {
   ArrowLeft, 
   ExternalLink, 
   Edit3, 
-  Clock, 
   Globe,
   Calendar,
   Plus,
@@ -15,17 +13,14 @@ import {
   X,
   Mail,
   ShieldCheck,
-  ChevronRight,
-  Link2,
   Building2,
-  User,
   MessageSquare,
   CheckCircle2,
-  History,
-  FileText,
-  Upload,
   AlertCircle,
-  Lightbulb
+  Lightbulb,
+  Link2,
+  FileText,
+  Upload
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -184,12 +179,12 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
 
   const getStageStyles = (stage: string) => {
     switch (stage) {
-      case 'Live': return "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
-      case 'In Review': return "bg-amber-500/10 text-amber-400 border-amber-500/20";
-      case 'Approved': return "bg-violet-500/10 text-violet-400 border-violet-500/20";
-      case 'Research': return "bg-slate-500/20 text-slate-300 border-slate-500/30";
-      case 'Rejected': return "bg-rose-500/10 text-rose-400 border-rose-500/20";
-      default: return "bg-blue-500/10 text-blue-400 border-blue-500/20";
+      case 'Live': return "bg-emerald-500/10 text-emerald-500 border-emerald-500/20";
+      case 'In Review': return "bg-amber-500/10 text-amber-500 border-amber-500/20";
+      case 'Approved': return "bg-violet-500/10 text-violet-500 border-violet-500/20";
+      case 'Research': return "bg-slate-500/10 text-slate-500 border-slate-500/20";
+      case 'Rejected': return "bg-rose-500/10 text-rose-500 border-rose-500/20";
+      default: return "bg-primary/10 text-primary border-primary/20";
     }
   };
 
@@ -228,7 +223,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
           <Button 
             variant="ghost" 
             onClick={handleOpenEdit}
-            className="h-10 px-4 rounded-xl border border-white/[0.05] text-tier-2 hover:text-tier-1 text-[12px] font-semibold uppercase tracking-wider"
+            className="h-10 px-4 rounded-xl border border-border text-tier-2 hover:text-tier-1 text-[12px] font-semibold uppercase tracking-wider"
           >
             <Edit3 className="size-4 mr-2" /> Recalibrate
           </Button>
@@ -247,9 +242,9 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
           
           {platform.currentStage === 'Rejected' && (
             <div className="premium-panel p-8 rounded-3xl border-rose-500/20 bg-rose-500/5 flex flex-col gap-6 animate-in slide-in-from-top-4 duration-500">
-              <div className="flex items-center gap-3 text-rose-400">
+              <div className="flex items-center gap-3 text-rose-500">
                 <AlertCircle className="size-5" />
-                <h3 className="text-[11px] font-bold uppercase tracking-[0.25em]">Rejection Post-Mortem</h3>
+                <h3 className="text-[11px] font-bold uppercase tracking-[0.25em]">Rejection Analysis</h3>
               </div>
               <div className="grid gap-6">
                 <div className="flex flex-col gap-2">
@@ -260,19 +255,19 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
                 </div>
                 <Separator className="bg-rose-500/10" />
                 <div className="flex flex-col gap-3">
-                  <div className="flex items-center gap-2 text-emerald-400">
+                  <div className="flex items-center gap-2 text-emerald-500">
                     <Lightbulb className="size-4" />
-                    <span className="text-[10px] font-bold uppercase tracking-widest">Key Learnings</span>
+                    <span className="text-[10px] font-bold uppercase tracking-widest">Lessons Learned</span>
                   </div>
                   <p className="text-[14px] font-medium text-tier-2 leading-relaxed">
-                    {platform.rejectionLessons || "Waiting for team analysis on how to optimize future outreach strategy."}
+                    {platform.rejectionLessons || "Waiting for team analysis on how to optimize future strategy."}
                   </p>
                 </div>
               </div>
             </div>
           )}
 
-          <div className="premium-panel p-8 rounded-3xl border-primary/20 bg-gradient-to-br from-primary/5 via-transparent to-transparent shadow-2xl relative overflow-hidden group">
+          <div className="premium-panel p-8 rounded-3xl border-primary/20 bg-gradient-to-br from-primary/5 via-transparent to-transparent shadow-xl relative overflow-hidden group">
             <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
               <Zap className="size-16 text-primary" />
             </div>
@@ -296,7 +291,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
           <section className="flex flex-col gap-8">
             <div className="flex items-center justify-between px-2">
               <div className="flex flex-col gap-1">
-                <h3 className="text-[11px] font-bold uppercase tracking-[0.25em] text-tier-4">Platform onboarding history</h3>
+                <h3 className="text-[11px] font-bold uppercase tracking-[0.25em] text-tier-4">Onboarding History</h3>
                 <span className="text-[13px] text-tier-3 font-medium">Tactical log and verified steps</span>
               </div>
               <Dialog open={isNoteOpen} onOpenChange={setIsNoteOpen}>
@@ -305,7 +300,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
                     <Plus className="size-3.5 mr-2" /> New Field Note
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="bg-background/95 backdrop-blur-2xl border-white/[0.1] rounded-2xl">
+                <DialogContent className="bg-background/95 backdrop-blur-2xl border-border rounded-2xl">
                   <DialogHeader>
                     <DialogTitle className="text-xl font-bold tracking-tight text-tier-1">Record Field Note</DialogTitle>
                   </DialogHeader>
@@ -314,7 +309,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
                       placeholder="Enter operational update or contact summary..."
                       value={newNote}
                       onChange={(e) => setNewNote(e.target.value)}
-                      className="bg-white/[0.03] border-white/[0.08] min-h-[150px] rounded-xl text-tier-1 p-4"
+                      className="bg-secondary/50 border-border min-h-[150px] rounded-xl text-tier-1 p-4"
                     />
                   </div>
                   <DialogFooter>
@@ -326,7 +321,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
               </Dialog>
             </div>
             
-            <div className="flex flex-col gap-8 relative before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-px before:bg-white/[0.05]">
+            <div className="flex flex-col gap-8 relative before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-px before:bg-border">
               {historyItems.length > 0 ? (
                 historyItems.map((entry: any, i: number) => (
                   <TimelineEntry 
@@ -352,8 +347,8 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
             <div className="flex flex-col gap-6 py-2">
               <div className="flex items-center justify-between">
                 <div className="flex flex-col gap-1">
-                  <h3 className="text-[11px] font-bold uppercase tracking-[0.25em] text-tier-4">Platform Onboarding Checklist</h3>
-                  <span className="text-[13px] text-tier-3 font-medium">Compliance & validation protocols</span>
+                  <h3 className="text-[11px] font-bold uppercase tracking-[0.25em] text-tier-4">Compliance Checklist</h3>
+                  <span className="text-[13px] text-tier-3 font-medium">Onboarding validation protocols</span>
                 </div>
                 <div className="size-10 rounded-full bg-primary/5 border border-primary/10 flex items-center justify-center">
                   <ShieldCheck className="size-5 text-primary" />
@@ -367,7 +362,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
                     <div key={i} className="flex items-center gap-4 py-2 group cursor-pointer" onClick={() => handleToggleRequirement(req)}>
                       <Checkbox 
                         checked={isChecked} 
-                        className="size-5 rounded-md border-white/10 data-[state=checked]:bg-primary data-[state=checked]:border-primary transition-all" 
+                        className="size-5 rounded-md border-border data-[state=checked]:bg-primary data-[state=checked]:border-primary transition-all" 
                       />
                       <span className={cn(
                         "text-[14px] font-medium tracking-tight transition-colors",
@@ -387,7 +382,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
         <div className="lg:col-span-4 flex flex-col gap-8">
           <div className="flex flex-col gap-6 px-1">
             <div className="flex items-center justify-between">
-              <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4">Company Contact Hub</h3>
+              <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4">Contact Hub</h3>
               <Building2 className="size-4 text-tier-3" />
             </div>
 
@@ -407,7 +402,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
                 />
               </div>
 
-              <Separator className="bg-white/[0.04]" />
+              <Separator className="bg-border" />
 
               <div className="flex flex-col gap-3">
                 <ContactField 
@@ -427,11 +422,11 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
                 </div>
               </div>
 
-              <Separator className="bg-white/[0.04]" />
+              <Separator className="bg-border" />
 
               {platform.contactPerson && (
-                <div className="flex flex-col gap-3 p-4 rounded-2xl bg-white/[0.02] border border-white/[0.05]">
-                  <span className="text-[9px] font-bold uppercase tracking-widest text-tier-4">Primary Contact Unit</span>
+                <div className="flex flex-col gap-3 p-4 rounded-2xl bg-secondary/30 border border-border">
+                  <span className="text-[9px] font-bold uppercase tracking-widest text-tier-4">Primary Contact</span>
                   <div className="flex items-center gap-3">
                     <div className="size-9 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-bold text-xs">
                       {platform.contactPerson.charAt(0)}
@@ -453,7 +448,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
             <div className="grid grid-cols-2 gap-3 pt-2">
               <Button 
                 variant="outline" 
-                className="h-10 rounded-xl border-white/[0.06] bg-white/[0.02] text-[10px] font-bold uppercase tracking-widest hover:bg-primary/10 hover:text-primary transition-all"
+                className="h-10 rounded-xl border-border bg-background text-[10px] font-bold uppercase tracking-widest hover:bg-primary/10 hover:text-primary transition-all"
                 onClick={() => {
                   if (platform.website) window.open(platform.website.startsWith('http') ? platform.website : `https://${platform.website}`, '_blank');
                 }}
@@ -462,7 +457,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
               </Button>
               <Button 
                 variant="outline" 
-                className="h-10 rounded-xl border-white/[0.06] bg-white/[0.02] text-[10px] font-bold uppercase tracking-widest hover:bg-primary/10 hover:text-primary transition-all"
+                className="h-10 rounded-xl border-border bg-background text-[10px] font-bold uppercase tracking-widest hover:bg-primary/10 hover:text-primary transition-all"
                 onClick={() => {
                   if (platform.supportEmail) window.location.href = `mailto:${platform.supportEmail}`;
                 }}
@@ -471,7 +466,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
               </Button>
               <Button 
                 onClick={() => setIsNoteOpen(true)}
-                className="col-span-2 h-10 rounded-xl bg-primary/20 text-primary border border-primary/20 text-[10px] font-bold uppercase tracking-widest hover:bg-primary hover:text-white transition-all shadow-lg active-glow"
+                className="col-span-2 h-10 rounded-xl bg-primary text-white text-[10px] font-bold uppercase tracking-widest hover:bg-primary/90 transition-all shadow-lg shadow-primary/20"
               >
                 <MessageSquare className="size-3.5 mr-2" /> Log Interaction
               </Button>
@@ -481,18 +476,18 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
           <section className="flex flex-col gap-4">
             <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4">About Platform</h3>
             <p className="text-[13px] text-tier-2 leading-relaxed font-medium">
-              {platform.notes || "No detailed institutional profile recorded. Strategic expansion protocols active."}
+              {platform.notes || "No detailed profile recorded for this expansion platform."}
             </p>
           </section>
 
           <section className="flex flex-col gap-5 pt-2">
             <div className="flex items-center justify-between">
-              <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4">Files & Documents</h3>
+              <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4">Documents</h3>
               <Upload className="size-3.5 text-tier-3 cursor-pointer hover:text-primary transition-colors" />
             </div>
             
             <div className="flex flex-col gap-3">
-              <div className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/[0.05] group hover:border-primary/20 transition-all cursor-pointer">
+              <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/30 border border-border group hover:border-primary/20 transition-all cursor-pointer">
                 <div className="size-8 rounded-lg bg-primary/5 flex items-center justify-center text-primary group-hover:bg-primary/10">
                   <FileText className="size-4" />
                 </div>
@@ -509,7 +504,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
 
       {editData && (
         <Dialog open={isEditOpen} onOpenChange={setIsAddOpen}>
-          <DialogContent className="bg-background/95 backdrop-blur-2xl border-white/[0.1] rounded-2xl sm:max-w-[600px] max-h-[90vh] overflow-y-auto custom-scrollbar">
+          <DialogContent className="bg-background/95 backdrop-blur-2xl border-border rounded-2xl sm:max-w-[600px] max-h-[90vh] overflow-y-auto custom-scrollbar">
             <DialogHeader>
               <DialogTitle className="text-xl font-bold tracking-tight text-tier-1">Mission Calibration</DialogTitle>
             </DialogHeader>
@@ -520,13 +515,13 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
                   <Input 
                     value={editData.name}
                     onChange={(e) => setEditData({...editData, name: e.target.value})}
-                    className="bg-white/[0.03] border-white/[0.08] h-11 rounded-xl text-tier-1"
+                    className="bg-secondary/50 border-border h-11 rounded-xl text-tier-1"
                   />
                 </div>
                 <div className="grid gap-2">
                   <Label className="text-[10px] uppercase tracking-widest text-tier-3">Current Stage</Label>
                   <Select value={editData.currentStage} onValueChange={(v) => setEditData({...editData, currentStage: v})}>
-                    <SelectTrigger className="bg-white/[0.03] border-white/[0.08] h-11 rounded-xl text-tier-1">
+                    <SelectTrigger className="bg-secondary/50 border-border h-11 rounded-xl text-tier-1">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -541,21 +536,21 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
               {editData.currentStage === 'Rejected' && (
                 <div className="grid gap-4 p-4 border border-rose-500/20 bg-rose-500/5 rounded-xl">
                   <div className="grid gap-2">
-                    <Label className="text-[10px] uppercase tracking-widest text-rose-400 font-bold">Reason for Rejection</Label>
+                    <Label className="text-[10px] uppercase tracking-widest text-rose-500 font-bold">Reason for Rejection</Label>
                     <Input 
                       value={editData.rejectionReason}
                       onChange={(e) => setEditData({...editData, rejectionReason: e.target.value})}
                       placeholder="e.g. Category saturation, logistics constraints..."
-                      className="bg-white/[0.03] border-white/[0.08] h-11 rounded-xl text-tier-1"
+                      className="bg-background border-rose-200 dark:border-rose-900 h-11 rounded-xl text-tier-1"
                     />
                   </div>
                   <div className="grid gap-2">
-                    <Label className="text-[10px] uppercase tracking-widest text-rose-400 font-bold">Lessons Learned</Label>
+                    <Label className="text-[10px] uppercase tracking-widest text-rose-500 font-bold">Lessons Learned</Label>
                     <Textarea 
                       value={editData.rejectionLessons}
                       onChange={(e) => setEditData({...editData, rejectionLessons: e.target.value})}
                       placeholder="What can we optimize for future attempts?"
-                      className="bg-white/[0.03] border-white/[0.08] min-h-[80px] rounded-xl text-tier-1 p-4"
+                      className="bg-background border-rose-200 dark:border-rose-900 min-h-[80px] rounded-xl text-tier-1 p-4"
                     />
                   </div>
                 </div>
@@ -567,7 +562,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
                   <Input 
                     value={editData.nextStep}
                     onChange={(e) => setEditData({...editData, nextStep: e.target.value})}
-                    className="bg-white/[0.03] border-white/[0.08] h-11 rounded-xl text-tier-1"
+                    className="bg-secondary/50 border-border h-11 rounded-xl text-tier-1"
                   />
                 </div>
                 <div className="grid gap-2">
@@ -584,12 +579,12 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
                 <Textarea 
                   value={editData.notes}
                   onChange={(e) => setEditData({...editData, notes: e.target.value})}
-                  placeholder="Enter detailed institutional profile or marketplace description..."
-                  className="bg-white/[0.03] border-white/[0.08] min-h-[100px] rounded-xl text-tier-1 p-4"
+                  placeholder="Enter detailed platform profile or marketplace description..."
+                  className="bg-secondary/50 border-border min-h-[100px] rounded-xl text-tier-1 p-4"
                 />
               </div>
 
-              <Separator className="bg-white/[0.05]" />
+              <Separator className="bg-border" />
               <span className="text-[10px] font-bold uppercase tracking-widest text-primary">Contact Calibration</span>
 
               <div className="grid grid-cols-2 gap-4">
@@ -598,7 +593,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
                   <Input 
                     value={editData.website}
                     onChange={(e) => setEditData({...editData, website: e.target.value})}
-                    className="bg-white/[0.03] border-white/[0.08] h-11 rounded-xl text-tier-1"
+                    className="bg-secondary/50 border-border h-11 rounded-xl text-tier-1"
                   />
                 </div>
                 <div className="grid gap-2">
@@ -606,7 +601,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
                   <Input 
                     value={editData.portalUrl}
                     onChange={(e) => setEditData({...editData, portalUrl: e.target.value})}
-                    className="bg-white/[0.03] border-white/[0.08] h-11 rounded-xl text-tier-1"
+                    className="bg-secondary/50 border-border h-11 rounded-xl text-tier-1"
                   />
                 </div>
               </div>
@@ -617,13 +612,13 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
                   <Input 
                     value={editData.supportEmail}
                     onChange={(e) => setEditData({...editData, supportEmail: e.target.value})}
-                    className="bg-white/[0.03] border-white/[0.08] h-11 rounded-xl text-tier-1"
+                    className="bg-secondary/50 border-border h-11 rounded-xl text-tier-1"
                   />
                 </div>
                 <div className="grid gap-2">
                   <Label className="text-[10px] uppercase tracking-widest text-tier-3">Comm Status</Label>
                   <Select value={editData.commStatus} onValueChange={(v) => setEditData({...editData, commStatus: v})}>
-                    <SelectTrigger className="bg-white/[0.03] border-white/[0.08] h-11 rounded-xl text-tier-1">
+                    <SelectTrigger className="bg-secondary/50 border-border h-11 rounded-xl text-tier-1">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -641,7 +636,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
                   <Input 
                     value={editData.contactPerson}
                     onChange={(e) => setEditData({...editData, contactPerson: e.target.value})}
-                    className="bg-white/[0.03] border-white/[0.08] h-11 rounded-xl text-tier-1"
+                    className="bg-secondary/50 border-border h-11 rounded-xl text-tier-1"
                   />
                 </div>
                 <div className="grid gap-2">
@@ -653,7 +648,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
                 </div>
               </div>
 
-              <Separator className="bg-white/[0.05]" />
+              <Separator className="bg-border" />
 
               <div className="grid gap-3">
                 <Label className="text-[10px] uppercase tracking-widest text-tier-4 font-bold">Onboarding Strategy</Label>
@@ -669,24 +664,24 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
                         setReqInput("");
                       }
                     }}
-                    className="bg-white/[0.02] border-white/[0.06] h-11 rounded-xl text-sm"
+                    className="bg-secondary/50 border-border h-11 rounded-xl text-sm"
                   />
                   <Button variant="secondary" onClick={() => {
                     if (reqInput) {
                       setEditData({...editData, requirements: [...editData.requirements, reqInput]});
                       setReqInput("");
                     }
-                  }} className="rounded-xl h-11 px-4 font-bold uppercase text-[10px] tracking-widest border border-white/[0.05]">Add</Button>
+                  }} className="rounded-xl h-11 px-4 font-bold uppercase text-[10px] tracking-widest border border-border">Add</Button>
                 </div>
                 <div className="flex flex-col gap-2 pt-2">
                   {editData.requirements.map((req: string, idx: number) => (
-                    <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-white/[0.02] border border-white/[0.05] group">
+                    <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-secondary/30 border border-border group">
                       <span className="text-[13px] font-medium text-tier-2">{req}</span>
                       <Button 
                         variant="ghost" 
                         size="icon" 
                         onClick={() => setEditData({...editData, requirements: editData.requirements.filter((_: any, i: number) => i !== idx)})}
-                        className="size-7 rounded-lg text-tier-4 hover:text-rose-400 hover:bg-rose-500/10 transition-all"
+                        className="size-7 rounded-lg text-tier-4 hover:text-rose-500 hover:bg-rose-500/10 transition-all"
                       >
                         <X className="size-3.5" />
                       </Button>
@@ -735,7 +730,7 @@ function ContactField({ label, value, icon: Icon, link }: { label: string, value
 function TimelineEntry({ date, user, content, type }: { date: string, user: string, content: string, type: 'note' | 'task' }) {
   return (
     <div className="flex flex-col gap-2 pl-8 relative">
-      <div className="absolute left-0 top-1.5 size-[23px] rounded-full bg-background border-2 border-white/[0.08] flex items-center justify-center shadow-lg shadow-black">
+      <div className="absolute left-0 top-1.5 size-[23px] rounded-full bg-background border-2 border-slate-200 dark:border-white/[0.08] flex items-center justify-center shadow-sm">
         {type === 'task' ? (
           <div className="size-full rounded-full bg-emerald-500/20 flex items-center justify-center">
             <CheckCircle2 className="size-3 text-emerald-500" />
@@ -747,7 +742,7 @@ function TimelineEntry({ date, user, content, type }: { date: string, user: stri
       <div className="flex items-center gap-3">
         <span className="text-[12px] font-semibold text-tier-2">{user}</span>
         <span className="text-[10px] font-bold uppercase tracking-widest text-tier-4">{date}</span>
-        {type === 'task' && <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-[8px] uppercase tracking-tighter px-1.5 h-4">Verified Step</Badge>}
+        {type === 'task' && <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 text-[8px] uppercase tracking-tighter px-1.5 h-4">Verified Step</Badge>}
       </div>
       <p className="text-[14px] text-tier-3 leading-relaxed font-medium">
         {content}

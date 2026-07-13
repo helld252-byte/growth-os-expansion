@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useMemo } from "react";
@@ -26,7 +25,7 @@ export default function CommandCenter() {
     const now = new Date();
     const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
-    // 1. KPIs (Focused on Platforms only)
+    // 1. KPIs
     const trackedOpps = opportunities.length;
     const activeConversations = opportunities.filter(o => o.commStatus && o.commStatus !== 'No outreach').length;
     const inReview = opportunities.filter(o => o.currentStage === 'In Review').length;
@@ -45,12 +44,12 @@ export default function CommandCenter() {
       { label: 'Live', count: opportunities.filter(o => o.currentStage === 'Live').length },
     ];
 
-    // 3. Verticals (Pruned)
+    // 3. Units by Category (Row Breakdown)
     const verticals = [
       { label: 'Platforms', count: opportunities.length, icon: Globe, path: '/channels' },
     ];
 
-    // 4. Momentum
+    // 4. This Week Progress Metrics
     const newLeadsThisWeek = opportunities.filter(o => new Date(o.createdAt || 0) >= sevenDaysAgo).length;
     const movedStages = opportunities.filter(o => new Date(o.updatedAt || 0) >= sevenDaysAgo && o.currentStage !== 'Not Started').length;
     const repliesReceived = opportunities.filter(o => 
@@ -62,7 +61,7 @@ export default function CommandCenter() {
       ['Approved', 'Live'].includes(o.currentStage)
     ).length;
     
-    // 5. Bottlenecks
+    // 5. Needs Attention
     const needsFollowUp = opportunities.filter(o => o.commStatus === 'Waiting reply').sort((a, b) => 
       new Date(a.lastContactDate || 0).getTime() - new Date(b.lastContactDate || 0).getTime()
     )[0];
@@ -104,7 +103,7 @@ export default function CommandCenter() {
   return (
     <div className="max-w-[1400px] mx-auto flex flex-col gap-12 animate-in fade-in duration-700">
       
-      {/* Executive Header */}
+      {/* Executive Stats Strip */}
       <header className="flex flex-col gap-8">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -116,24 +115,23 @@ export default function CommandCenter() {
               <p className="text-tier-4 text-[11px] font-bold uppercase tracking-[0.2em] mt-1.5">Today’s growth priorities</p>
             </div>
           </div>
-          <Badge variant="outline" className="bg-emerald-500/5 text-emerald-400 border-emerald-500/20 text-[9px] font-bold uppercase tracking-widest px-3 py-1">System Live</Badge>
+          <Badge variant="outline" className="bg-emerald-500/5 text-emerald-500 border-emerald-500/20 text-[9px] font-bold uppercase tracking-widest px-3 py-1">System Live</Badge>
         </div>
 
-        {/* Executive Stats Strip */}
-        <div className="bg-white/[0.015] border border-white/[0.05] rounded-2xl p-4 flex items-center justify-between divide-x divide-white/[0.04] shadow-xl backdrop-blur-sm">
-          <StatModule label="Tracked Platforms" value={data.kpis.trackedOpps} />
+        <div className="bg-card border border-border rounded-2xl p-4 flex items-center justify-between divide-x divide-border shadow-xl backdrop-blur-sm">
+          <StatModule label="Tracked Units" value={data.kpis.trackedOpps} />
           <StatModule label="In Review" value={data.kpis.inReview} />
           <StatModule label="Live" value={data.kpis.livePartnerships} highlight />
           <StatModule label="Active Conv." value={data.kpis.activeConversations} />
           <StatModule label="Response Rate" value={`${data.kpis.responseRate}%`} />
-          <StatModule label="This Week %" value="+12.5%" color="text-emerald-400" />
+          <StatModule label="This Week %" value="+12.5%" color="text-emerald-500" />
         </div>
       </header>
 
-      {/* Growth Pipeline Section */}
+      {/* Growth Pipeline */}
       <section className="flex flex-col gap-8">
         <div className="flex items-center justify-between px-1">
-          <h3 className="text-[10px] font-bold uppercase tracking-[0.3em] text-tier-4">Platform Growth Pipeline</h3>
+          <h3 className="text-[10px] font-bold uppercase tracking-[0.3em] text-tier-4">Growth Pipeline</h3>
         </div>
         <div className="grid grid-cols-5 gap-6">
           {data.stages.map((stage, i) => (
@@ -142,7 +140,7 @@ export default function CommandCenter() {
                 <span className="text-[11px] font-medium text-tier-3 group-hover:text-tier-1 transition-colors uppercase tracking-widest">{stage.label}</span>
                 <span className="text-xl font-bold text-tier-1">{stage.count}</span>
               </div>
-              <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+              <div className="h-1 w-full bg-secondary rounded-full overflow-hidden">
                 <div 
                   className={cn(
                     "h-full transition-all duration-1000",
@@ -161,7 +159,7 @@ export default function CommandCenter() {
         
         {/* Units by Category */}
         <div className="lg:col-span-5 flex flex-col gap-6">
-          <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4 px-1">Active Verticals</h3>
+          <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4 px-1">Units by Category</h3>
           <div className="flex flex-col gap-3">
             {data.verticals.map((v) => (
               <Link 
@@ -170,14 +168,14 @@ export default function CommandCenter() {
                 className="premium-panel px-5 py-4 rounded-xl flex items-center justify-between hover:border-primary/40 group transition-all"
               >
                 <div className="flex items-center gap-4">
-                  <div className="size-8 rounded-lg bg-white/[0.03] border border-white/[0.05] flex items-center justify-center text-tier-3 group-hover:text-primary group-hover:bg-primary/5 transition-all">
+                  <div className="size-8 rounded-lg bg-secondary border border-border flex items-center justify-center text-tier-3 group-hover:text-primary group-hover:bg-primary/5 transition-all">
                     <v.icon className="size-4" />
                   </div>
                   <span className="text-[13px] font-medium text-tier-2 group-hover:text-tier-1 transition-colors">{v.label}</span>
                 </div>
                 <div className="flex items-center gap-4">
                   <span className="text-[14px] font-medium text-tier-1">{v.count}</span>
-                  <div className="size-6 rounded-full flex items-center justify-center bg-white/[0.02] border border-white/[0.05] group-hover:bg-primary/10 group-hover:border-primary/30 transition-all">
+                  <div className="size-6 rounded-full flex items-center justify-center bg-secondary border border-border group-hover:bg-primary/10 group-hover:border-primary/30 transition-all">
                     <ChevronRight className="size-3.5 text-tier-4 group-hover:text-primary" />
                   </div>
                 </div>
@@ -188,29 +186,29 @@ export default function CommandCenter() {
 
         {/* This Week Progress */}
         <div className="lg:col-span-4 flex flex-col gap-6">
-          <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4 px-1">Weekly Velocity</h3>
-          <div className="premium-panel rounded-2xl flex flex-col h-full overflow-hidden border-white/[0.05]">
-            <div className="grid grid-cols-2 divide-x divide-y divide-white/[0.04] border-b border-white/[0.04]">
+          <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4 px-1">This Week Progress</h3>
+          <div className="premium-panel rounded-2xl flex flex-col h-full overflow-hidden">
+            <div className="grid grid-cols-2 divide-x divide-y divide-border border-b border-border">
               <MetricCell label="New Leads" value={data.momentum.newLeadsThisWeek} />
-              <MetricCell label="Replies" value={data.momentum.repliesReceived} />
-              <MetricCell label="Moved" value={data.momentum.movedStages} />
-              <MetricCell label="Wins" value={data.momentum.wins} color="text-emerald-400" />
+              <MetricCell label="Replies Received" value={data.momentum.repliesReceived} />
+              <MetricCell label="Moved Forward" value={data.momentum.movedStages} />
+              <MetricCell label="Wins" value={data.momentum.wins} color="text-emerald-500" />
             </div>
 
-            <div className="p-6 flex flex-col gap-5 mt-auto bg-white/[0.01]">
+            <div className="p-6 flex flex-col gap-5 mt-auto bg-secondary/10">
               <div className="flex flex-col gap-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-[9px] font-bold text-tier-4 uppercase tracking-[0.2em]">Growth Velocity</span>
-                  <span className="text-[11px] font-bold text-emerald-400">+12.5% WoW</span>
+                  <span className="text-[9px] font-bold text-tier-4 uppercase tracking-[0.2em]">Velocity</span>
+                  <span className="text-[11px] font-bold text-emerald-500">+12.5% WoW</span>
                 </div>
-                <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                <div className="h-1 w-full bg-secondary rounded-full overflow-hidden">
                   <div className="h-full bg-emerald-500/40 w-[65%] rounded-full shadow-[0_0_8px_rgba(16,185,129,0.2)]" />
                 </div>
               </div>
               
-              <div className="flex items-center gap-3 px-4 py-2.5 bg-white/[0.02] border border-white/[0.04] rounded-xl group hover:border-primary/20 transition-all">
+              <div className="flex items-center gap-3 px-4 py-2.5 bg-background border border-border rounded-xl group hover:border-primary/20 transition-all">
                 <div className="size-1.5 rounded-full bg-primary animate-pulse" />
-                <span className="text-[11px] font-medium text-tier-3">Priority: <span className="text-tier-1">Platform Onboarding</span></span>
+                <span className="text-[11px] font-medium text-tier-3">Focus area this week: <span className="text-tier-1">Platform Onboarding</span></span>
               </div>
             </div>
           </div>
@@ -239,9 +237,9 @@ export default function CommandCenter() {
       {/* Recent Updates */}
       <section className="flex flex-col gap-6">
         <div className="flex items-center justify-between px-1">
-          <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4">Platform Activity</h3>
+          <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4">Recent Updates</h3>
         </div>
-        <div className="flex flex-col gap-px bg-white/[0.02] border border-white/[0.05] rounded-2xl overflow-hidden shadow-xl">
+        <div className="flex flex-col gap-px bg-border border border-border rounded-2xl overflow-hidden shadow-xl">
           {data.recentActivity.map((item) => (
             <ActivityRow key={item.id} item={item} />
           ))}
@@ -268,7 +266,7 @@ function StatModule({ label, value, highlight, color }: { label: string, value: 
 
 function MetricCell({ label, value, color }: { label: string, value: number, color?: string }) {
   return (
-    <div className="p-6 flex flex-col gap-1.5 hover:bg-white/[0.01] transition-colors group">
+    <div className="p-6 flex flex-col gap-1.5 hover:bg-secondary/20 transition-colors group">
       <span className="text-[9px] font-bold uppercase tracking-[0.15em] text-tier-4 group-hover:text-tier-3 transition-colors">{label}</span>
       <span className={cn("text-2xl font-bold tracking-tight", color || "text-tier-1")}>{value}</span>
     </div>
@@ -279,9 +277,9 @@ function AttentionCard({ label, value, sub, urgent }: any) {
   return (
     <div className={cn(
       "p-5 rounded-2xl border flex flex-col gap-1.5 transition-all shadow-lg",
-      urgent ? "bg-rose-500/[0.03] border-rose-500/20" : "bg-white/[0.015] border-white/[0.05]"
+      urgent ? "bg-rose-500/[0.03] border-rose-500/20" : "bg-card border-border"
     )}>
-      <span className={cn("text-[9px] font-bold uppercase tracking-widest mb-0.5", urgent ? "text-rose-400" : "text-tier-4")}>{label}</span>
+      <span className={cn("text-[9px] font-bold uppercase tracking-widest mb-0.5", urgent ? "text-rose-500" : "text-tier-4")}>{label}</span>
       <span className="text-[14px] font-bold text-tier-2 truncate">{value}</span>
       <span className="text-[11px] font-medium text-tier-4">{sub}</span>
     </div>
@@ -292,7 +290,7 @@ function ActivityRow({ item }: { item: any }) {
   const date = item.updatedAt?.toDate ? item.updatedAt.toDate() : new Date(item.updatedAt || item.createdAt || 0);
   
   return (
-    <div className="px-6 py-4 bg-background/40 flex items-center justify-between hover:bg-white/[0.02] transition-colors group border-b border-white/[0.03] last:border-0">
+    <div className="px-6 py-4 bg-background flex items-center justify-between hover:bg-secondary/30 transition-colors group border-b border-border last:border-0">
       <div className="flex items-center gap-5">
         <div className="size-2 rounded-full bg-primary/20 group-hover:bg-primary transition-all" />
         <div className="flex flex-col">
@@ -303,7 +301,7 @@ function ActivityRow({ item }: { item: any }) {
         </div>
       </div>
       <div className="flex items-center gap-8">
-        <Badge variant="outline" className="h-5 px-2 text-[9px] uppercase tracking-widest font-bold border-white/5 bg-white/[0.03] text-tier-4 group-hover:border-primary/20 group-hover:text-tier-3 transition-all">
+        <Badge variant="outline" className="h-5 px-2 text-[9px] uppercase tracking-widest font-bold border-border bg-secondary/50 text-tier-4 group-hover:border-primary/20 group-hover:text-tier-3 transition-all">
           Platform
         </Badge>
         <span className="text-[11px] font-bold text-tier-4 uppercase w-20 text-right">{date.toLocaleDateString([], { month: 'short', day: 'numeric' })}</span>
