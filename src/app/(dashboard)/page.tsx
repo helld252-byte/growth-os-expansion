@@ -12,7 +12,8 @@ import {
   History,
   Target,
   BarChart3,
-  Layers
+  Layers,
+  ArrowRight
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useCollection, useMemoFirebase } from "@/firebase";
@@ -105,15 +106,17 @@ export default function CommandCenter() {
       </header>
 
       {/* Unified Mission Intelligence Section */}
-      <section className="premium-panel p-10 rounded-[32px] bg-gradient-to-br from-primary/[0.03] via-transparent to-transparent flex flex-col gap-10 border-white/[0.04]">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
-          <div className="lg:col-span-1 flex flex-col gap-8">
-            <div className="flex flex-col gap-1">
+      <section className="premium-panel p-10 rounded-[32px] bg-gradient-to-br from-primary/[0.03] via-transparent to-transparent flex flex-col gap-12 border-white/[0.04]">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+          
+          {/* Key Insights Rail */}
+          <div className="lg:col-span-3 flex flex-col gap-8">
+            <div className="flex flex-col gap-1.5">
               <h2 className="text-[11px] font-bold uppercase tracking-[0.25em] text-tier-1">Mission Key Insights</h2>
               <p className="text-[13px] text-tier-3 font-medium">Core performance telemetry across all vertical channels.</p>
             </div>
             
-            <div className="grid grid-cols-1 gap-6">
+            <div className="flex flex-col gap-6">
               <InsightBlock label="Total Pipeline" value={data.intel.trackedOpps} icon={Layers} />
               <InsightBlock label="Live Channels" value={data.intel.livePartnerships} icon={Target} color="text-emerald-500" />
               <InsightBlock label="In Evaluation" value={data.intel.inReview} icon={Clock} color="text-primary" />
@@ -121,35 +124,69 @@ export default function CommandCenter() {
             </div>
           </div>
 
-          <div className="lg:col-span-3 flex flex-col gap-8 bg-white/[0.015] border border-white/[0.04] rounded-2xl p-8 shadow-inner">
-            <div className="flex items-center justify-between">
-              <div className="flex flex-col gap-1">
-                <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-tier-4">Growth Pipeline Flow</h3>
-                <span className="text-[14px] text-tier-2 font-medium">Visual distribution of opportunities across the onboarding mission.</span>
-              </div>
-              <Badge variant="outline" className="bg-white/5 border-white/10 text-tier-3 text-[9px] font-bold uppercase tracking-widest px-2.5 py-1">Funnel Health: Stable</Badge>
+          {/* Redesigned Growth Pipeline */}
+          <div className="lg:col-span-9 flex flex-col gap-8">
+            <div className="flex flex-col gap-1.5">
+              <h3 className="text-[11px] font-bold uppercase tracking-[0.25em] text-tier-1">Growth Pipeline Flow</h3>
+              <span className="text-[13px] text-tier-3 font-medium">Distribution of high-impact opportunities across onboarding phases.</span>
             </div>
 
-            <div className="grid grid-cols-5 gap-6 mt-4">
-              {data.stages.map((stage, i) => (
-                <div key={stage.label} className="flex flex-col gap-4 group">
-                  <div className="flex flex-col gap-1">
-                    <span className="text-[10px] font-bold text-tier-4 group-hover:text-tier-1 transition-colors uppercase tracking-[0.15em]">{stage.label}</span>
-                    <span className="text-2xl font-bold text-tier-1">{stage.count}</span>
+            <div className="grid grid-cols-5 gap-4">
+              {data.stages.map((stage, i) => {
+                const total = data.intel.trackedOpps || 1;
+                const percentage = Math.min((stage.count / total) * 100, 100);
+                const isFinal = i === 4;
+
+                return (
+                  <div key={stage.label} className="relative group">
+                    <div className={cn(
+                      "flex flex-col gap-6 p-6 rounded-2xl border transition-all duration-500 h-full",
+                      "bg-white shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] border-white/[0.08]",
+                      "hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] hover:translate-y-[-2px] hover:border-primary/20",
+                      isFinal && "bg-emerald-500/5 border-emerald-500/10"
+                    )}>
+                      <div className="flex flex-col gap-1">
+                        <span className={cn(
+                          "text-[9px] font-bold uppercase tracking-[0.2em]",
+                          isFinal ? "text-emerald-500" : "text-tier-4 group-hover:text-tier-1 transition-colors"
+                        )}>
+                          {stage.label}
+                        </span>
+                        <div className="flex items-baseline gap-1.5">
+                          <span className="text-3xl font-bold text-tier-1 tracking-tight">{stage.count}</span>
+                          <span className="text-[10px] font-bold text-tier-4">Units</span>
+                        </div>
+                      </div>
+
+                      <div className="mt-auto flex flex-col gap-3">
+                        <div className="h-1.5 w-full bg-secondary/50 rounded-full overflow-hidden relative">
+                          <div 
+                            className={cn(
+                              "h-full transition-all duration-1000 ease-out rounded-full",
+                              isFinal 
+                                ? "bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.6)]" 
+                                : "bg-primary/60 shadow-[0_0_10px_rgba(147,51,234,0.3)]"
+                            )} 
+                            style={{ width: `${percentage || 5}%` }}
+                          />
+                        </div>
+                        <div className="flex items-center justify-between text-[9px] font-bold uppercase tracking-widest text-tier-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <span>Verified</span>
+                          <span>{percentage.toFixed(0)}%</span>
+                        </div>
+                      </div>
+                    </div>
+                    {i < 4 && (
+                      <div className="absolute top-1/2 -right-3 -translate-y-1/2 z-10 opacity-20 group-hover:opacity-40 transition-opacity">
+                        <ArrowRight className="size-4 text-tier-3" />
+                      </div>
+                    )}
                   </div>
-                  <div className="h-1.5 w-full bg-white/[0.05] rounded-full overflow-hidden">
-                    <div 
-                      className={cn(
-                        "h-full transition-all duration-1000",
-                        i === 4 ? "bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.4)]" : "bg-primary/50"
-                      )} 
-                      style={{ width: `${Math.min((stage.count / (data.intel.trackedOpps || 1)) * 100 * 2, 100)}%` }}
-                    />
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
+
         </div>
       </section>
 
