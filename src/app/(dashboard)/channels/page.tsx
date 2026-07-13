@@ -201,82 +201,6 @@ export default function PlatformsPage() {
             </nav>
           </div>
         </div>
-
-        <div className="mt-auto">
-          <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-            <DialogTrigger asChild>
-              <Button className="w-full bg-secondary hover:bg-secondary/80 text-tier-1 font-semibold text-[11px] uppercase tracking-wider h-11 rounded-xl transition-all shadow-sm border border-border">
-                <Plus className="size-4 mr-2" /> Add Platform
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="bg-background/95 backdrop-blur-2xl border-border rounded-2xl sm:max-w-[500px]">
-              <DialogHeader>
-                <DialogTitle className="text-xl font-bold tracking-tight text-tier-1">New Strategic Platform</DialogTitle>
-              </DialogHeader>
-              <div className="grid gap-6 py-4">
-                <div className="grid gap-2">
-                  <Label className="text-[10px] uppercase tracking-widest text-tier-3">Platform Name</Label>
-                  <Input 
-                    value={newOp.name}
-                    onChange={(e) => setNewOp({...newOp, name: e.target.value})}
-                    placeholder="e.g. Amazon Europe" 
-                    className="bg-secondary/50 border-border h-12 rounded-xl text-tier-1"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="grid gap-2">
-                    <Label className="text-[10px] uppercase tracking-widest text-tier-3">Type</Label>
-                    <Select value={newOp.type} onValueChange={(v) => setNewOp({...newOp, type: v})}>
-                      <SelectTrigger className="bg-secondary/50 border-border h-12 rounded-xl text-tier-1">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="bg-popover/95 backdrop-blur-xl border-border">
-                        <SelectItem value="Wholesale">Wholesale</SelectItem>
-                        <SelectItem value="Dropshipping">Dropshipping</SelectItem>
-                        <SelectItem value="Marketplace">Marketplace</SelectItem>
-                        <SelectItem value="Partnership">Partnership</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="grid gap-2">
-                    <Label className="text-[10px] uppercase tracking-widest text-tier-3">Source</Label>
-                    <Select value={newOp.source} onValueChange={(v) => setNewOp({...newOp, source: v})}>
-                      <SelectTrigger className="bg-secondary/50 border-border h-12 rounded-xl text-tier-1">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="bg-popover/95 backdrop-blur-xl border-border">
-                        <SelectItem value="RangeMe">RangeMe</SelectItem>
-                        <SelectItem value="Google">Google</SelectItem>
-                        <SelectItem value="AI">AI Search</SelectItem>
-                        <SelectItem value="LinkedIn">LinkedIn</SelectItem>
-                        <SelectItem value="Referral">Referral</SelectItem>
-                        <SelectItem value="Other">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div className="grid gap-2">
-                  <Label className="text-[10px] uppercase tracking-widest text-tier-3">Market</Label>
-                  <Input 
-                    value={newOp.market}
-                    onChange={(e) => setNewOp({...newOp, market: e.target.value})}
-                    placeholder="e.g. EU, US" 
-                    className="bg-secondary/50 border-border h-12 rounded-xl text-tier-1"
-                  />
-                </div>
-              </div>
-              <DialogFooter>
-                <Button 
-                  onClick={handleAddPlatform}
-                  disabled={!newOp.name}
-                  className="w-full bg-primary text-white h-12 rounded-xl font-bold uppercase tracking-widest shadow-lg shadow-primary/20"
-                >
-                  Initialize Platform
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        </div>
       </aside>
 
       <main className="flex-1 flex flex-col gap-10">
@@ -298,6 +222,80 @@ export default function PlatformsPage() {
                 className="pl-11 h-11 bg-white/[0.02] border-border rounded-xl font-medium text-[13px] focus-visible:ring-primary/20 placeholder:text-tier-3 transition-all text-tier-1" 
               />
             </div>
+            
+            <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
+              <DialogTrigger asChild>
+                <Button className="bg-primary hover:bg-primary/90 text-white font-bold h-11 px-6 rounded-xl text-[11px] uppercase tracking-wider transition-all shadow-lg shadow-primary/20">
+                  <Plus className="size-4 mr-2" /> Add Platform
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="bg-background/95 backdrop-blur-2xl border-border rounded-2xl sm:max-w-[500px]">
+                <DialogHeader>
+                  <DialogTitle className="text-xl font-bold tracking-tight text-tier-1">New Strategic Platform</DialogTitle>
+                </DialogHeader>
+                <div className="grid gap-6 py-4">
+                  <div className="grid gap-2">
+                    <Label className="text-[10px] uppercase tracking-widest text-tier-3">Platform Name</Label>
+                    <Input 
+                      value={newOp.name}
+                      onChange={(e) => setNewOp({...newOp, name: e.target.value})}
+                      placeholder="e.g. Amazon Europe" 
+                      className="bg-secondary/50 border-border h-12 rounded-xl text-tier-1"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="grid gap-2">
+                      <Label className="text-[10px] uppercase tracking-widest text-tier-3">Type</Label>
+                      <Select value={newOp.type} onValueChange={(v) => setNewOp({...newOp, type: v})}>
+                        <SelectTrigger className="bg-secondary/50 border-border h-12 rounded-xl text-tier-1">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-popover/95 backdrop-blur-xl border-border">
+                          <SelectItem value="Wholesale">Wholesale</SelectItem>
+                          <SelectItem value="Dropshipping">Dropshipping</SelectItem>
+                          <SelectItem value="Marketplace">Marketplace</SelectItem>
+                          <SelectItem value="Partnership">Partnership</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="grid gap-2">
+                      <Label className="text-[10px] uppercase tracking-widest text-tier-3">Discovery Source</Label>
+                      <Select value={newOp.source} onValueChange={(v) => setNewOp({...newOp, source: v})}>
+                        <SelectTrigger className="bg-secondary/50 border-border h-12 rounded-xl text-tier-1">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-popover/95 backdrop-blur-xl border-border">
+                          <SelectItem value="RangeMe">RangeMe</SelectItem>
+                          <SelectItem value="Google">Google</SelectItem>
+                          <SelectItem value="AI">AI Search</SelectItem>
+                          <SelectItem value="LinkedIn">LinkedIn</SelectItem>
+                          <SelectItem value="Referral">Referral</SelectItem>
+                          <SelectItem value="Other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <div className="grid gap-2">
+                    <Label className="text-[10px] uppercase tracking-widest text-tier-3">Target Market</Label>
+                    <Input 
+                      value={newOp.market}
+                      onChange={(e) => setNewOp({...newOp, market: e.target.value})}
+                      placeholder="e.g. EU, US" 
+                      className="bg-secondary/50 border-border h-12 rounded-xl text-tier-1"
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button 
+                    onClick={handleAddPlatform}
+                    disabled={!newOp.name}
+                    className="w-full bg-primary text-white h-12 rounded-xl font-bold uppercase tracking-widest shadow-lg shadow-primary/20"
+                  >
+                    Initialize Platform
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </div>
         </header>
 
@@ -367,17 +365,15 @@ function PlatformListItem({ platform }: { platform: any }) {
         return "bg-rose-500/10 text-rose-400 border-rose-500/20";
       case 'Onboarding':
         return "bg-cyan-500/10 text-cyan-400 border-cyan-500/20";
-      case 'Not Started':
-        return "bg-zinc-500/10 text-zinc-100 border-zinc-500/30";
       default:
-        return "bg-slate-500/10 text-slate-100 border-slate-500/20";
+        return "bg-zinc-500/10 text-zinc-100 border-zinc-500/30";
     }
   };
 
   return (
     <div className="premium-panel p-6 rounded-2xl flex items-center justify-between group hover:bg-secondary/30 hover:border-border cursor-pointer transition-all active:scale-[0.995]">
       <div className="flex items-center gap-7">
-        <div className="size-12 rounded-xl bg-secondary/30 border border-border flex items-center justify-center text-tier-3 group-hover:text-tier-1 group-hover:bg-secondary/50 transition-all">
+        <div className="size-12 rounded-xl bg-secondary/30 border border-border flex items-center justify-center text-tier-3 group-hover:text-tier-1 transition-all">
           <Globe className="size-6" />
         </div>
         
@@ -425,7 +421,7 @@ function PlatformListItem({ platform }: { platform: any }) {
           </span>
         </div>
         
-        <div className="size-10 rounded-full flex items-center justify-center bg-secondary/20 border border-border group-hover:border-border group-hover:bg-secondary/80 transition-all">
+        <div className="size-10 rounded-full flex items-center justify-center bg-secondary/20 border border-border group-hover:bg-secondary transition-all">
           <ChevronRight className="size-5 text-tier-3 group-hover:text-tier-1" />
         </div>
       </div>

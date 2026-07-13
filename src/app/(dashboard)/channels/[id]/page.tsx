@@ -118,9 +118,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
     );
   }
 
-  if (!platform) {
-    return notFound();
-  }
+  if (!platform) return notFound();
 
   const handleOpenEdit = () => {
     setEditData({
@@ -161,8 +159,6 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
   const handleAddNote = () => {
     if (!docRef || !newNote || !user) return;
     const firstName = user.displayName?.split(' ')[0] || "Mikhail";
-
-    // Combine picked date and time
     const combinedDate = new Date(`${noteDate}T${noteTime}:00`);
 
     const journalEntry = {
@@ -179,10 +175,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
     setNoteDate(new Date().toISOString().split('T')[0]);
     setNoteTime(new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }));
     setIsNoteOpen(false);
-    toast({
-      title: "Field Note Recorded",
-      description: "Platform onboarding history has been updated.",
-    });
+    toast({ title: "Field Note Recorded" });
   };
 
   const handleToggleRequirement = (req: string) => {
@@ -193,10 +186,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
       ? currentCompleted.filter((r: string) => r !== req)
       : [...currentCompleted, req];
     
-    updateDocumentNonBlocking(docRef, {
-      completedRequirements: newCompleted,
-      updatedAt: serverTimestamp(),
-    });
+    updateDocumentNonBlocking(docRef, { completedRequirements: newCompleted });
   };
 
   const getStageStyles = (stage: string) => {
@@ -204,7 +194,6 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
       case 'Live': return "bg-emerald-500/10 text-emerald-500 border-emerald-500/20";
       case 'In Review': return "bg-amber-500/10 text-amber-400 border-amber-500/20";
       case 'Approved': return "bg-violet-500/10 text-violet-500 border-violet-500/20";
-      case 'Research': return "bg-slate-500/10 text-slate-500 border-slate-500/20";
       case 'Rejected': return "bg-rose-500/10 text-rose-500 border-rose-500/20";
       default: return "bg-primary/10 text-primary border-primary/20";
     }
@@ -214,13 +203,9 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
     <div className="max-w-[1200px] mx-auto flex flex-col gap-8 animate-in fade-in duration-500">
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-2">
         <div className="flex flex-col gap-6">
-          <Link 
-            href="/channels" 
-            className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.2em] text-tier-3 hover:text-tier-1 transition-colors w-fit group"
-          >
+          <Link href="/channels" className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.2em] text-tier-3 hover:text-tier-1 transition-colors w-fit group">
             <ArrowLeft className="size-3.5 group-hover:-translate-x-1 transition-transform" /> Platforms
           </Link>
-          
           <div className="flex flex-col gap-3">
             <div className="flex items-center gap-4 flex-wrap">
               <h1 className="text-4xl font-semibold tracking-tight text-tier-1">{platform.name}</h1>
@@ -245,13 +230,8 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
             </div>
           </div>
         </div>
-
         <div className="flex items-center gap-3">
-          <Button 
-            variant="ghost" 
-            onClick={handleOpenEdit}
-            className="h-10 px-4 rounded-xl border border-border text-tier-2 hover:bg-secondary/50 hover:text-tier-1 text-[12px] font-semibold uppercase tracking-wider transition-all"
-          >
+          <Button variant="ghost" onClick={handleOpenEdit} className="h-10 px-4 rounded-xl border border-border text-tier-2 hover:bg-secondary/50 hover:text-tier-1 text-[12px] font-semibold uppercase tracking-wider">
             <Edit3 className="size-4 mr-2" /> Recalibrate
           </Button>
           {platform.website && (
@@ -266,34 +246,6 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <div className="lg:col-span-8 flex flex-col gap-10">
-          
-          {platform.currentStage === 'Rejected' && (
-            <div className="premium-panel p-8 rounded-3xl border-rose-500/20 bg-rose-500/5 flex flex-col gap-6 animate-in slide-in-from-top-4 duration-500">
-              <div className="flex items-center gap-3 text-rose-500">
-                <AlertCircle className="size-5" />
-                <h3 className="text-[11px] font-bold uppercase tracking-[0.25em]">Rejection Analysis</h3>
-              </div>
-              <div className="grid gap-6">
-                <div className="flex flex-col gap-2">
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-tier-4">Reason for Rejection</span>
-                  <p className="text-[15px] font-medium text-tier-2 leading-relaxed italic">
-                    "{platform.rejectionReason || "No specific reason recorded."}"
-                  </p>
-                </div>
-                <Separator className="bg-rose-500/10" />
-                <div className="flex flex-col gap-3">
-                  <div className="flex items-center gap-2 text-emerald-500">
-                    <Lightbulb className="size-4" />
-                    <span className="text-[10px] font-bold uppercase tracking-widest">Lessons Learned</span>
-                  </div>
-                  <p className="text-[14px] font-medium text-tier-2 leading-relaxed">
-                    {platform.rejectionLessons || "Waiting for team analysis on how to optimize future strategy."}
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-
           <div className="premium-panel p-8 rounded-3xl border-primary/20 bg-gradient-to-br from-primary/5 via-transparent to-transparent shadow-sm relative overflow-hidden group">
             <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
               <Zap className="size-16 text-primary" />
@@ -305,21 +257,19 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
                   {platform.nextStep || "Initializing growth protocols."}
                 </h2>
                 <div className="flex flex-col items-start md:items-end gap-1.5 shrink-0">
-                  <div className="flex flex-col items-end">
-                    <span className="text-[10px] font-semibold uppercase tracking-widest text-tier-4">Target Date</span>
-                    <div className="flex items-center gap-2 text-tier-1 font-semibold">
-                      <Calendar className="size-4 text-primary" />
-                      <span>{platform.dueDate || 'Open Timeline'}</span>
-                    </div>
-                    {daysUntil !== null && (
-                      <span className={cn(
-                        "text-[11px] font-bold mt-1 uppercase tracking-wider",
-                        daysUntil < 0 ? "text-rose-500" : daysUntil <= 7 ? "text-amber-500" : "text-emerald-500"
-                      )}>
-                        {daysUntil < 0 ? `${Math.abs(daysUntil)} Days Overdue` : daysUntil === 0 ? "Due Today" : `${daysUntil} Days Remaining`}
-                      </span>
-                    )}
+                  <span className="text-[10px] font-semibold uppercase tracking-widest text-tier-4">Target Date</span>
+                  <div className="flex items-center gap-2 text-tier-1 font-semibold">
+                    <Calendar className="size-4 text-primary" />
+                    <span>{platform.dueDate || 'Open Timeline'}</span>
                   </div>
+                  {daysUntil !== null && (
+                    <span className={cn(
+                      "text-[11px] font-bold mt-1 uppercase tracking-wider",
+                      daysUntil < 0 ? "text-rose-500" : daysUntil <= 7 ? "text-amber-500" : "text-emerald-500"
+                    )}>
+                      {daysUntil < 0 ? `${Math.abs(daysUntil)} Days Overdue` : daysUntil === 0 ? "Due Today" : `${daysUntil} Days Remaining`}
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
@@ -327,10 +277,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
 
           <section className="flex flex-col gap-8">
             <div className="flex items-center justify-between px-2">
-              <div className="flex flex-col gap-1">
-                <h3 className="text-[11px] font-bold uppercase tracking-[0.25em] text-tier-4">Activity Timeline</h3>
-                <span className="text-[13px] text-tier-3 font-medium">Historical updates and verified progress logs.</span>
-              </div>
+              <h3 className="text-[11px] font-bold uppercase tracking-[0.25em] text-tier-4">Activity Timeline</h3>
               <Dialog open={isNoteOpen} onOpenChange={setIsNoteOpen}>
                 <DialogTrigger asChild>
                   <Button variant="ghost" className="h-8 text-[10px] font-bold uppercase tracking-wider text-tier-3 hover:bg-secondary/50 hover:text-primary transition-all">
@@ -338,100 +285,37 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="bg-background/95 backdrop-blur-2xl border-border rounded-2xl sm:max-w-[500px]">
-                  <DialogHeader>
-                    <DialogTitle className="text-xl font-bold tracking-tight text-tier-1">Record Field Note</DialogTitle>
-                  </DialogHeader>
+                  <DialogHeader><DialogTitle className="text-xl font-bold tracking-tight text-tier-1">Record Field Note</DialogTitle></DialogHeader>
                   <div className="grid gap-6 py-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div className="grid gap-2">
-                        <Label className="text-[10px] uppercase tracking-widest text-tier-3">Interaction Date</Label>
+                        <Label className="text-[10px] uppercase tracking-widest text-tier-3">Date</Label>
                         <DatePicker value={noteDate} onChange={setNoteDate} />
                       </div>
                       <div className="grid gap-2">
-                        <Label className="text-[10px] uppercase tracking-widest text-tier-3">Interaction Time</Label>
-                        <Input 
-                          type="time" 
-                          value={noteTime} 
-                          onChange={(e) => setNoteTime(e.target.value)}
-                          className="bg-secondary/50 border-border h-11 rounded-xl text-tier-1 px-4"
-                        />
+                        <Label className="text-[10px] uppercase tracking-widest text-tier-3">Time</Label>
+                        <Input type="time" value={noteTime} onChange={(e) => setNoteTime(e.target.value)} className="bg-secondary/50 border-border h-11 rounded-xl text-tier-1" />
                       </div>
                     </div>
                     <div className="grid gap-2">
                       <Label className="text-[10px] uppercase tracking-widest text-tier-3">Interaction Summary</Label>
-                      <Textarea 
-                        placeholder="Enter operational update or contact summary..."
-                        value={newNote}
-                        onChange={(e) => setNewNote(e.target.value)}
-                        className="bg-secondary/50 border-border min-h-[150px] rounded-xl text-tier-1 p-4"
-                      />
+                      <Textarea placeholder="Enter operational update..." value={newNote} onChange={(e) => setNewNote(e.target.value)} className="bg-secondary/50 border-border min-h-[150px] rounded-xl text-tier-1 p-4" />
                     </div>
                   </div>
-                  <DialogFooter>
-                    <Button onClick={handleAddNote} className="w-full bg-primary text-white h-12 rounded-xl font-bold uppercase tracking-widest">
-                      Commit to History
-                    </Button>
-                  </DialogFooter>
+                  <DialogFooter><Button onClick={handleAddNote} className="w-full bg-primary text-white h-12 rounded-xl font-bold uppercase tracking-widest">Commit to History</Button></DialogFooter>
                 </DialogContent>
               </Dialog>
             </div>
-            
             <div className="flex flex-col gap-8 relative before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-px before:bg-border">
               {historyItems.length > 0 ? (
                 historyItems.map((entry: any, i: number) => (
-                  <TimelineEntry 
-                    key={i}
-                    date={entry.date.toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })} 
-                    user={entry.user} 
-                    content={entry.content} 
-                    type={entry.type}
-                  />
+                  <TimelineEntry key={i} date={entry.date.toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })} user={entry.user} content={entry.content} type={entry.type} />
                 ))
               ) : (
-                <TimelineEntry 
-                  date={platform.lastUpdate ? new Date(platform.lastUpdate).toLocaleDateString() : 'Initial'} 
-                  user="System" 
-                  content={platform.notes || "Operational history synchronized. Growth protocols active."} 
-                  type="note"
-                />
+                <TimelineEntry date="Initial" user="System" content={platform.notes || "Operational history synchronized."} type="note" />
               )}
             </div>
           </section>
-
-          {platform.requirements && platform.requirements.length > 0 && (
-            <div className="flex flex-col gap-6 py-2">
-              <div className="flex items-center justify-between">
-                <div className="flex flex-col gap-1">
-                  <h3 className="text-[11px] font-bold uppercase tracking-[0.25em] text-tier-4">Compliance Checklist</h3>
-                  <span className="text-[13px] text-tier-3 font-medium">Onboarding validation protocols</span>
-                </div>
-                <div className="size-10 rounded-full bg-primary/5 border border-primary/10 flex items-center justify-center">
-                  <ShieldCheck className="size-5 text-primary" />
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-4">
-                {platform.requirements.map((req: string, i: number) => {
-                  const isChecked = (platform.completedRequirements || []).includes(req);
-                  return (
-                    <div key={i} className="flex items-center gap-4 py-3 px-4 rounded-xl border border-transparent hover:bg-secondary/50 hover:border-border transition-all cursor-pointer group" onClick={() => handleToggleRequirement(req)}>
-                      <Checkbox 
-                        checked={isChecked} 
-                        className="size-5 rounded-md border-border data-[state=checked]:bg-primary data-[state=checked]:border-primary transition-all" 
-                      />
-                      <span className={cn(
-                        "text-[14px] font-medium tracking-tight transition-colors",
-                        isChecked ? "text-tier-4 line-through" : "text-tier-2 group-hover:text-tier-1"
-                      )}>
-                        {req}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
         </div>
 
         <div className="lg:col-span-4 flex flex-col gap-8">
@@ -440,332 +324,44 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
               <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4">Contact Hub</h3>
               <Building2 className="size-4 text-tier-3" />
             </div>
-
             <div className="flex flex-col gap-5">
-              <div className="flex flex-col gap-3">
-                <ContactField 
-                  label="Official Website" 
-                  value={platform.website} 
-                  icon={Globe} 
-                  link={platform.website}
-                />
-                <ContactField 
-                  label="Supplier Portal" 
-                  value={platform.portalUrl} 
-                  icon={Link2} 
-                  link={platform.portalUrl}
-                />
-                <ContactField 
-                  label="Discovery Source" 
-                  value={platform.source || "Google"} 
-                  icon={Target} 
-                />
-              </div>
-
+              <ContactField label="Official Website" value={platform.website} icon={Globe} link={platform.website} />
+              <ContactField label="Supplier Portal" value={platform.portalUrl} icon={Link2} link={platform.portalUrl} />
+              <ContactField label="Discovery Source" value={platform.source || "Google"} icon={Target} />
               <Separator className="bg-border" />
-
-              <div className="flex flex-col gap-3">
-                <ContactField 
-                  label="Onboarding Support" 
-                  value={platform.supportEmail} 
-                  icon={Mail} 
-                  link={platform.supportEmail ? `mailto:${platform.supportEmail}` : undefined}
-                />
-                <div className="flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-2.5 text-tier-3">
-                    <Zap className="size-3.5" />
-                    <span className="text-[10px] font-bold uppercase tracking-widest">Comm Status</span>
-                  </div>
-                  <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 text-[9px] uppercase tracking-widest font-bold">
-                    {platform.commStatus || "No outreach"}
-                  </Badge>
-                </div>
-              </div>
-
-              <Separator className="bg-border" />
-
               {platform.contactPerson && (
                 <div className="flex flex-col gap-3 p-4 rounded-2xl bg-secondary/30 border border-border">
                   <span className="text-[9px] font-bold uppercase tracking-widest text-tier-4">Primary Contact</span>
                   <div className="flex items-center gap-3">
-                    <div className="size-9 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-bold text-xs">
-                      {platform.contactPerson.charAt(0)}
-                    </div>
+                    <div className="size-9 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-bold text-xs">{platform.contactPerson.charAt(0)}</div>
                     <div className="flex flex-col">
-                      <span className="text-[13px] font-semibold text-tier-1 leading-none">{platform.contactPerson}</span>
-                      <span className="text-[11px] text-tier-3 mt-1">{platform.contactRole || 'Decision Maker'}</span>
+                      <span className="text-[13px] font-semibold text-tier-1">{platform.contactPerson}</span>
+                      <span className="text-[11px] text-tier-3">{platform.contactRole || 'Decision Maker'}</span>
                     </div>
                   </div>
                 </div>
               )}
-
-              <div className="flex items-center justify-between px-1">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-tier-4">Last Interaction</span>
-                <span className="text-[11px] font-semibold text-tier-2">{platform.lastContactDate || 'Never'}</span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3 pt-2">
-              <Button 
-                variant="outline" 
-                className="h-10 rounded-xl border-border bg-background text-[10px] font-bold uppercase tracking-widest hover:bg-secondary transition-all"
-                onClick={() => {
-                  if (platform.website) window.open(platform.website.startsWith('http') ? platform.website : `https://${platform.website}`, '_blank');
-                }}
-              >
-                Open Site
-              </Button>
-              <Button 
-                variant="outline" 
-                className="h-10 rounded-xl border-border bg-background text-[10px] font-bold uppercase tracking-widest hover:bg-secondary transition-all"
-                onClick={() => {
-                  if (platform.supportEmail) window.location.href = `mailto:${platform.supportEmail}`;
-                }}
-              >
-                Send Email
-              </Button>
-              <Button 
-                onClick={() => setIsNoteOpen(true)}
-                className="col-span-2 h-10 rounded-xl bg-primary text-white text-[10px] font-bold uppercase tracking-widest hover:bg-primary/90 transition-all shadow-lg shadow-primary/20"
-              >
-                <MessageSquare className="size-3.5 mr-2" /> Log Interaction
-              </Button>
             </div>
           </div>
-
-          <section className="flex flex-col gap-4">
-            <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4">About Platform</h3>
-            <p className="text-[13px] text-tier-2 leading-relaxed font-medium">
-              {platform.notes || "No detailed profile recorded for this expansion platform."}
-            </p>
-          </section>
-
-          <section className="flex flex-col gap-5 pt-2">
-            <div className="flex items-center justify-between">
-              <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4">Documents</h3>
-              <Upload className="size-3.5 text-tier-3 cursor-pointer hover:text-primary transition-colors" />
-            </div>
-            
-            <div className="flex flex-col gap-3">
-              <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/30 border border-border group hover:bg-secondary/50 hover:border-border transition-all cursor-pointer">
-                <div className="size-8 rounded-lg bg-primary/5 flex items-center justify-center text-primary group-hover:bg-primary/10">
-                  <FileText className="size-4" />
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-[12px] font-semibold text-tier-2 leading-none">Partnership_Agreement.pdf</span>
-                  <span className="text-[10px] text-tier-4 mt-1">2.4 MB • Pending Signature</span>
-                </div>
-              </div>
-              <p className="text-[11px] text-tier-4 italic px-1">Awaiting document synchronization...</p>
-            </div>
-          </section>
         </div>
       </div>
 
       {editData && (
         <Dialog open={isEditOpen} onOpenChange={setIsAddOpen}>
-          <DialogContent className="bg-background/95 backdrop-blur-2xl border-border rounded-2xl sm:max-w-[600px] max-h-[90vh] overflow-y-auto custom-scrollbar">
-            <DialogHeader>
-              <DialogTitle className="text-xl font-bold tracking-tight text-tier-1">Mission Calibration</DialogTitle>
-            </DialogHeader>
+          <DialogContent className="bg-background/95 backdrop-blur-2xl border-border rounded-2xl sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+            <DialogHeader><DialogTitle className="text-xl font-bold tracking-tight text-tier-1">Mission Calibration</DialogTitle></DialogHeader>
             <div className="grid gap-6 py-4">
               <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                  <Label className="text-[10px] uppercase tracking-widest text-tier-3">Platform Name</Label>
-                  <Input 
-                    value={editData.name}
-                    onChange={(e) => setEditData({...editData, name: e.target.value})}
-                    className="bg-secondary/50 border-border h-11 rounded-xl text-tier-1"
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label className="text-[10px] uppercase tracking-widest text-tier-3">Current Stage</Label>
-                  <Select value={editData.currentStage} onValueChange={(v) => setEditData({...editData, currentStage: v})}>
-                    <SelectTrigger className="bg-secondary/50 border-border h-11 rounded-xl text-tier-1">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {['Not Started', 'Research', 'Applied', 'In Review', 'Approved', 'Rejected', 'Onboarding', 'Live'].map(s => (
-                        <SelectItem key={s} value={s}>{s}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+                <div className="grid gap-2"><Label className="text-[10px] uppercase tracking-widest text-tier-3">Platform Name</Label><Input value={editData.name} onChange={(e) => setEditData({...editData, name: e.target.value})} className="bg-secondary/50 border-border h-11 rounded-xl" /></div>
+                <div className="grid gap-2"><Label className="text-[10px] uppercase tracking-widest text-tier-3">Stage</Label><Select value={editData.currentStage} onValueChange={(v) => setEditData({...editData, currentStage: v})}><SelectTrigger className="bg-secondary/50 border-border h-11 rounded-xl"><SelectValue /></SelectTrigger><SelectContent>{['Not Started', 'Research', 'Applied', 'In Review', 'Approved', 'Rejected', 'Onboarding', 'Live'].map(s => (<SelectItem key={s} value={s}>{s}</SelectItem>))}</SelectContent></Select></div>
               </div>
-
               <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                  <Label className="text-[10px] uppercase tracking-widest text-tier-3">Discovery Source</Label>
-                  <Select value={editData.source} onValueChange={(v) => setEditData({...editData, source: v})}>
-                    <SelectTrigger className="bg-secondary/50 border-border h-11 rounded-xl text-tier-1">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {['RangeMe', 'Google', 'AI', 'LinkedIn', 'Referral', 'Other'].map(s => (
-                        <SelectItem key={s} value={s}>{s}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="grid gap-2">
-                  <Label className="text-[10px] uppercase tracking-widest text-tier-3">Priority</Label>
-                  <Select value={editData.priority} onValueChange={(v) => setEditData({...editData, priority: v})}>
-                    <SelectTrigger className="bg-secondary/50 border-border h-11 rounded-xl text-tier-1">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {['High', 'Medium', 'Low'].map(s => (
-                        <SelectItem key={s} value={s}>{s}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+                <div className="grid gap-2"><Label className="text-[10px] uppercase tracking-widest text-tier-3">Source</Label><Select value={editData.source} onValueChange={(v) => setEditData({...editData, source: v})}><SelectTrigger className="bg-secondary/50 border-border h-11 rounded-xl"><SelectValue /></SelectTrigger><SelectContent>{['RangeMe', 'Google', 'AI', 'LinkedIn', 'Referral', 'Other'].map(s => (<SelectItem key={s} value={s}>{s}</SelectItem>))}</SelectContent></Select></div>
+                <div className="grid gap-2"><Label className="text-[10px] uppercase tracking-widest text-tier-3">Target Date</Label><DatePicker value={editData.dueDate} onChange={(v) => setEditData({...editData, dueDate: v})} /></div>
               </div>
-
-              {editData.currentStage === 'Rejected' && (
-                <div className="grid gap-4 p-4 border border-rose-500/20 bg-rose-500/5 rounded-xl">
-                  <div className="grid gap-2">
-                    <Label className="text-[10px] uppercase tracking-widest text-rose-500 font-bold">Reason for Rejection</Label>
-                    <Input 
-                      value={editData.rejectionReason}
-                      onChange={(e) => setEditData({...editData, rejectionReason: e.target.value})}
-                      placeholder="e.g. Category saturation, logistics constraints..."
-                      className="bg-background border-rose-200 dark:border-rose-900 h-11 rounded-xl text-tier-1"
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label className="text-[10px] uppercase tracking-widest text-rose-500 font-bold">Lessons Learned</Label>
-                    <Textarea 
-                      value={editData.rejectionLessons}
-                      onChange={(e) => setEditData({...editData, rejectionLessons: e.target.value})}
-                      placeholder="What can we optimize for future attempts?"
-                      className="bg-background border-rose-200 dark:border-rose-900 min-h-[80px] rounded-xl text-tier-1 p-4"
-                    />
-                  </div>
-                </div>
-              )}
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                  <Label className="text-[10px] uppercase tracking-widest text-tier-3">Objective</Label>
-                  <Input 
-                    value={editData.nextStep}
-                    onChange={(e) => setEditData({...editData, nextStep: e.target.value})}
-                    className="bg-secondary/50 border-border h-11 rounded-xl text-tier-1"
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label className="text-[10px] uppercase tracking-widest text-tier-3">Target Date</Label>
-                  <DatePicker 
-                    value={editData.dueDate}
-                    onChange={(v) => setEditData({...editData, dueDate: v})}
-                  />
-                </div>
-              </div>
-
-              <div className="grid gap-2">
-                <Label className="text-[10px] uppercase tracking-widest text-tier-3">About Platform / Description</Label>
-                <Textarea 
-                  value={editData.notes}
-                  onChange={(e) => setEditData({...editData, notes: e.target.value})}
-                  placeholder="Enter detailed platform profile or marketplace description..."
-                  className="bg-secondary/50 border-border min-h-[100px] rounded-xl text-tier-1 p-4"
-                />
-              </div>
-
-              <Separator className="bg-border" />
-              <span className="text-[10px] font-bold uppercase tracking-widest text-primary">Contact Calibration</span>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                  <Label className="text-[10px] uppercase tracking-widest text-tier-3">Website</Label>
-                  <Input 
-                    value={editData.website}
-                    onChange={(e) => setEditData({...editData, website: e.target.value})}
-                    className="bg-secondary/50 border-border h-11 rounded-xl text-tier-1"
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label className="text-[10px] uppercase tracking-widest text-tier-3">Portal URL</Label>
-                  <Input 
-                    value={editData.portalUrl}
-                    onChange={(e) => setEditData({...editData, portalUrl: e.target.value})}
-                    className="bg-secondary/50 border-border h-11 rounded-xl text-tier-1"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                  <Label className="text-[10px] uppercase tracking-widest text-tier-3">Support Email</Label>
-                  <Input 
-                    value={editData.supportEmail}
-                    onChange={(e) => setEditData({...editData, supportEmail: e.target.value})}
-                    className="bg-secondary/50 border-border h-11 rounded-xl text-tier-1"
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label className="text-[10px] uppercase tracking-widest text-tier-3">Comm Status</Label>
-                  <Select value={editData.commStatus} onValueChange={(v) => setEditData({...editData, commStatus: v})}>
-                    <SelectTrigger className="bg-secondary/50 border-border h-11 rounded-xl text-tier-1">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {["No outreach", "Contacted", "Waiting reply", "In discussion", "Approved", "Rejected"].map(s => (
-                        <SelectItem key={s} value={s}>{s}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <Separator className="bg-border" />
-
-              <div className="grid gap-3">
-                <Label className="text-[10px] uppercase tracking-widest text-tier-4 font-bold">Onboarding Strategy</Label>
-                <div className="flex gap-2">
-                  <Input 
-                    placeholder="Add requirement (e.g. VAT validation)"
-                    value={reqInput}
-                    onChange={(e) => setReqInput(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && reqInput) {
-                        e.preventDefault();
-                        setEditData({...editData, requirements: [...editData.requirements, reqInput]});
-                        setReqInput("");
-                      }
-                    }}
-                    className="bg-secondary/50 border-border h-11 rounded-xl text-sm"
-                  />
-                  <Button variant="secondary" onClick={() => {
-                    if (reqInput) {
-                      setEditData({...editData, requirements: [...editData.requirements, reqInput]});
-                      setReqInput("");
-                    }
-                  }} className="rounded-xl h-11 px-4 font-bold uppercase text-[10px] tracking-widest border border-border">Add</Button>
-                </div>
-                <div className="flex flex-col gap-2 pt-2">
-                  {editData.requirements.map((req: string, idx: number) => (
-                    <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-secondary/30 border border-border group hover:bg-secondary/50 transition-all">
-                      <span className="text-[13px] font-medium text-tier-2">{req}</span>
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        onClick={() => setEditData({...editData, requirements: editData.requirements.filter((_: any, i: number) => i !== idx)})}
-                        className="size-7 rounded-lg text-tier-4 hover:text-rose-500 hover:bg-rose-500/10 transition-all"
-                      >
-                        <X className="size-3.5" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <div className="grid gap-2"><Label className="text-[10px] uppercase tracking-widest text-tier-3">About</Label><Textarea value={editData.notes} onChange={(e) => setEditData({...editData, notes: e.target.value})} className="bg-secondary/50 border-border min-h-[100px] rounded-xl" /></div>
             </div>
-            <DialogFooter className="pt-2">
-              <Button onClick={handleUpdate} className="w-full bg-primary text-white h-12 rounded-xl font-bold uppercase tracking-widest shadow-xl shadow-primary/20 hover:scale-[1.01] active:scale-[0.99] transition-all">
-                Synchronize Mission
-              </Button>
-            </DialogFooter>
+            <DialogFooter><Button onClick={handleUpdate} className="w-full bg-primary text-white h-12 rounded-xl font-bold uppercase tracking-widest">Synchronize Mission</Button></DialogFooter>
           </DialogContent>
         </Dialog>
       )}
@@ -775,22 +371,11 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
 
 function ContactField({ label, value, icon: Icon, link }: { label: string, value?: string, icon: any, link?: string }) {
   if (!value && !link) return null;
-  
   return (
     <div className="flex items-center justify-between gap-4 group">
-      <div className="flex items-center gap-2.5 text-tier-3">
-        <Icon className="size-3.5" />
-        <span className="text-[10px] font-bold uppercase tracking-widest">{label}</span>
-      </div>
+      <div className="flex items-center gap-2.5 text-tier-3"><Icon className="size-3.5" /><span className="text-[10px] font-bold uppercase tracking-widest">{label}</span></div>
       {link ? (
-        <a 
-          href={link.startsWith('http') || link.startsWith('mailto') ? link : `https://${link}`} 
-          target={link.startsWith('mailto') ? undefined : "_blank"} 
-          rel="noopener noreferrer"
-          className="text-[12px] font-semibold text-primary hover:underline truncate max-w-[150px]"
-        >
-          {value || 'Link'}
-        </a>
+        <a href={link.startsWith('http') ? link : `https://${link}`} target="_blank" rel="noopener noreferrer" className="text-[12px] font-semibold text-primary hover:underline truncate max-w-[150px]">{value || 'Link'}</a>
       ) : (
         <span className="text-[12px] font-semibold text-tier-1">{value || 'N/A'}</span>
       )}
@@ -799,8 +384,6 @@ function ContactField({ label, value, icon: Icon, link }: { label: string, value
 }
 
 function TimelineEntry({ date, user, content, type }: { date: string, user: string, content: string, type: 'note' | 'task' }) {
-  const displayUser = (user === "Mikhail" || user.startsWith("Mikhail ")) ? "Mikhail" : user;
-
   return (
     <div className="flex flex-col gap-2 pl-8 relative">
       <div className="absolute left-0 top-1.5 size-[23px] flex items-center justify-center">
@@ -810,15 +393,11 @@ function TimelineEntry({ date, user, content, type }: { date: string, user: stri
           type === 'task' ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]" : "bg-primary shadow-[0_0_8px_rgba(147,51,234,0.3)]"
         )} />
       </div>
-      
       <div className="flex items-center gap-3">
-        <span className="text-[12px] font-semibold text-tier-2">{displayUser}</span>
+        <span className="text-[12px] font-semibold text-tier-2">{user}</span>
         <span className="text-[10px] font-bold uppercase tracking-widest text-tier-4">{date}</span>
-        {type === 'task' && <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 text-[8px] uppercase tracking-tighter px-1.5 h-4">Verified Step</Badge>}
       </div>
-      <p className="text-[14px] text-tier-3 leading-relaxed font-medium">
-        {content}
-      </p>
+      <p className="text-[14px] text-tier-3 leading-relaxed font-medium">{content}</p>
     </div>
   );
 }

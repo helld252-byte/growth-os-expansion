@@ -1,3 +1,4 @@
+
 'use client';
 
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
@@ -53,8 +54,8 @@ export default function DashboardLayout({
 
   const isAdmin = !!adminDoc || !!nestedAdminDoc;
 
-  // Extract first name for Mikhail or generic display
-  const firstName = user?.displayName?.split(' ')[0] || "Operator";
+  // Extract first name for display
+  const firstName = user?.displayName?.split(' ')[0] || "Mikhail";
 
   useEffect(() => {
     if (!isUserLoading && !user) {
@@ -84,7 +85,7 @@ export default function DashboardLayout({
 
   const getSectionLabel = (path: string) => {
     if (path === "/") return "Home";
-    if (path.startsWith("/channels")) return "Platforms";
+    if (path.startsWith("/channels")) return "Opportunities";
     if (path.startsWith("/tasks")) return "Operational Tasks";
     if (path.startsWith("/hub")) return "Intelligence Hub";
     if (path.startsWith("/settings")) return "System Config";
@@ -110,7 +111,7 @@ export default function DashboardLayout({
         <SidebarInset className="flex flex-col overflow-hidden bg-transparent">
           <header className="h-14 flex items-center justify-between px-6 bg-background/20 backdrop-blur-xl sticky top-0 z-40 border-b border-border/50">
             <div className="flex items-center gap-5">
-              <SidebarTrigger className="text-tier-3 hover:text-tier-1 hover:bg-secondary/50 transition-colors" />
+              <SidebarTrigger className="text-tier-3 hover:text-tier-1 hover:bg-secondary/50 transition-colors p-2 rounded-lg" />
               <div className="h-4 w-px bg-border hidden sm:block" />
               <div className="flex items-center gap-3">
                 <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-tier-3">Unit-01</span>
@@ -118,12 +119,6 @@ export default function DashboardLayout({
                 <span className="text-[11px] font-medium uppercase tracking-[0.15em] text-primary">
                   {getSectionLabel(pathname)}
                 </span>
-                {isAdmin && (
-                  <>
-                    <span className="text-tier-3/20 text-xs">/</span>
-                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-primary/10 text-primary font-bold uppercase tracking-widest border border-primary/20">Admin</span>
-                  </>
-                )}
               </div>
             </div>
 
@@ -131,7 +126,7 @@ export default function DashboardLayout({
               <div className="flex items-center gap-4">
                 <div 
                   onClick={() => setIsSearchOpen(true)}
-                  className="hidden sm:flex items-center bg-secondary border border-border rounded-lg px-3 py-1.5 gap-3 cursor-pointer hover:bg-secondary/80 transition-all group"
+                  className="hidden sm:flex items-center bg-secondary border border-border rounded-lg px-3 py-1.5 gap-3 cursor-pointer hover:bg-secondary transition-all group"
                 >
                   <Search className="size-3.5 text-tier-3 group-hover:text-primary transition-colors" />
                   <span className="text-[11px] font-medium tracking-tight text-tier-3 group-hover:text-primary pr-6 transition-colors">Search Platforms & Tasks</span>
@@ -148,7 +143,7 @@ export default function DashboardLayout({
               
               <DropdownMenu>
                 <DropdownMenuTrigger className="flex items-center gap-3 cursor-pointer group outline-none">
-                  <div className="size-7 rounded-full overflow-hidden border border-border group-hover:border-accent/40 transition-all opacity-90 group-hover:opacity-100">
+                  <div className="size-7 rounded-full overflow-hidden border border-border group-hover:border-primary/40 transition-all opacity-90 group-hover:opacity-100">
                     <img src={user.photoURL || "https://picsum.photos/seed/user/100/100"} alt="Avatar" className="w-full h-full object-cover" />
                   </div>
                   <ChevronDown className="size-3 text-tier-3 group-hover:text-primary transition-colors" />
@@ -159,14 +154,12 @@ export default function DashboardLayout({
                     <span className="text-[10px] text-tier-3 font-medium truncate">{user.email}</span>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator className="bg-border" />
-                  {isAdmin && (
-                    <DropdownMenuItem asChild className="hover:bg-secondary cursor-pointer">
-                      <Link href="/settings" className="flex items-center gap-2">
-                        <Zap className="size-3.5 text-primary" />
-                        <span className="text-[12px] font-semibold text-tier-2">Profile Intel</span>
-                      </Link>
-                    </DropdownMenuItem>
-                  )}
+                  <DropdownMenuItem asChild className="hover:bg-secondary cursor-pointer">
+                    <Link href="/settings" className="flex items-center gap-2">
+                      <Zap className="size-3.5 text-primary" />
+                      <span className="text-[12px] font-semibold text-tier-2">Profile Intel</span>
+                    </Link>
+                  </DropdownMenuItem>
                   {isAdmin && (
                     <DropdownMenuItem asChild className="hover:bg-secondary cursor-pointer">
                       <Link href="/admin" className="flex items-center gap-2">

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useMemo } from "react";
@@ -44,7 +45,7 @@ export default function CommandCenter() {
       { label: 'Live', count: opportunities.filter(o => o.currentStage === 'Live').length },
     ];
 
-    // 3. Units by Category (Row Breakdown)
+    // 3. Units by Category
     const verticals = [
       { label: 'Platforms', count: opportunities.length, icon: Globe, path: '/channels' },
     ];
@@ -103,11 +104,11 @@ export default function CommandCenter() {
   return (
     <div className="max-w-[1400px] mx-auto flex flex-col gap-12 animate-in fade-in duration-700">
       
-      {/* Executive Stats Strip */}
+      {/* Executive Header */}
       <header className="flex flex-col gap-8">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20 shadow-lg active-glow">
+            <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20 shadow-lg">
               <Activity className="size-5 text-primary" />
             </div>
             <div className="flex flex-col">
@@ -168,14 +169,14 @@ export default function CommandCenter() {
                 className="premium-panel px-5 py-4 rounded-xl flex items-center justify-between hover:bg-secondary/50 hover:border-border group transition-all"
               >
                 <div className="flex items-center gap-4">
-                  <div className="size-8 rounded-lg bg-secondary border border-border flex items-center justify-center text-tier-3 group-hover:text-tier-1 group-hover:bg-secondary/50 transition-all">
+                  <div className="size-8 rounded-lg bg-secondary border border-border flex items-center justify-center text-tier-3 group-hover:text-tier-1 transition-all">
                     <v.icon className="size-4" />
                   </div>
                   <span className="text-[13px] font-medium text-tier-2 group-hover:text-tier-1 transition-colors">{v.label}</span>
                 </div>
                 <div className="flex items-center gap-4">
                   <span className="text-[14px] font-medium text-tier-1">{v.count}</span>
-                  <div className="size-6 rounded-full flex items-center justify-center bg-secondary border border-border group-hover:bg-secondary group-hover:border-border transition-all">
+                  <div className="size-6 rounded-full flex items-center justify-center bg-secondary border border-border transition-all">
                     <ChevronRight className="size-3.5 text-tier-4 group-hover:text-tier-1" />
                   </div>
                 </div>
@@ -206,9 +207,9 @@ export default function CommandCenter() {
                 </div>
               </div>
               
-              <div className="flex items-center gap-3 px-4 py-2.5 bg-background border border-border rounded-xl hover:bg-secondary/50 transition-all cursor-default">
+              <div className="flex items-center gap-3 px-4 py-2.5 bg-background border border-border rounded-xl transition-all cursor-default">
                 <div className="size-1.5 rounded-full bg-primary animate-pulse" />
-                <span className="text-[11px] font-medium text-tier-3">Focus area this week: <span className="text-tier-1">Platform Onboarding</span></span>
+                <span className="text-[11px] font-medium text-tier-3">Focus area: <span className="text-tier-1">Platform Onboarding</span></span>
               </div>
             </div>
           </div>
@@ -267,7 +268,7 @@ function StatModule({ label, value, highlight, color }: { label: string, value: 
 function MetricCell({ label, value, color }: { label: string, value: number, color?: string }) {
   return (
     <div className="p-6 flex flex-col gap-1.5 hover:bg-secondary/50 transition-colors group cursor-default">
-      <span className="text-[9px] font-bold uppercase tracking-[0.15em] text-tier-4 group-hover:text-tier-3 transition-colors">{label}</span>
+      <span className="text-[9px] font-bold uppercase tracking-[0.15em] text-tier-4 transition-colors">{label}</span>
       <span className={cn("text-2xl font-bold tracking-tight", color || "text-tier-1")}>{value}</span>
     </div>
   );
@@ -292,16 +293,16 @@ function ActivityRow({ item }: { item: any }) {
   return (
     <div className="px-6 py-4 bg-background flex items-center justify-between hover:bg-secondary/50 transition-colors group border-b border-border last:border-0">
       <div className="flex items-center gap-5">
-        <div className="size-2 rounded-full bg-primary/20 group-hover:bg-primary transition-all" />
+        <div className="size-2 rounded-full bg-primary/20 transition-all" />
         <div className="flex flex-col">
-          <span className="text-[14px] font-semibold text-tier-1 group-hover:text-tier-1 transition-colors leading-none">{item.name}</span>
+          <span className="text-[14px] font-semibold text-tier-1 leading-none">{item.name}</span>
           <span className="text-[11px] text-tier-4 font-medium uppercase tracking-tighter mt-1.5">
             Status updated to <span className="text-tier-3 font-bold">{item.currentStage || item.status}</span>
           </span>
         </div>
       </div>
       <div className="flex items-center gap-8">
-        <Badge variant="outline" className="h-5 px-2 text-[9px] uppercase tracking-widest font-bold border-border bg-secondary/50 text-tier-4 group-hover:bg-secondary group-hover:border-border transition-all">
+        <Badge variant="outline" className="h-5 px-2 text-[9px] uppercase tracking-widest font-bold border-border bg-secondary/50 text-tier-4">
           Platform
         </Badge>
         <span className="text-[11px] font-bold text-tier-4 uppercase w-20 text-right">{date.toLocaleDateString([], { month: 'short', day: 'numeric' })}</span>
