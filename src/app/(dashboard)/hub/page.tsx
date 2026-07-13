@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -21,7 +20,8 @@ import {
   Hash,
   MapPin,
   Link as LinkIcon,
-  X
+  X,
+  Sparkles
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -132,9 +132,11 @@ export default function HubPage() {
   };
 
   const handleDeleteResource = (resourceId: string, title: string) => {
+    if (!window.confirm(`Decommission strategic asset "${title}"?`)) return;
     const resourceRef = doc(firestore, 'company_resources', resourceId);
     deleteDocumentNonBlocking(resourceRef);
     toast({
+      variant: "destructive",
       title: "Asset Decommissioned",
       description: `"${title}" has been removed from the registry.`,
     });
@@ -156,29 +158,32 @@ export default function HubPage() {
   });
 
   return (
-    <div className="max-w-[1440px] mx-auto flex flex-col gap-6 animate-in zoom-in-95 duration-500">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-border/50">
-        <div className="flex items-center gap-4">
-          <div className="size-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center">
-            <Library className="size-5 text-primary" />
+    <div className="max-w-[1440px] mx-auto flex flex-col gap-10 animate-in fade-in duration-700">
+      <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-white/[0.03]">
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center gap-4">
+            <div className="size-11 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center shadow-lg active-glow">
+              <Library className="size-5.5 text-primary" />
+            </div>
+            <div className="flex flex-col">
+              <h1 className="text-3xl font-semibold tracking-tight text-tier-1">Intelligence Hub</h1>
+              <span className="text-[10px] font-bold text-tier-4 uppercase tracking-[0.25em] mt-1">Strategic Asset Registry</span>
+            </div>
           </div>
-          <div className="flex flex-col gap-1">
-            <h1 className="text-2xl font-semibold tracking-tight text-tier-1">Intelligence Hub</h1>
-            <p className="text-[11px] text-tier-2 font-medium uppercase tracking-[0.15em]">
-              Strategic library for company profile, brand expansion, and sales materials.
-            </p>
-          </div>
+          <p className="text-tier-2 text-[14px] font-medium leading-relaxed max-w-2xl">
+            Central repository for company profiles, brand guidelines, and tactical sales materials. Use these assets to ensure mission consistency.
+          </p>
         </div>
 
         <Dialog open={isAddOpen} onOpenChange={(open) => { setIsAddOpen(open); if (!open) resetForm(); }}>
           <DialogTrigger asChild>
-            <Button className="bg-primary hover:bg-primary/90 text-white font-semibold gap-1.5 h-10 px-6 rounded-xl text-[11px] uppercase tracking-wider transition-all shadow-lg shadow-primary/20">
-              <Plus className="size-4" /> New Resource
+            <Button className="bg-primary hover:bg-primary/90 text-white font-bold gap-2.5 h-11 px-8 rounded-xl text-[11px] uppercase tracking-wider transition-all shadow-xl shadow-primary/20">
+              <Plus className="size-4" /> Record Asset
             </Button>
           </DialogTrigger>
-          <DialogContent className="bg-background/95 backdrop-blur-2xl border-border rounded-2xl sm:max-w-[650px] max-h-[90vh] overflow-y-auto custom-scrollbar">
+          <DialogContent className="bg-background/95 backdrop-blur-2xl border-white/[0.1] rounded-2xl sm:max-w-[650px] max-h-[90vh] overflow-y-auto custom-scrollbar">
             <DialogHeader>
-              <DialogTitle className="text-xl font-bold tracking-tight text-tier-1">Record Strategic Asset</DialogTitle>
+              <DialogTitle className="text-xl font-bold tracking-tight text-tier-1">New Strategic Asset</DialogTitle>
             </DialogHeader>
             <div className="grid gap-6 py-4">
               <div className="grid grid-cols-2 gap-4">
@@ -187,17 +192,17 @@ export default function HubPage() {
                   <Input 
                     value={newResource.title}
                     onChange={(e) => setNewResource({...newResource, title: e.target.value})}
-                    placeholder="e.g. Master Company Identity" 
-                    className="bg-secondary/50 border-border h-12 rounded-xl text-tier-1"
+                    placeholder="e.g. Master Pitch Deck v3" 
+                    className="bg-white/[0.03] border-white/[0.08] h-12 rounded-xl text-tier-1"
                   />
                 </div>
                 <div className="grid gap-2">
                   <Label className="text-[10px] uppercase tracking-widest text-tier-3">Category</Label>
                   <Select value={newResource.category} onValueChange={(v) => setNewResource({...newResource, category: v})}>
-                    <SelectTrigger className="bg-secondary/50 border-border h-12 rounded-xl text-tier-1">
+                    <SelectTrigger className="bg-white/[0.03] border-white/[0.08] h-12 rounded-xl text-tier-1">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-popover/95 backdrop-blur-xl border-border">
+                    <SelectContent className="bg-popover/95 backdrop-blur-xl border-white/[0.1]">
                       {categoryOptions.map(opt => (
                         <SelectItem key={opt.label} value={opt.label}>{opt.label}</SelectItem>
                       ))}
@@ -207,76 +212,76 @@ export default function HubPage() {
               </div>
 
               {newResource.category === "Company Profile" && (
-                <div className="grid grid-cols-2 gap-4 p-4 border border-border rounded-xl bg-secondary/20">
+                <div className="grid grid-cols-2 gap-4 p-4 border border-white/[0.05] rounded-xl bg-white/[0.01]">
                   <div className="grid gap-2">
-                    <Label className="text-[10px] uppercase tracking-widest text-tier-3">Address</Label>
+                    <Label className="text-[10px] uppercase tracking-widest text-tier-3">Official Address</Label>
                     <Input 
                       value={newResource.address}
                       onChange={(e) => setNewResource({...newResource, address: e.target.value})}
-                      placeholder="Street, City, Country" 
-                      className="bg-background border-border h-10 rounded-xl text-tier-1 text-sm"
+                      placeholder="Full business address" 
+                      className="bg-white/[0.02] border-white/[0.08] h-10 rounded-xl text-tier-1 text-sm"
                     />
                   </div>
                   <div className="grid gap-2">
-                    <Label className="text-[10px] uppercase tracking-widest text-tier-3">Phone</Label>
+                    <Label className="text-[10px] uppercase tracking-widest text-tier-3">Primary Phone</Label>
                     <Input 
                       value={newResource.phone}
                       onChange={(e) => setNewResource({...newResource, phone: e.target.value})}
-                      placeholder="+1 (555) 000-0000" 
-                      className="bg-background border-border h-10 rounded-xl text-tier-1 text-sm"
+                      placeholder="Support line" 
+                      className="bg-white/[0.02] border-white/[0.08] h-10 rounded-xl text-tier-1 text-sm"
                     />
                   </div>
                   <div className="grid gap-2 col-span-2">
-                    <Label className="text-[10px] uppercase tracking-widest text-tier-3">Tax ID / Registration</Label>
+                    <Label className="text-[10px] uppercase tracking-widest text-tier-3">Tax ID / Business Registration</Label>
                     <Input 
                       value={newResource.taxId}
                       onChange={(e) => setNewResource({...newResource, taxId: e.target.value})}
-                      placeholder="VAT / EIN / Company Number" 
-                      className="bg-background border-border h-10 rounded-xl text-tier-1 text-sm"
+                      placeholder="VAT / EIN / Registration Number" 
+                      className="bg-white/[0.02] border-white/[0.08] h-10 rounded-xl text-tier-1 text-sm"
                     />
                   </div>
                 </div>
               )}
 
               <div className="grid gap-2">
-                <Label className="text-[10px] uppercase tracking-widest text-tier-3">Asset Content / Description</Label>
+                <Label className="text-[10px] uppercase tracking-widest text-tier-3">Strategic Content</Label>
                 <Textarea 
                   value={newResource.content}
                   onChange={(e) => setNewResource({...newResource, content: e.target.value})}
-                  placeholder="Enter strategic content, mission statements, or detailed info..." 
-                  className="bg-secondary/50 border-border min-h-[120px] rounded-xl text-tier-1 p-4"
+                  placeholder="Paste mission statements, FAQs, or boilerplate copy here..." 
+                  className="bg-white/[0.03] border-white/[0.08] min-h-[150px] rounded-xl text-tier-1 p-4"
                 />
               </div>
 
               <div className="grid gap-3">
-                <Label className="text-[10px] uppercase tracking-widest text-tier-3">Strategic Links & Files</Label>
+                <Label className="text-[10px] uppercase tracking-widest text-tier-3">Reference Links</Label>
                 <div className="flex gap-2">
                   <Input 
-                    placeholder="Link Label (e.g. Sales Deck)" 
+                    placeholder="Link Name" 
                     value={linkInput.label}
                     onChange={(e) => setLinkInput({...linkInput, label: e.target.value})}
-                    className="bg-secondary/50 border-border h-10 rounded-xl text-xs"
+                    className="bg-white/[0.03] border-white/[0.08] h-11 rounded-xl text-xs"
                   />
                   <Input 
                     placeholder="URL (https://...)" 
                     value={linkInput.url}
                     onChange={(e) => setLinkInput({...linkInput, url: e.target.value})}
-                    className="bg-secondary/50 border-border h-10 rounded-xl text-xs"
+                    className="bg-white/[0.03] border-white/[0.08] h-11 rounded-xl text-xs"
                   />
-                  <Button variant="secondary" onClick={handleAddLink} className="h-10 px-4 rounded-xl text-[10px] uppercase font-bold">Add</Button>
+                  <Button variant="secondary" onClick={handleAddLink} className="h-11 px-6 rounded-xl text-[10px] uppercase font-bold">Add</Button>
                 </div>
                 {newResource.links.length > 0 && (
                   <div className="flex flex-wrap gap-2 pt-2">
                     {newResource.links.map((link, idx) => (
-                      <Badge key={idx} variant="secondary" className="pl-3 pr-1 py-1 gap-2 rounded-lg bg-secondary border-border group">
-                        <span className="text-[10px]">{link.label}</span>
+                      <Badge key={idx} variant="outline" className="pl-3 pr-1 py-1 gap-2 rounded-lg bg-white/[0.02] border-white/[0.1] text-tier-2">
+                        <span className="text-[10px] font-bold">{link.label}</span>
                         <Button 
                           variant="ghost" 
                           size="icon" 
-                          className="size-4 rounded-full hover:bg-rose-500/20 hover:text-rose-400"
+                          className="size-5 rounded-full hover:bg-rose-500/20 hover:text-rose-400 transition-colors"
                           onClick={() => removeLink(idx)}
                         >
-                          <X className="size-2.5" />
+                          <X className="size-3" />
                         </Button>
                       </Badge>
                     ))}
@@ -290,192 +295,222 @@ export default function HubPage() {
                 disabled={!newResource.title || !newResource.content}
                 className="w-full bg-primary text-white h-12 rounded-xl font-bold uppercase tracking-widest"
               >
-                Synchronize Asset
+                Synchronize Mission Asset
               </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
-      </div>
+      </header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-10">
-        <div className="lg:col-span-1 flex flex-col gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+        <aside className="lg:col-span-3 flex flex-col gap-10">
           <div className="relative group">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-tier-3 group-focus-within:text-primary transition-colors" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-tier-3 group-focus-within:text-primary transition-colors" />
             <Input 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Filter library..." 
-              className="pl-10 h-11 bg-white/[0.02] border-border rounded-xl text-[13px] font-medium text-tier-1 placeholder:text-tier-4 focus-visible:ring-primary/20" 
+              placeholder="Search library..." 
+              className="pl-11 h-11 bg-white/[0.02] border-white/[0.05] rounded-xl text-[13px] font-medium text-tier-1 focus-visible:ring-primary/20 transition-all" 
             />
           </div>
 
-          <div className="flex flex-col gap-1.5">
-            <h3 className="text-[9px] font-semibold uppercase tracking-[0.25em] text-tier-4 px-3 mb-2">Resource Types</h3>
-            <Button 
-              variant="ghost" 
+          <div className="flex flex-col gap-2">
+            <h3 className="text-[9px] font-bold uppercase tracking-[0.25em] text-tier-4 px-3 mb-2">Resource Index</h3>
+            <FilterButton 
+              active={selectedCategory === "All Assets"} 
               onClick={() => setSelectedCategory("All Assets")}
-              className={cn(
-                "justify-start gap-4 h-10 px-3.5 rounded-lg transition-all text-[13px] font-medium",
-                selectedCategory === "All Assets" 
-                  ? "bg-secondary text-tier-1 hover:bg-secondary" 
-                  : "text-tier-3 hover:bg-secondary/50 hover:text-tier-1"
-              )}
-            >
-              <Library className={cn("size-4.5", selectedCategory === "All Assets" ? "text-primary" : "text-tier-3")} /> 
-              All Assets
-            </Button>
+              icon={Library}
+              label="All Strategic Intel"
+            />
             {categoryOptions.map((cat) => (
-              <Button 
+              <FilterButton 
                 key={cat.label}
-                variant="ghost" 
+                active={selectedCategory === cat.label}
                 onClick={() => setSelectedCategory(cat.label)}
-                className={cn(
-                  "justify-start gap-4 h-10 px-3.5 rounded-lg transition-all text-[13px] font-medium",
-                  selectedCategory === cat.label 
-                    ? "bg-secondary text-tier-1 hover:bg-secondary" 
-                    : "text-tier-3 hover:bg-secondary/50 hover:text-tier-1"
-                )}
-              >
-                <cat.icon className={cn("size-4.5", selectedCategory === cat.label ? "text-primary" : "text-tier-3")} /> 
-                {cat.label}
-              </Button>
+                icon={cat.icon}
+                label={cat.label}
+              />
             ))}
           </div>
-        </div>
 
-        <div className="lg:col-span-4 grid grid-cols-1 md:grid-cols-2 gap-6 content-start">
-          {isLoading ? (
-            <div className="col-span-2 flex flex-col items-center justify-center h-64 gap-4 opacity-50">
-              <Loader2 className="size-8 text-primary animate-spin" />
-              <span className="text-[10px] font-bold uppercase tracking-widest">Retrieving Assets...</span>
+          <div className="premium-panel p-6 rounded-2xl flex flex-col gap-5 border-emerald-500/20 bg-emerald-500/5 mt-auto shadow-sm">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-500">System Tip</span>
+              <Sparkles className="size-4 text-emerald-500" />
             </div>
-          ) : filteredResources.length === 0 ? (
-            <div className="col-span-2 h-64 border border-dashed border-border rounded-2xl flex flex-col items-center justify-center gap-4 opacity-30">
-              <Library className="size-10" />
-              <span className="text-[11px] font-bold uppercase tracking-widest">No Intelligence Assets Recorded</span>
-            </div>
-          ) : (
-            filteredResources.map((section) => (
-              <div key={section.id} className={cn(
-                "premium-panel p-6 rounded-2xl flex flex-col gap-5 group transition-all",
-                section.category === "Company Profile" ? "border-border bg-secondary/20 shadow-sm" : "hover:bg-secondary/30 hover:border-border"
-              )}>
-                <div className="flex items-center justify-between">
-                  <Badge variant="outline" className={cn(
-                    "font-medium uppercase text-[9px] tracking-wider px-2.5 py-0.5 rounded-lg",
-                    section.category === "Company Profile" ? "bg-primary text-white border-primary" : "bg-secondary text-tier-2 border-border"
-                  )}>
-                    {section.category}
-                  </Badge>
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2 text-[10px] text-tier-3 font-semibold uppercase tracking-wider">
-                      <Clock className="size-3.5" /> {section.lastUpdatedAt ? new Date(section.lastUpdatedAt).toLocaleDateString() : 'Recent'}
+            <p className="text-[12px] font-medium text-tier-2 leading-relaxed">
+              Use "Copy Description" to quickly populate outreach emails or platform application forms.
+            </p>
+          </div>
+        </aside>
+
+        <div className="lg:col-span-9 flex flex-col gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {isLoading ? (
+              <div className="col-span-full h-72 flex flex-col items-center justify-center gap-4 opacity-40">
+                <Loader2 className="size-10 text-primary animate-spin" />
+                <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-tier-3">Scanning Registry...</span>
+              </div>
+            ) : filteredResources.length === 0 ? (
+              <div className="col-span-full h-72 border border-dashed border-white/[0.05] rounded-3xl flex flex-col items-center justify-center gap-4 opacity-30">
+                <Library className="size-14 text-tier-4" />
+                <span className="text-[11px] font-bold uppercase tracking-[0.3em] text-tier-4">No matching assets found</span>
+              </div>
+            ) : (
+              filteredResources.map((asset) => (
+                <div key={asset.id} className={cn(
+                  "premium-panel p-7 rounded-3xl flex flex-col gap-6 group transition-all relative overflow-hidden",
+                  asset.category === "Company Profile" ? "border-primary/20 bg-primary/5" : "hover:bg-white/[0.02]"
+                )}>
+                  <div className="flex items-center justify-between">
+                    <Badge variant="outline" className={cn(
+                      "font-bold uppercase text-[9px] tracking-widest px-3 py-0.5 rounded-lg border",
+                      asset.category === "Company Profile" ? "bg-primary text-white border-primary" : "bg-white/5 text-tier-3 border-white/10"
+                    )}>
+                      {asset.category}
+                    </Badge>
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-1.5 text-[10px] text-tier-4 font-bold uppercase tracking-widest">
+                        <Clock className="size-3.5" /> {asset.lastUpdatedAt ? new Date(asset.lastUpdatedAt).toLocaleDateString() : 'Active'}
+                      </div>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={() => handleDeleteResource(asset.id, asset.title)}
+                        className="size-8 rounded-lg text-tier-4 hover:text-rose-500 hover:bg-rose-500/10 opacity-0 group-hover:opacity-100 transition-all"
+                      >
+                        <Trash2 className="size-3.5" />
+                      </Button>
                     </div>
+                  </div>
+
+                  <div className="flex flex-col gap-4 flex-1">
+                    <div className="flex flex-col gap-2">
+                      <h3 className="text-lg font-semibold text-tier-1 tracking-tight group-hover:text-primary transition-colors leading-tight">
+                        {asset.title}
+                      </h3>
+                      <p className="text-[14px] text-tier-3 leading-relaxed font-medium text-justify">
+                        {asset.content}
+                      </p>
+                    </div>
+
+                    {asset.category === "Company Profile" && (
+                      <div className="flex flex-col gap-3 p-4 bg-white/[0.02] border border-white/[0.05] rounded-2xl shadow-inner">
+                        {asset.address && (
+                          <div className="flex items-start gap-3">
+                            <MapPin className="size-3.5 text-primary shrink-0 mt-0.5" />
+                            <span className="text-[12px] font-semibold text-tier-2 leading-snug">{asset.address}</span>
+                          </div>
+                        )}
+                        {asset.phone && (
+                          <div className="flex items-center gap-3">
+                            <Phone className="size-3.5 text-primary shrink-0" />
+                            <span className="text-[12px] font-semibold text-tier-2">{asset.phone}</span>
+                          </div>
+                        )}
+                        {asset.taxId && (
+                          <div className="flex items-center gap-3">
+                            <Hash className="size-3.5 text-primary shrink-0" />
+                            <span className="text-[12px] font-bold text-tier-2 uppercase tracking-tight">ID: {asset.taxId}</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {asset.links && asset.links.length > 0 && (
+                      <div className="flex flex-col gap-3 pt-2">
+                        <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-tier-4">Operational Links</span>
+                        <div className="flex flex-wrap gap-2">
+                          {asset.links.map((link: any, idx: number) => (
+                            <Button 
+                              key={idx} 
+                              variant="outline" 
+                              size="sm" 
+                              asChild
+                              className="h-9 rounded-xl border-white/[0.08] bg-white/[0.02] hover:bg-white/[0.05] hover:border-primary/30 transition-all px-4"
+                            >
+                              <a href={link.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
+                                <ExternalLink className="size-3.5 text-primary" />
+                                <span className="text-[10px] font-bold uppercase tracking-wider">{link.label}</span>
+                              </a>
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-3 mt-6 pt-5 border-t border-white/[0.04]">
                     <Button 
                       variant="ghost" 
-                      size="icon" 
-                      onClick={() => handleDeleteResource(section.id, section.title)}
-                      className="size-7 rounded-lg text-tier-4 hover:text-rose-400 hover:bg-rose-500/10 opacity-0 group-hover:opacity-100 transition-all"
+                      className="rounded-xl h-10 font-bold gap-2.5 bg-white/[0.02] border border-white/[0.05] hover:bg-primary/10 hover:border-primary/20 hover:text-primary transition-all flex-1 text-[10px] uppercase tracking-[0.15em]"
+                      onClick={() => copyToClipboard(asset.content)}
                     >
-                      <Trash2 className="size-3.5" />
+                      <Copy className="size-4" /> Copy Strategic Text
                     </Button>
                   </div>
                 </div>
+              )
+            ))}
 
+            {/* Premium Highlight Card */}
+            <div className="premium-panel p-10 rounded-[32px] flex flex-col lg:flex-row items-center justify-between bg-gradient-to-br from-primary/10 via-transparent to-accent/10 border-primary/20 col-span-full shadow-2xl relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-10 opacity-5 group-hover:opacity-10 transition-opacity rotate-12">
+                <FileText className="size-64 text-primary" />
+              </div>
+              <div className="flex items-center gap-10 relative z-10">
+                <div className="size-20 rounded-3xl bg-white border border-white/[0.1] flex items-center justify-center shadow-2xl shadow-primary/20 ring-1 ring-white/10 group-hover:scale-105 transition-transform duration-500">
+                  <ShieldCheck className="size-10 text-primary" />
+                </div>
                 <div className="flex flex-col gap-4">
-                  <div className="flex flex-col gap-1">
-                    <h3 className="text-lg font-semibold text-tier-1 tracking-tight">
-                      {section.title}
-                    </h3>
-                    <p className="text-[14px] text-tier-2 leading-relaxed font-medium">
-                      {section.content}
+                  <div className="flex items-center gap-4">
+                    <Badge className="bg-primary text-white font-bold uppercase text-[10px] tracking-[0.25em] px-4 py-1 rounded-full shadow-lg shadow-primary/20">Featured Intel</Badge>
+                    <span className="text-[10px] font-bold text-tier-4 uppercase tracking-[0.2em]">Master Strategy Blueprint v2.8</span>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <h3 className="text-2xl font-bold text-tier-1 tracking-tight leading-none">Core Business Operating System</h3>
+                    <p className="text-[15px] text-tier-2 leading-relaxed font-medium max-w-2xl text-justify">
+                      "We architect high-fidelity growth systems for modern multi-channel enterprises. Our vision is to provide the tactical backbone for global retail, wholesale, and direct-to-consumer expansion."
                     </p>
                   </div>
-
-                  {section.category === "Company Profile" && (
-                    <div className="flex flex-col gap-3 p-4 bg-background border border-border rounded-xl">
-                      {section.address && (
-                        <div className="flex items-start gap-3 text-[12px]">
-                          <MapPin className="size-3.5 text-primary shrink-0 mt-0.5" />
-                          <span className="text-tier-2">{section.address}</span>
-                        </div>
-                      )}
-                      {section.phone && (
-                        <div className="flex items-center gap-3 text-[12px]">
-                          <Phone className="size-3.5 text-primary shrink-0" />
-                          <span className="text-tier-2">{section.phone}</span>
-                        </div>
-                      )}
-                      {section.taxId && (
-                        <div className="flex items-center gap-3 text-[12px]">
-                          <Hash className="size-3.5 text-primary shrink-0" />
-                          <span className="text-tier-2">Tax ID: {section.taxId}</span>
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {section.links && section.links.length > 0 && (
-                    <div className="flex flex-col gap-2">
-                      <span className="text-[9px] font-bold uppercase tracking-widest text-tier-4">Strategic Assets & Files</span>
-                      <div className="flex flex-wrap gap-2">
-                        {section.links.map((link: any, idx: number) => (
-                          <Button 
-                            key={idx} 
-                            variant="outline" 
-                            size="sm" 
-                            asChild
-                            className="h-8 rounded-lg border-border bg-background hover:bg-secondary transition-all px-3"
-                          >
-                            <a href={link.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
-                              <ExternalLink className="size-3 text-primary" />
-                              <span className="text-[10px] font-semibold">{link.label}</span>
-                            </a>
-                          </Button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <div className="flex items-center gap-3 mt-auto pt-5 border-t border-border">
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="rounded-xl h-10 font-semibold gap-2.5 bg-secondary/50 border border-border hover:bg-secondary hover:text-tier-1 transition-all flex-1 text-[11px] uppercase tracking-wider"
-                    onClick={() => copyToClipboard(section.content)}
-                  >
-                    <Copy className="size-4" /> Copy Description
-                  </Button>
                 </div>
               </div>
-            )
-          ))}
 
-          {/* Featured Strategy Section */}
-          <div className="premium-panel p-8 rounded-2xl flex flex-col gap-5 border-primary/20 bg-gradient-to-br from-primary/10 via-transparent to-transparent col-span-1 md:col-span-2 shadow-sm group">
-            <div className="flex items-center justify-between">
-              <Badge className="bg-primary text-white font-semibold uppercase text-[10px] tracking-[0.15em] px-3 py-0.5 rounded-lg shadow-lg shadow-primary/20">Featured Strategic Asset</Badge>
-              <FileText className="size-6 text-primary group-hover:scale-110 transition-transform" />
-            </div>
-            <div className="flex flex-col gap-3">
-              <h3 className="text-xl font-semibold text-tier-1 tracking-tight">Standard Brand Pitch</h3>
-              <p className="text-[15px] text-tier-2 leading-relaxed font-medium">
-                "Our modular systems redefine spatial efficiency for enterprises. We provide the backbone for modern retail and wholesale operations. Scaling growth through strategic multi-channel execution."
-              </p>
-            </div>
-            <div className="flex items-center gap-4 mt-2">
-              <Button 
-                className="bg-primary hover:bg-primary/90 text-white font-bold gap-2.5 rounded-xl px-8 h-11 text-[11px] uppercase tracking-wider transition-all shadow-xl shadow-primary/20 active:scale-95"
-                onClick={() => copyToClipboard("Our modular systems redefine spatial efficiency for enterprises...")}
-              >
-                <Copy className="size-4" /> Copy Full Pitch
-              </Button>
-              <span className="text-[10px] font-bold text-tier-4 uppercase tracking-widest">Master Blueprint v2.1</span>
+              <div className="flex flex-col items-center gap-4 mt-10 lg:mt-0 relative z-10 shrink-0">
+                <Button 
+                  className="bg-primary hover:bg-primary/90 text-white font-bold gap-3 rounded-2xl px-10 h-14 text-[11px] uppercase tracking-[0.2em] transition-all shadow-2xl shadow-primary/30 active:scale-95"
+                  onClick={() => copyToClipboard("We architect high-fidelity growth systems for modern multi-channel enterprises...")}
+                >
+                  <Copy className="size-5" /> Copy Master Pitch
+                </Button>
+                <div className="flex items-center gap-2">
+                  <div className="size-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+                  <span className="text-[10px] font-bold text-tier-4 uppercase tracking-widest">Verified Global Identity</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
+  );
+}
+
+function FilterButton({ active, onClick, icon: Icon, label }: any) {
+  return (
+    <Button 
+      variant="ghost" 
+      onClick={onClick}
+      className={cn(
+        "h-11 justify-start gap-4 px-4 rounded-xl transition-all relative group",
+        active 
+          ? "bg-primary/10 text-primary shadow-sm hover:bg-primary/15" 
+          : "text-tier-3 hover:bg-white/[0.03] hover:text-tier-1"
+      )}
+    >
+      <Icon className={cn("size-4.5", active ? "text-primary" : "text-tier-4 group-hover:text-tier-2")} />
+      <span className={cn("text-[13px] tracking-tight font-semibold", active ? "text-primary" : "")}>{label}</span>
+      {active && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-primary rounded-full shadow-[0_0_10px_hsl(var(--primary))]" />}
+    </Button>
   );
 }
