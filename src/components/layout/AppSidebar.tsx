@@ -4,10 +4,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { 
-  LayoutDashboard, 
+  LayoutGrid, 
   Layers, 
-  CheckSquare, 
+  BarChart3, 
   Library, 
+  CheckSquare, 
   Settings,
   Zap,
   ShieldAlert
@@ -25,17 +26,18 @@ import {
   SidebarFooter
 } from "@/components/ui/sidebar";
 
-const commandItems = [
-  { icon: LayoutDashboard, label: "Command Center", path: "/" },
+const mainItems = [
+  { icon: LayoutGrid, label: "Dashboard", path: "/" },
+  { icon: Layers, label: "Opportunities", path: "/channels" },
 ];
 
-const growthItems = [
-  { icon: Layers, label: "Platforms", path: "/channels" },
+const adminMainItems = [
+  { icon: BarChart3, label: "Analytics", path: "/reports" },
+  { icon: Library, label: "Resources", path: "/hub" },
 ];
 
 const operationsItems = [
   { icon: CheckSquare, label: "Operational Tasks", path: "/tasks" },
-  { icon: Library, label: "Intelligence Hub", path: "/hub" },
 ];
 
 interface AppSidebarProps {
@@ -55,8 +57,8 @@ export function AppSidebar({ isAdmin }: AppSidebarProps) {
           className={cn(
             "h-10 rounded-lg transition-all duration-200 px-3 relative group overflow-hidden",
             isActive 
-              ? "bg-primary/10 text-primary font-semibold shadow-[inset_0_0_0_1px_rgba(255,255,255,0.02)]" 
-              : "text-tier-3 hover:bg-white/[0.03] hover:text-tier-1 font-medium"
+              ? "bg-secondary text-tier-1 font-semibold shadow-[inset_0_0_0_1px_rgba(255,255,255,0.02)]" 
+              : "text-tier-3 hover:bg-secondary/50 hover:text-tier-1 font-medium"
           )}
         >
           <Link href={item.path}>
@@ -72,7 +74,7 @@ export function AppSidebar({ isAdmin }: AppSidebarProps) {
   };
 
   return (
-    <Sidebar variant="inset" className="border-r border-white/[0.02] bg-sidebar/40 backdrop-blur-2xl">
+    <Sidebar variant="inset" className="border-r border-border bg-sidebar/40 backdrop-blur-2xl">
       <SidebarHeader className="py-10 px-6">
         <div className="flex items-center gap-4">
           <div className="size-10 rounded-xl bg-gradient-to-br from-primary/80 to-accent/80 flex items-center justify-center shadow-lg ring-1 ring-white/10">
@@ -87,16 +89,10 @@ export function AppSidebar({ isAdmin }: AppSidebarProps) {
 
       <SidebarContent className="px-5">
         <SidebarGroup>
-          <SidebarGroupLabel className="px-3 text-[10px] uppercase font-bold tracking-[0.2em] text-tier-4 mb-3">Main Command</SidebarGroupLabel>
+          <SidebarGroupLabel className="px-3 text-[10px] uppercase font-bold tracking-[0.2em] text-tier-4 mb-3">MAIN</SidebarGroupLabel>
           <SidebarMenu className="gap-1">
-            {commandItems.map(renderMenuItem)}
-          </SidebarMenu>
-        </SidebarGroup>
-
-        <SidebarGroup className="mt-4">
-          <SidebarGroupLabel className="px-3 text-[10px] uppercase font-bold tracking-[0.2em] text-tier-4 mb-3">Growth Verticals</SidebarGroupLabel>
-          <SidebarMenu className="gap-1">
-            {growthItems.map(renderMenuItem)}
+            {mainItems.map(renderMenuItem)}
+            {isAdmin && adminMainItems.map(renderMenuItem)}
           </SidebarMenu>
         </SidebarGroup>
 
@@ -123,7 +119,7 @@ export function AppSidebar({ isAdmin }: AppSidebarProps) {
         {isAdmin && (
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild className="h-10 rounded-lg hover:bg-white/[0.03] transition-colors px-3 group">
+              <SidebarMenuButton asChild className="h-10 rounded-lg hover:bg-secondary/50 transition-colors px-3 group">
                 <Link href="/settings">
                   <Settings className="size-4.5 text-tier-3/40 group-hover:text-tier-1 transition-transform duration-700 group-hover:rotate-90" />
                   <span className="font-medium tracking-tight ml-3.5 text-[13px] text-tier-2 group-hover:text-tier-1">System Config</span>
@@ -138,7 +134,7 @@ export function AppSidebar({ isAdmin }: AppSidebarProps) {
             <span>Version</span>
             <span>2.7.0-B</span>
           </div>
-          <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
+          <div className="w-full h-1 bg-border rounded-full overflow-hidden">
             <div className="w-1/3 h-full bg-primary/40 rounded-full" />
           </div>
         </div>
