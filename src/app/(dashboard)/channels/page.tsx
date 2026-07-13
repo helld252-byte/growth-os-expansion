@@ -16,7 +16,8 @@ import {
   CheckCircle2,
   X,
   Shield,
-  Target
+  Target,
+  Ghost
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -45,7 +46,7 @@ import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 import { DatePicker } from "@/components/ui/date-picker";
 
-type FilterStatus = 'all' | 'rangeme' | 'applied' | 'waiting' | 'approved' | 'rejected' | 'high-priority';
+type FilterStatus = 'all' | 'rangeme' | 'applied' | 'waiting' | 'approved' | 'rejected' | 'no-response' | 'high-priority';
 
 const BUSINESS_MODELS = ["Wholesale", "B2B", "Dropshipping", "BTC", "B2B + Dropshipping", "Marketplace", "Partnership"];
 const BUSINESS_TYPES = [
@@ -147,6 +148,7 @@ export default function PlatformsPage() {
     if (activeFilter === 'waiting') return p.currentStage === 'In Review';
     if (activeFilter === 'approved') return p.currentStage === 'Approved';
     if (activeFilter === 'rejected') return p.currentStage === 'Rejected';
+    if (activeFilter === 'no-response') return p.currentStage === 'No Response';
     if (activeFilter === 'high-priority') return p.priority === 'High';
     return true;
   });
@@ -158,6 +160,7 @@ export default function PlatformsPage() {
     'waiting': (opportunities || []).filter(p => p.currentStage === 'In Review').length,
     'approved': (opportunities || []).filter(p => p.currentStage === 'Approved').length,
     'rejected': (opportunities || []).filter(p => p.currentStage === 'Rejected').length,
+    'no-response': (opportunities || []).filter(p => p.currentStage === 'No Response').length,
     'high-priority': (opportunities || []).filter(p => p.priority === 'High').length,
   };
 
@@ -210,6 +213,13 @@ export default function PlatformsPage() {
                 icon={CheckCircle2}
                 label="Approved"
                 count={counts['approved']}
+              />
+              <FilterButton 
+                active={activeFilter === 'no-response'} 
+                onClick={() => setActiveFilter('no-response')}
+                icon={Ghost}
+                label="No Response"
+                count={counts['no-response']}
               />
               <FilterButton 
                 active={activeFilter === 'rejected'} 
@@ -432,6 +442,8 @@ function PlatformListItem({ platform }: { platform: any }) {
         return "bg-slate-500/20 text-slate-100 border-slate-500/40";
       case 'Rejected':
         return "bg-rose-500/10 text-rose-400 border-rose-500/20";
+      case 'No Response':
+        return "bg-slate-500/10 text-slate-400 border-slate-500/20";
       case 'Onboarding':
         return "bg-cyan-500/10 text-cyan-400 border-cyan-500/20";
       default:

@@ -39,7 +39,7 @@ export default function CommandCenter() {
     const approved = opportunities.filter(o => o.currentStage === 'Approved' || o.currentStage === 'Live' || o.currentStage === 'Onboarding');
     const successRate = contacted.length > 0 ? Math.round((approved.length / contacted.length) * 100) : 0;
 
-    // 2. Integrated Pipeline Data
+    // 2. Integrated Pipeline Data (Active Flow)
     const stages = [
       { label: 'Research', count: opportunities.filter(o => o.currentStage === 'Research' || o.currentStage === 'Not Started').length },
       { label: 'Applied', count: opportunities.filter(o => o.currentStage === 'Applied').length },
@@ -50,7 +50,7 @@ export default function CommandCenter() {
 
     // 3. Needs Attention (Priority & Bottlenecks)
     const urgentFollowUps = opportunities
-      .filter(o => o.commStatus === 'Waiting reply' || o.priority === 'High')
+      .filter(o => (o.commStatus === 'Waiting reply' || o.priority === 'High') && !['Rejected', 'No Response'].includes(o.currentStage))
       .sort((a, b) => {
         const dateA = a.updatedAt?.toDate ? a.updatedAt.toDate() : new Date(a.updatedAt || 0);
         const dateB = b.updatedAt?.toDate ? b.updatedAt.toDate() : new Date(b.updatedAt || 0);

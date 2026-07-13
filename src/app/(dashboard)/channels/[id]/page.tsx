@@ -22,7 +22,8 @@ import {
   Link2,
   User,
   MoreVertical,
-  X
+  X,
+  Ghost
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -74,7 +75,7 @@ const BUSINESS_TYPES = [
   "Licensing Partner"
 ];
 
-const STAGES = ['Not Started', 'Research', 'Applied', 'In Review', 'Approved', 'Rejected', 'Onboarding', 'Live'];
+const STAGES = ['Not Started', 'Research', 'Applied', 'In Review', 'Approved', 'Rejected', 'No Response', 'Onboarding', 'Live'];
 const ROADMAP_STAGES = ['Research', 'Applied', 'In Review', 'Approved', 'Onboarding', 'Live'];
 
 export default function PlatformDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -110,7 +111,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
       user: j.user,
       content: j.content,
       type: 'note',
-      originalIndex: idx // Keep track for editing/deleting
+      originalIndex: idx 
     }));
 
     const completedTasks = (platformTasks || [])
@@ -256,9 +257,12 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
       case 'In Review': return "bg-amber-500/10 text-amber-400 border-amber-500/20";
       case 'Approved': return "bg-violet-500/10 text-violet-500 border-violet-500/20";
       case 'Rejected': return "bg-rose-500/10 text-rose-500 border-rose-500/20";
+      case 'No Response': return "bg-slate-500/10 text-slate-400 border-slate-500/20";
       default: return "bg-primary/10 text-primary border-primary/20";
     }
   };
+
+  const isPostMortemStage = platform.currentStage === 'Rejected' || platform.currentStage === 'No Response';
 
   return (
     <div className="max-w-[1200px] mx-auto flex flex-col gap-8 animate-in fade-in duration-500">
@@ -312,30 +316,54 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <div className="lg:col-span-8 flex flex-col gap-10">
           
-          {platform.currentStage === 'Rejected' && (
-            <div className="premium-panel p-8 rounded-3xl border-rose-500/20 bg-rose-500/5 flex flex-col gap-6 animate-in slide-in-from-top-2 duration-500">
+          {isPostMortemStage && (
+            <div className={cn(
+              "premium-panel p-8 rounded-3xl flex flex-col gap-6 animate-in slide-in-from-top-2 duration-500",
+              platform.currentStage === 'Rejected' ? "border-rose-500/20 bg-rose-500/5" : "border-slate-500/20 bg-slate-500/5"
+            )}>
               <div className="flex items-center gap-3">
-                <div className="size-8 rounded-lg bg-rose-500/10 flex items-center justify-center text-rose-500 shadow-sm">
-                  <Frown className="size-4" />
+                <div className={cn(
+                  "size-8 rounded-lg flex items-center justify-center shadow-sm",
+                  platform.currentStage === 'Rejected' ? "bg-rose-500/10 text-rose-500" : "bg-slate-500/10 text-slate-500"
+                )}>
+                  {platform.currentStage === 'Rejected' ? <Frown className="size-4" /> : <Ghost className="size-4" />}
                 </div>
-                <h3 className="text-[11px] font-bold uppercase tracking-[0.25em] text-rose-500">Mission Post-Mortem Analysis</h3>
+                <h3 className={cn(
+                  "text-[11px] font-bold uppercase tracking-[0.25em]",
+                  platform.currentStage === 'Rejected' ? "text-rose-500" : "text-slate-500"
+                )}>
+                  Mission {platform.currentStage === 'Rejected' ? "Post-Mortem Analysis" : "Inactivity Report"}
+                </h3>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="flex flex-col gap-2">
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-rose-400 opacity-80">Reason for Rejection</span>
+                  <span className={cn(
+                    "text-[10px] font-bold uppercase tracking-widest opacity-80",
+                    platform.currentStage === 'Rejected' ? "text-rose-400" : "text-slate-400"
+                  )}>
+                    {platform.currentStage === 'Rejected' ? "Reason for Rejection" : "Observations on Inactivity"}
+                  </span>
                   <p className="text-[14px] text-tier-2 leading-relaxed font-medium">
                     {platform.rejectionReason || "No specific reason recorded yet."}
                   </p>
                 </div>
                 <div className="flex flex-col gap-2">
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-rose-400 opacity-80">Strategic Lessons</span>
+                  <span className={cn(
+                    "text-[10px] font-bold uppercase tracking-widest opacity-80",
+                    platform.currentStage === 'Rejected' ? "text-rose-400" : "text-slate-400"
+                  )}>
+                    Strategic Lessons
+                  </span>
                   <p className="text-[14px] text-tier-2 leading-relaxed font-medium">
                     {platform.rejectionLessons || "Waiting for team analysis to extract learning points."}
                   </p>
                 </div>
               </div>
-              <Separator className="bg-rose-500/10" />
-              <Button variant="ghost" onClick={handleOpenEdit} className="w-fit h-8 text-[10px] font-bold uppercase tracking-widest text-rose-400 hover:text-rose-300 hover:bg-rose-500/10">
+              <Separator className={platform.currentStage === 'Rejected' ? "bg-rose-500/10" : "bg-slate-500/10"} />
+              <Button variant="ghost" onClick={handleOpenEdit} className={cn(
+                "w-fit h-8 text-[10px] font-bold uppercase tracking-widest",
+                platform.currentStage === 'Rejected' ? "text-rose-400 hover:text-rose-300 hover:bg-rose-500/10" : "text-slate-400 hover:text-slate-300 hover:bg-slate-500/10"
+              )}>
                 <Edit3 className="size-3 mr-2" /> Update Analysis
               </Button>
             </div>
@@ -551,16 +579,51 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
                 <div className="grid gap-2"><Label className="text-[10px] uppercase tracking-widest text-tier-3">Stage</Label><Select value={editData.currentStage} onValueChange={(v) => setEditData({...editData, currentStage: v})}><SelectTrigger className="bg-secondary/50 border-border h-11 rounded-xl"><SelectValue /></SelectTrigger><SelectContent>{STAGES.map(s => (<SelectItem key={s} value={s}>{s}</SelectItem>))}</SelectContent></Select></div>
               </div>
 
-              {editData.currentStage === 'Rejected' && (
-                <div className="p-4 rounded-xl bg-rose-500/5 border border-rose-500/20 grid gap-4 animate-in fade-in duration-300">
-                   <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-rose-500 flex items-center gap-2"><Frown className="size-3" /> Post-Mortem Intelligence</h4>
+              {(editData.currentStage === 'Rejected' || editData.currentStage === 'No Response') && (
+                <div className={cn(
+                  "p-4 rounded-xl border grid gap-4 animate-in fade-in duration-300",
+                  editData.currentStage === 'Rejected' ? "bg-rose-500/5 border-rose-500/20" : "bg-slate-500/5 border-slate-500/20"
+                )}>
+                   <h4 className={cn(
+                     "text-[10px] font-bold uppercase tracking-[0.2em] flex items-center gap-2",
+                     editData.currentStage === 'Rejected' ? "text-rose-500" : "text-slate-500"
+                   )}>
+                     {editData.currentStage === 'Rejected' ? <Frown className="size-3" /> : <Ghost className="size-3" />} 
+                     {editData.currentStage === 'Rejected' ? "Post-Mortem Intelligence" : "Inactivity Analysis"}
+                   </h4>
                    <div className="grid gap-2">
-                     <Label className="text-[10px] uppercase tracking-widest text-rose-400">Reason for Rejection</Label>
-                     <Input value={editData.rejectionReason} onChange={(e) => setEditData({...editData, rejectionReason: e.target.value})} placeholder="Why were we not approved?" className="bg-rose-500/5 border-rose-500/20 h-11 rounded-xl text-tier-1" />
+                     <Label className={cn(
+                       "text-[10px] uppercase tracking-widest",
+                       editData.currentStage === 'Rejected' ? "text-rose-400" : "text-slate-400"
+                     )}>
+                       {editData.currentStage === 'Rejected' ? "Reason for Rejection" : "Reason for Inactivity"}
+                     </Label>
+                     <Input 
+                       value={editData.rejectionReason} 
+                       onChange={(e) => setEditData({...editData, rejectionReason: e.target.value})} 
+                       placeholder={editData.currentStage === 'Rejected' ? "Why were we not approved?" : "Why did they stop responding?"} 
+                       className={cn(
+                         "h-11 rounded-xl text-tier-1",
+                         editData.currentStage === 'Rejected' ? "bg-rose-500/5 border-rose-500/20" : "bg-slate-500/5 border-slate-500/20"
+                       )} 
+                     />
                    </div>
                    <div className="grid gap-2">
-                     <Label className="text-[10px] uppercase tracking-widest text-rose-400">Lessons Learned</Label>
-                     <Textarea value={editData.rejectionLessons} onChange={(e) => setEditData({...editData, rejectionLessons: e.target.value})} placeholder="What should we change in our approach next time?" className="bg-rose-500/5 border-rose-500/20 min-h-[80px] rounded-xl text-tier-1 p-3" />
+                     <Label className={cn(
+                       "text-[10px] uppercase tracking-widest",
+                       editData.currentStage === 'Rejected' ? "text-rose-400" : "text-slate-400"
+                     )}>
+                       Lessons Learned
+                     </Label>
+                     <Textarea 
+                       value={editData.rejectionLessons} 
+                       onChange={(e) => setEditData({...editData, rejectionLessons: e.target.value})} 
+                       placeholder="What should we change in our approach next time?" 
+                       className={cn(
+                         "min-h-[80px] rounded-xl text-tier-1 p-3",
+                         editData.currentStage === 'Rejected' ? "bg-rose-500/5 border-rose-500/20" : "bg-slate-500/5 border-slate-500/20"
+                       )} 
+                     />
                    </div>
                 </div>
               )}
