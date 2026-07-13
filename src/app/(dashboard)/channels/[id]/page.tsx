@@ -20,7 +20,9 @@ import {
   CheckCircle2,
   Circle,
   Link2,
-  User
+  User,
+  MoreVertical,
+  X
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -43,6 +45,12 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
 import { useDoc, useMemoFirebase, useUser, updateDocumentNonBlocking, useCollection, deleteDocumentNonBlocking } from "@/firebase";
 import { doc, getFirestore, serverTimestamp, collection, query, where } from "firebase/firestore";
 import { cn } from "@/lib/utils";
@@ -78,6 +86,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
 
   const [isEditOpen, setIsAddOpen] = useState(false);
   const [isNoteOpen, setIsNoteOpen] = useState(false);
+  const [editingNoteIdx, setEditingNoteIdx] = useState<number | null>(null);
   const [newNote, setNewNote] = useState("");
   
   const [noteDate, setNoteDate] = useState<string>(new Date().toISOString().split('T')[0]);
@@ -96,11 +105,12 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
   const historyItems = useMemo(() => {
     if (!platform) return [];
     
-    const journalItems = (platform.journal || []).map((j: any) => ({
+    const journalItems = (platform.journal || []).map((j: any, idx: number) => ({
       date: new Date(j.date),
       user: j.user,
       content: j.content,
-      type: 'note'
+      type: 'note',
+      originalIndex: idx // Keep track for editing/deleting
     }));
 
     const completedTasks = (platformTasks || [])
@@ -109,7 +119,8 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
         date: t.updatedAt ? (t.updatedAt.toDate ? t.updatedAt.toDate() : new Date(t.updatedAt)) : new Date(t.dueDate || Date.now()),
         user: "System",
         content: `Step Verified: ${t.title}`,
-        type: 'task'
+        type: 'task',
+        originalIndex: -1
       }));
 
     return [...journalItems, ...completedTasks].sort((a, b) => b.date.getTime() - a.date.getTime());
@@ -184,6 +195,24 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
     }
   };
 
+  const handleOpenAddNote = () => {
+    setEditingNoteIdx(null);
+    setNewNote("");
+    setNoteDate(new Date().toISOString().split('T')[0]);
+    setNoteTime(new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }));
+    setIsNoteOpen(true);
+  };
+
+  const handleOpenEditNote = (idx: number) => {
+    const note = platform.journal[idx];
+    const dateObj = new Date(note.date);
+    setEditingNoteIdx(idx);
+    setNewNote(note.content);
+    setNoteDate(dateObj.toISOString().split('T')[0]);
+    setNoteTime(dateObj.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }));
+    setIsNoteOpen(true);
+  };
+
   const handleAddNote = () => {
     if (!docRef || !newNote || !user) return;
     const firstName = user.displayName?.split(' ')[0] || "Mikhail";
@@ -194,16 +223,31 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
       user: firstName,
       content: newNote,
     };
-    const updatedJournal = [journalEntry, ...(platform.journal || [])];
+
+    let updatedJournal = [...(platform.journal || [])];
+    if (editingNoteIdx !== null) {
+      updatedJournal[editingNoteIdx] = journalEntry;
+    } else {
+      updatedJournal = [journalEntry, ...updatedJournal];
+    }
+
     updateDocumentNonBlocking(docRef, {
       journal: updatedJournal,
       lastUpdate: serverTimestamp(),
     });
+    
     setNewNote("");
-    setNoteDate(new Date().toISOString().split('T')[0]);
-    setNoteTime(new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }));
     setIsNoteOpen(false);
-    toast({ title: "Field Note Recorded" });
+    toast({ title: editingNoteIdx !== null ? "Note Updated" : "Note Recorded" });
+  };
+
+  const handleDeleteNote = (idx: number) => {
+    if (!docRef || !platform.journal) return;
+    if (window.confirm("Confirm deletion of this historical note?")) {
+      const updatedJournal = platform.journal.filter((_: any, i: number) => i !== idx);
+      updateDocumentNonBlocking(docRef, { journal: updatedJournal });
+      toast({ title: "Note Decommissioned", variant: "destructive" });
+    }
   };
 
   const getStageStyles = (stage: string) => {
@@ -268,7 +312,6 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <div className="lg:col-span-8 flex flex-col gap-10">
           
-          {/* Rejection Analysis Banner */}
           {platform.currentStage === 'Rejected' && (
             <div className="premium-panel p-8 rounded-3xl border-rose-500/20 bg-rose-500/5 flex flex-col gap-6 animate-in slide-in-from-top-2 duration-500">
               <div className="flex items-center gap-3">
@@ -332,12 +375,12 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
               <h3 className="text-[11px] font-bold uppercase tracking-[0.25em] text-tier-4">Activity Timeline</h3>
               <Dialog open={isNoteOpen} onOpenChange={setIsNoteOpen}>
                 <DialogTrigger asChild>
-                  <Button variant="ghost" className="h-8 text-[10px] font-bold uppercase tracking-wider text-tier-3 hover:bg-secondary/50 hover:text-primary transition-all">
-                    <Plus className="size-3.5 mr-2" /> New Field Note
+                  <Button variant="ghost" onClick={handleOpenAddNote} className="h-8 text-[10px] font-bold uppercase tracking-wider text-tier-3 hover:bg-secondary/50 hover:text-primary transition-all">
+                    <Plus className="size-3.5 mr-2" /> Add Note
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="bg-background/95 backdrop-blur-2xl border-border rounded-2xl sm:max-w-[500px]">
-                  <DialogHeader><DialogTitle className="text-xl font-bold tracking-tight text-tier-1">Record Field Note</DialogTitle></DialogHeader>
+                  <DialogHeader><DialogTitle className="text-xl font-bold tracking-tight text-tier-1">{editingNoteIdx !== null ? "Calibrate Note" : "Add Note"}</DialogTitle></DialogHeader>
                   <div className="grid gap-6 py-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div className="grid gap-2">
@@ -361,7 +404,15 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
             <div className="flex flex-col gap-8 relative before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-px before:bg-border">
               {historyItems.length > 0 ? (
                 historyItems.map((entry: any, i: number) => (
-                  <TimelineEntry key={i} date={entry.date.toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })} user={entry.user} content={entry.content} type={entry.type} />
+                  <TimelineEntry 
+                    key={i} 
+                    date={entry.date.toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })} 
+                    user={entry.user} 
+                    content={entry.content} 
+                    type={entry.type} 
+                    onEdit={() => handleOpenEditNote(entry.originalIndex)}
+                    onDelete={() => handleDeleteNote(entry.originalIndex)}
+                  />
                 ))
               ) : (
                 <TimelineEntry date="Initial" user="System" content={platform.notes || "Operational history synchronized."} type="note" />
@@ -371,8 +422,6 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
         </div>
 
         <div className="lg:col-span-4 flex flex-col gap-8">
-          
-          {/* Mission Roadmap Card */}
           <section className="premium-panel p-6 rounded-2xl flex flex-col gap-6 bg-white shadow-sm border-border">
             <div className="flex items-center justify-between">
               <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4">Mission Roadmap</h3>
@@ -430,7 +479,6 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
             </div>
           </section>
 
-          {/* Unified Contact Hub Card */}
           <section className="premium-panel p-6 rounded-2xl flex flex-col gap-6 bg-white shadow-sm border-border">
             <div className="flex items-center justify-between">
               <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4">Contact Intelligence</h3>
@@ -438,7 +486,6 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
             </div>
             
             <div className="flex flex-col gap-5">
-              {/* Operational Channels */}
               <div className="flex flex-col gap-4">
                 <ContactField label="Supplier Portal" value={platform.portalUrl} icon={Link2} link={platform.portalUrl} />
                 <ContactField label="Support Email" value={platform.supportEmail} icon={Mail} link={`mailto:${platform.supportEmail}`} />
@@ -469,7 +516,6 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
             </div>
           </section>
 
-          {/* About Platform Card */}
           <section className="premium-panel p-6 rounded-2xl flex flex-col gap-6 bg-white shadow-sm border-border">
             <div className="flex items-center gap-3">
               <div className="size-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
@@ -601,9 +647,9 @@ function ContactField({ label, value, icon: Icon, link }: { label: string, value
   );
 }
 
-function TimelineEntry({ date, user, content, type }: { date: string, user: string, content: string, type: 'note' | 'task' }) {
+function TimelineEntry({ date, user, content, type, onEdit, onDelete }: { date: string, user: string, content: string, type: 'note' | 'task', onEdit?: () => void, onDelete?: () => void }) {
   return (
-    <div className="flex flex-col gap-2 pl-8 relative">
+    <div className="flex flex-col gap-2 pl-8 relative group">
       <div className="absolute left-0 top-1.5 size-[23px] flex items-center justify-center">
         <div className="size-full rounded-full bg-background border border-border absolute inset-0 shadow-sm" />
         <div className={cn(
@@ -611,9 +657,21 @@ function TimelineEntry({ date, user, content, type }: { date: string, user: stri
           type === 'task' ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]" : "bg-primary shadow-[0_0_8px_rgba(147,51,234,0.3)]"
         )} />
       </div>
-      <div className="flex items-center gap-3">
-        <span className="text-[12px] font-semibold text-tier-2">{user}</span>
-        <span className="text-[10px] font-bold uppercase tracking-widest text-tier-4">{date}</span>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <span className="text-[12px] font-semibold text-tier-2">{user}</span>
+          <span className="text-[10px] font-bold uppercase tracking-widest text-tier-4">{date}</span>
+        </div>
+        {type === 'note' && onEdit && onDelete && (
+          <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+            <Button variant="ghost" size="icon" onClick={onEdit} className="size-6 rounded-md hover:bg-secondary text-tier-3 hover:text-primary">
+              <Edit3 className="size-3" />
+            </Button>
+            <Button variant="ghost" size="icon" onClick={onDelete} className="size-6 rounded-md hover:bg-rose-500/10 text-tier-3 hover:text-rose-500">
+              <Trash2 className="size-3" />
+            </Button>
+          </div>
+        )}
       </div>
       <p className="text-[14px] text-tier-3 leading-relaxed font-medium text-justify">{content}</p>
     </div>

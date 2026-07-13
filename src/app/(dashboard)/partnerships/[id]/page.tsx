@@ -22,7 +22,8 @@ import {
   MessageSquare,
   ExternalLink,
   Target,
-  Users
+  Users,
+  Trash2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -62,6 +63,7 @@ export default function PartnershipDetailPage({ params }: { params: Promise<{ id
 
   const [isEditOpen, setIsAddOpen] = useState(false);
   const [isNoteOpen, setIsNoteOpen] = useState(false);
+  const [editingNoteIdx, setEditingNoteIdx] = useState<number | null>(null);
   const [newNote, setNewNote] = useState("");
 
   const docRef = useMemoFirebase(() => doc(firestore, 'partners', id), [firestore, id]);
@@ -77,11 +79,12 @@ export default function PartnershipDetailPage({ params }: { params: Promise<{ id
   const historyItems = useMemo(() => {
     if (!partner) return [];
     
-    const journalItems = (partner.journal || []).map((j: any) => ({
+    const journalItems = (partner.journal || []).map((j: any, idx: number) => ({
       date: new Date(j.date),
       user: j.user,
       content: j.content,
-      type: 'note'
+      type: 'note',
+      originalIndex: idx
     }));
 
     const completedTasks = (partnerTasks || [])
@@ -90,7 +93,8 @@ export default function PartnershipDetailPage({ params }: { params: Promise<{ id
         date: t.updatedAt ? (t.updatedAt.toDate ? t.updatedAt.toDate() : new Date(t.updatedAt)) : new Date(t.dueDate || Date.now()),
         user: "System",
         content: `Step Verified: ${t.title}`,
-        type: 'task'
+        type: 'task',
+        originalIndex: -1
       }));
 
     return [...journalItems, ...completedTasks].sort((a, b) => b.date.getTime() - a.date.getTime());
@@ -138,18 +142,49 @@ export default function PartnershipDetailPage({ params }: { params: Promise<{ id
     });
   };
 
+  const handleOpenAddNote = () => {
+    setEditingNoteIdx(null);
+    setNewNote("");
+    setIsNoteOpen(true);
+  };
+
+  const handleOpenEditNote = (idx: number) => {
+    const note = partner.journal[idx];
+    setEditingNoteIdx(idx);
+    setNewNote(note.content);
+    setIsNoteOpen(true);
+  };
+
   const handleAddNote = () => {
     if (!docRef || !newNote || !user) return;
+    const firstName = user.displayName?.split(' ')[0] || "Mikhail";
+    
     const journalEntry = {
       date: new Date().toISOString(),
-      user: user.displayName || "System Operator",
+      user: firstName,
       content: newNote,
     };
-    const updatedJournal = [journalEntry, ...(partner.journal || [])];
+
+    let updatedJournal = [...(partner.journal || [])];
+    if (editingNoteIdx !== null) {
+      updatedJournal[editingNoteIdx] = journalEntry;
+    } else {
+      updatedJournal = [journalEntry, ...updatedJournal];
+    }
+
     updateDocumentNonBlocking(docRef, { journal: updatedJournal });
     setNewNote("");
     setIsNoteOpen(false);
-    toast({ title: "Field Note Recorded" });
+    toast({ title: editingNoteIdx !== null ? "Note Updated" : "Note Recorded" });
+  };
+
+  const handleDeleteNote = (idx: number) => {
+    if (!docRef || !partner.journal) return;
+    if (window.confirm("Confirm deletion of this note?")) {
+      const updatedJournal = partner.journal.filter((_: any, i: number) => i !== idx);
+      updateDocumentNonBlocking(docRef, { journal: updatedJournal });
+      toast({ title: "Note Removed", variant: "destructive" });
+    }
   };
 
   const getStatusStyles = (status: string) => {
@@ -226,12 +261,12 @@ export default function PartnershipDetailPage({ params }: { params: Promise<{ id
               <h3 className="text-[11px] font-bold uppercase tracking-[0.25em] text-tier-4">Partnership history</h3>
               <Dialog open={isNoteOpen} onOpenChange={setIsNoteOpen}>
                 <DialogTrigger asChild>
-                  <Button variant="ghost" className="h-8 text-[10px] font-bold uppercase tracking-wider text-tier-3 hover:text-primary">
-                    <Plus className="size-3.5 mr-2" /> New Field Note
+                  <Button variant="ghost" onClick={handleOpenAddNote} className="h-8 text-[10px] font-bold uppercase tracking-wider text-tier-3 hover:text-primary">
+                    <Plus className="size-3.5 mr-2" /> Add Note
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="bg-background/95 backdrop-blur-2xl border-white/[0.1] rounded-2xl">
-                  <DialogHeader><DialogTitle className="text-xl font-bold tracking-tight text-tier-1">Record Field Note</DialogTitle></DialogHeader>
+                  <DialogHeader><DialogTitle className="text-xl font-bold tracking-tight text-tier-1">{editingNoteIdx !== null ? "Calibrate Note" : "Add Note"}</DialogTitle></DialogHeader>
                   <div className="py-4"><Textarea placeholder="Enter interaction summary..." value={newNote} onChange={(e) => setNewNote(e.target.value)} className="bg-white/[0.03] border-white/[0.08] min-h-[150px] rounded-xl text-tier-1 p-4" /></div>
                   <DialogFooter><Button onClick={handleAddNote} className="w-full bg-primary text-white h-12 rounded-xl font-bold uppercase tracking-widest">Commit to History</Button></DialogFooter>
                 </DialogContent>
@@ -240,7 +275,15 @@ export default function PartnershipDetailPage({ params }: { params: Promise<{ id
             <div className="flex flex-col gap-8 relative before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-px before:bg-white/[0.05]">
               {historyItems.length > 0 ? (
                 historyItems.map((entry: any, i: number) => (
-                  <TimelineEntry key={i} date={entry.date.toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })} user={entry.user} content={entry.content} type={entry.type} />
+                  <TimelineEntry 
+                    key={i} 
+                    date={entry.date.toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })} 
+                    user={entry.user} 
+                    content={entry.content} 
+                    type={entry.type} 
+                    onEdit={() => handleOpenEditNote(entry.originalIndex)}
+                    onDelete={() => handleDeleteNote(entry.originalIndex)}
+                  />
                 ))
               ) : (
                 <TimelineEntry date="Initial" user="System" content={partner.notes || "Operational history synchronized."} type="note" />
@@ -329,15 +372,27 @@ function ContactField({ label, value, icon: Icon }: { label: string, value?: str
   );
 }
 
-function TimelineEntry({ date, user, content, type }: { date: string, user: string, content: string, type: 'note' | 'task' }) {
+function TimelineEntry({ date, user, content, type, onEdit, onDelete }: { date: string, user: string, content: string, type: 'note' | 'task', onEdit?: () => void, onDelete?: () => void }) {
   return (
-    <div className="flex flex-col gap-2 pl-8 relative">
+    <div className="flex flex-col gap-2 pl-8 relative group">
       <div className="absolute left-0 top-1.5 size-[23px] rounded-full bg-background border-2 border-white/[0.08] flex items-center justify-center">
         {type === 'task' ? (<div className="size-full rounded-full bg-emerald-500/20 flex items-center justify-center"><CheckCircle2 className="size-3 text-emerald-500" /></div>) : (<div className="size-1.5 rounded-full bg-primary" />)}
       </div>
-      <div className="flex items-center gap-3">
-        <span className="text-[12px] font-semibold text-tier-2">{user}</span>
-        <span className="text-[10px] font-bold uppercase tracking-widest text-tier-4">{date}</span>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <span className="text-[12px] font-semibold text-tier-2">{user}</span>
+          <span className="text-[10px] font-bold uppercase tracking-widest text-tier-4">{date}</span>
+        </div>
+        {type === 'note' && onEdit && onDelete && (
+          <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+            <Button variant="ghost" size="icon" onClick={onEdit} className="size-6 rounded-md hover:bg-secondary text-tier-3 hover:text-primary">
+              <Edit3 className="size-3" />
+            </Button>
+            <Button variant="ghost" size="icon" onClick={onDelete} className="size-6 rounded-md hover:bg-rose-500/10 text-tier-3 hover:text-rose-500">
+              <Trash2 className="size-3" />
+            </Button>
+          </div>
+        )}
       </div>
       <p className="text-[14px] text-tier-3 leading-relaxed font-medium text-justify">{content}</p>
     </div>
