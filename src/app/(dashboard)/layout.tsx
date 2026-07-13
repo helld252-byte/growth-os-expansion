@@ -23,6 +23,7 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { useUser, useAuth, useDoc, useMemoFirebase } from "@/firebase";
 import { doc, getFirestore } from "firebase/firestore";
+import { cn } from "@/lib/utils";
 
 export default function DashboardLayout({
   children,
@@ -82,7 +83,7 @@ export default function DashboardLayout({
   };
 
   const getSectionLabel = (path: string) => {
-    if (path === "/") return "Command Center";
+    if (path === "/") return "Home";
     if (path.startsWith("/channels")) return "Platforms";
     if (path.startsWith("/tasks")) return "Operational Tasks";
     if (path.startsWith("/hub")) return "Intelligence Hub";
@@ -109,7 +110,7 @@ export default function DashboardLayout({
         <SidebarInset className="flex flex-col overflow-hidden bg-transparent">
           <header className="h-14 flex items-center justify-between px-6 bg-background/20 backdrop-blur-xl sticky top-0 z-40 border-b border-border/50">
             <div className="flex items-center gap-5">
-              <SidebarTrigger className="text-tier-3 hover:text-primary transition-colors" />
+              <SidebarTrigger className="text-tier-3 hover:text-tier-1 hover:bg-secondary/50 transition-colors" />
               <div className="h-4 w-px bg-border hidden sm:block" />
               <div className="flex items-center gap-3">
                 <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-tier-3">Unit-01</span>

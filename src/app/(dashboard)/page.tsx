@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useMemo } from "react";
@@ -112,14 +111,14 @@ export default function CommandCenter() {
               <Activity className="size-5 text-primary" />
             </div>
             <div className="flex flex-col">
-              <h1 className="text-2xl font-bold tracking-tight text-tier-1 leading-none">Command Center</h1>
-              <p className="text-tier-4 text-[11px] font-bold uppercase tracking-[0.2em] mt-1.5">Today’s growth priorities</p>
+              <h1 className="text-2xl font-bold tracking-tight text-tier-1 leading-none">Home</h1>
+              <p className="text-tier-4 text-[11px] font-bold uppercase tracking-[0.2em] mt-1.5">What should I work on today?</p>
             </div>
           </div>
           <Badge variant="outline" className="bg-emerald-500/5 text-emerald-500 border-emerald-500/20 text-[9px] font-bold uppercase tracking-widest px-3 py-1">System Live</Badge>
         </div>
 
-        <div className="bg-card border border-border rounded-2xl p-4 flex items-center justify-between divide-x divide-border shadow-xl backdrop-blur-sm">
+        <div className="bg-card border border-border rounded-2xl p-4 flex items-center justify-between divide-x divide-border shadow-sm backdrop-blur-sm">
           <StatModule label="Tracked Units" value={data.kpis.trackedOpps} />
           <StatModule label="In Review" value={data.kpis.inReview} />
           <StatModule label="Live" value={data.kpis.livePartnerships} highlight />
@@ -166,7 +165,7 @@ export default function CommandCenter() {
               <Link 
                 key={v.label} 
                 href={v.path} 
-                className="premium-panel px-5 py-4 rounded-xl flex items-center justify-between hover:bg-secondary/30 hover:border-border group transition-all"
+                className="premium-panel px-5 py-4 rounded-xl flex items-center justify-between hover:bg-secondary/50 hover:border-border group transition-all"
               >
                 <div className="flex items-center gap-4">
                   <div className="size-8 rounded-lg bg-secondary border border-border flex items-center justify-center text-tier-3 group-hover:text-tier-1 group-hover:bg-secondary/50 transition-all">
@@ -240,7 +239,7 @@ export default function CommandCenter() {
         <div className="flex items-center justify-between px-1">
           <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4">Recent Updates</h3>
         </div>
-        <div className="flex flex-col gap-px bg-border border border-border rounded-2xl overflow-hidden shadow-xl">
+        <div className="flex flex-col gap-px bg-border border border-border rounded-2xl overflow-hidden shadow-sm">
           {data.recentActivity.map((item) => (
             <ActivityRow key={item.id} item={item} />
           ))}
@@ -277,7 +276,7 @@ function MetricCell({ label, value, color }: { label: string, value: number, col
 function AttentionCard({ label, value, sub, urgent }: any) {
   return (
     <div className={cn(
-      "p-5 rounded-2xl border flex flex-col gap-1.5 transition-all shadow-lg hover:bg-secondary/30",
+      "p-5 rounded-2xl border flex flex-col gap-1.5 transition-all shadow-sm hover:bg-secondary/50",
       urgent ? "bg-rose-500/[0.03] border-rose-500/20" : "bg-card border-border shadow-sm"
     )}>
       <span className={cn("text-[9px] font-bold uppercase tracking-widest mb-0.5", urgent ? "text-rose-500" : "text-tier-4")}>{label}</span>
