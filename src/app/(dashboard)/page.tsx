@@ -9,7 +9,10 @@ import {
   Clock,
   TrendingUp,
   Zap,
-  History
+  History,
+  Target,
+  BarChart3,
+  Layers
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useCollection, useMemoFirebase } from "@/firebase";
@@ -26,28 +29,25 @@ export default function CommandCenter() {
   const data = useMemo(() => {
     if (!opportunities) return null;
 
-    const now = new Date();
-    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-
-    // 1. KPIs (Global View)
+    // 1. Core Intelligence Metrics
     const trackedOpps = opportunities.length;
-    const inReview = opportunities.filter(o => o.currentStage === 'In Review').length;
     const livePartnerships = opportunities.filter(o => o.currentStage === 'Live').length;
+    const inReview = opportunities.filter(o => o.currentStage === 'In Review').length;
     
     const contacted = opportunities.filter(o => o.commStatus && o.commStatus !== 'No outreach');
-    const responded = contacted.filter(o => ['In discussion', 'Approved', 'Waiting reply'].includes(o.commStatus || ''));
-    const responseRate = contacted.length > 0 ? Math.round((responded.length / contacted.length) * 100) : 0;
+    const approved = opportunities.filter(o => o.currentStage === 'Approved' || o.currentStage === 'Live' || o.currentStage === 'Onboarding');
+    const successRate = contacted.length > 0 ? Math.round((approved.length / contacted.length) * 100) : 0;
 
-    // 2. Funnel Stages (Growth Pipeline)
+    // 2. Integrated Pipeline Data
     const stages = [
       { label: 'Research', count: opportunities.filter(o => o.currentStage === 'Research' || o.currentStage === 'Not Started').length },
       { label: 'Applied', count: opportunities.filter(o => o.currentStage === 'Applied').length },
       { label: 'In Review', count: opportunities.filter(o => o.currentStage === 'In Review').length },
-      { label: 'Approved', count: opportunities.filter(o => o.currentStage === 'Approved').length },
+      { label: 'Approved', count: opportunities.filter(o => o.currentStage === 'Approved' || o.currentStage === 'Onboarding').length },
       { label: 'Live', count: opportunities.filter(o => o.currentStage === 'Live').length },
     ];
 
-    // 3. Needs Attention (Bottlenecks)
+    // 3. Needs Attention (Priority & Bottlenecks)
     const urgentFollowUps = opportunities
       .filter(o => o.commStatus === 'Waiting reply' || o.priority === 'High')
       .sort((a, b) => {
@@ -57,7 +57,7 @@ export default function CommandCenter() {
       })
       .slice(0, 5);
 
-    // 4. Recent Updates
+    // 4. Recent Activity Mini-Feed
     const recentActivity = opportunities
       .sort((a, b) => {
         const dateA = a.updatedAt?.toDate ? a.updatedAt.toDate() : new Date(a.updatedAt || a.createdAt || 0);
@@ -67,7 +67,7 @@ export default function CommandCenter() {
       .slice(0, 6);
 
     return { 
-      kpis: { trackedOpps, inReview, livePartnerships, responseRate },
+      intel: { trackedOpps, livePartnerships, inReview, successRate },
       stages,
       urgentFollowUps,
       recentActivity
@@ -78,7 +78,7 @@ export default function CommandCenter() {
     return (
       <div className="flex flex-col items-center justify-center h-[80vh] gap-4">
         <Loader2 className="size-8 text-primary animate-spin" />
-        <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-tier-4">Scanning Registry</span>
+        <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-tier-4">Syncing Mission Data</span>
       </div>
     );
   }
@@ -88,115 +88,136 @@ export default function CommandCenter() {
   return (
     <div className="max-w-[1400px] mx-auto flex flex-col gap-12 animate-in fade-in duration-700">
       
-      {/* Executive Header */}
-      <header className="flex flex-col gap-8">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20 shadow-lg">
-              <Activity className="size-5 text-primary" />
-            </div>
-            <div className="flex flex-col">
-              <h1 className="text-2xl font-bold tracking-tight text-tier-1 leading-none">Home</h1>
-              <p className="text-tier-4 text-[11px] font-bold uppercase tracking-[0.2em] mt-1.5">What should I work on today?</p>
-            </div>
+      <header className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <div className="size-11 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center shadow-lg active-glow">
+            <Activity className="size-5.5 text-primary" />
           </div>
-          <Badge variant="outline" className="bg-emerald-500/5 text-emerald-500 border-emerald-500/20 text-[9px] font-bold uppercase tracking-widest px-3 py-1">System Live</Badge>
+          <div className="flex flex-col">
+            <h1 className="text-3xl font-semibold tracking-tight text-tier-1 leading-none">Command Center</h1>
+            <p className="text-tier-4 text-[10px] font-bold uppercase tracking-[0.25em] mt-2">Operational Oversight Unit-01</p>
+          </div>
         </div>
-
-        <div className="bg-card border border-border rounded-2xl p-4 flex items-center justify-between divide-x divide-border shadow-sm backdrop-blur-sm">
-          <StatModule label="Tracked Units" value={data.kpis.trackedOpps} />
-          <StatModule label="In Review" value={data.kpis.inReview} />
-          <StatModule label="Live" value={data.kpis.livePartnerships} highlight />
-          <StatModule label="Response Rate" value={`${data.kpis.responseRate}%`} />
-          <StatModule label="Mission Velocity" value="Stable" color="text-emerald-500" />
-        </div>
+        <Badge variant="outline" className="bg-emerald-500/5 text-emerald-500 border-emerald-500/20 text-[9px] font-bold uppercase tracking-widest px-3 py-1 rounded-lg flex items-center gap-2">
+          <div className="size-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+          Mission Synchronized
+        </Badge>
       </header>
 
-      {/* Growth Pipeline (Onboarding Flow) */}
-      <section className="flex flex-col gap-8">
-        <div className="flex items-center justify-between px-1">
-          <h3 className="text-[10px] font-bold uppercase tracking-[0.3em] text-tier-4">Growth Pipeline (Onboarding Flow)</h3>
-        </div>
-        <div className="grid grid-cols-5 gap-6">
-          {data.stages.map((stage, i) => (
-            <div key={stage.label} className="flex flex-col gap-3.5 group">
-              <div className="flex items-end justify-between px-1">
-                <span className="text-[11px] font-medium text-tier-3 group-hover:text-tier-1 transition-colors uppercase tracking-widest">{stage.label}</span>
-                <span className="text-xl font-bold text-tier-1">{stage.count}</span>
-              </div>
-              <div className="h-1 w-full bg-secondary rounded-full overflow-hidden">
-                <div 
-                  className={cn(
-                    "h-full transition-all duration-1000",
-                    i === 4 ? "bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.4)]" : "bg-primary/40"
-                  )} 
-                  style={{ width: `${Math.min((stage.count / (data.kpis.trackedOpps || 1)) * 100 * 2, 100)}%` }}
-                />
-              </div>
+      {/* Unified Mission Intelligence Section */}
+      <section className="premium-panel p-10 rounded-[32px] bg-gradient-to-br from-primary/[0.03] via-transparent to-transparent flex flex-col gap-10 border-white/[0.04]">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
+          <div className="lg:col-span-1 flex flex-col gap-8">
+            <div className="flex flex-col gap-1">
+              <h2 className="text-[11px] font-bold uppercase tracking-[0.25em] text-tier-1">Mission Key Insights</h2>
+              <p className="text-[13px] text-tier-3 font-medium">Core performance telemetry across all vertical channels.</p>
             </div>
-          ))}
+            
+            <div className="grid grid-cols-1 gap-6">
+              <InsightBlock label="Total Pipeline" value={data.intel.trackedOpps} icon={Layers} />
+              <InsightBlock label="Live Channels" value={data.intel.livePartnerships} icon={Target} color="text-emerald-500" />
+              <InsightBlock label="In Evaluation" value={data.intel.inReview} icon={Clock} color="text-primary" />
+              <InsightBlock label="Conversion Success" value={`${data.intel.successRate}%`} icon={BarChart3} />
+            </div>
+          </div>
+
+          <div className="lg:col-span-3 flex flex-col gap-8 bg-white/[0.015] border border-white/[0.04] rounded-2xl p-8 shadow-inner">
+            <div className="flex items-center justify-between">
+              <div className="flex flex-col gap-1">
+                <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-tier-4">Growth Pipeline Flow</h3>
+                <span className="text-[14px] text-tier-2 font-medium">Visual distribution of opportunities across the onboarding mission.</span>
+              </div>
+              <Badge variant="outline" className="bg-white/5 border-white/10 text-tier-3 text-[9px] font-bold uppercase tracking-widest px-2.5 py-1">Funnel Health: Stable</Badge>
+            </div>
+
+            <div className="grid grid-cols-5 gap-6 mt-4">
+              {data.stages.map((stage, i) => (
+                <div key={stage.label} className="flex flex-col gap-4 group">
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[10px] font-bold text-tier-4 group-hover:text-tier-1 transition-colors uppercase tracking-[0.15em]">{stage.label}</span>
+                    <span className="text-2xl font-bold text-tier-1">{stage.count}</span>
+                  </div>
+                  <div className="h-1.5 w-full bg-white/[0.05] rounded-full overflow-hidden">
+                    <div 
+                      className={cn(
+                        "h-full transition-all duration-1000",
+                        i === 4 ? "bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.4)]" : "bg-primary/50"
+                      )} 
+                      style={{ width: `${Math.min((stage.count / (data.intel.trackedOpps || 1)) * 100 * 2, 100)}%` }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
         
-        {/* Needs Attention (Priority & Bottlenecks) */}
-        <div className="lg:col-span-8 flex flex-col gap-6">
-          <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4 px-1">Needs Attention</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Needs Attention Column */}
+        <div className="lg:col-span-8 flex flex-col gap-8">
+          <div className="flex items-center justify-between px-2">
+            <div className="flex flex-col gap-1">
+              <h3 className="text-[11px] font-bold uppercase tracking-[0.25em] text-tier-1">Needs Attention</h3>
+              <p className="text-[13px] text-tier-3 font-medium">Critical bottlenecks and high-priority tactical follow-ups.</p>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {data.urgentFollowUps.length > 0 ? (
               data.urgentFollowUps.map((opp) => (
                 <Link 
                   key={opp.id} 
                   href={`/channels/${opp.id}`} 
-                  className="premium-panel p-5 rounded-xl flex items-center justify-between hover:bg-secondary/50 border-border group transition-all"
+                  className="premium-panel p-6 rounded-2xl flex items-center justify-between hover:bg-white/[0.02] border-white/[0.05] group transition-all active:scale-[0.99]"
                 >
-                  <div className="flex items-start gap-4">
-                    <div className="size-8 rounded-lg bg-rose-500/5 border border-rose-500/10 flex items-center justify-center text-rose-500">
-                      <AlertCircle className="size-4" />
+                  <div className="flex items-start gap-5">
+                    <div className="size-10 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-500 shadow-lg shadow-rose-500/5">
+                      <AlertCircle className="size-5" />
                     </div>
-                    <div className="flex flex-col gap-1">
-                      <span className="text-[13px] font-semibold text-tier-1 group-hover:text-primary transition-colors">{opp.name}</span>
+                    <div className="flex flex-col gap-1.5">
+                      <span className="text-[15px] font-semibold text-tier-1 group-hover:text-primary transition-colors tracking-tight">{opp.name}</span>
                       <span className="text-[10px] text-tier-4 font-bold uppercase tracking-widest">
-                        {opp.commStatus === 'Waiting reply' ? "Awaiting Reply" : "High Priority Action"}
+                        {opp.commStatus === 'Waiting reply' ? "Awaiting Partner Reply" : "Immediate Mission Action"}
                       </span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <Badge variant="outline" className="text-[9px] uppercase tracking-widest font-bold border-border">{opp.currentStage}</Badge>
-                    <ChevronRight className="size-3.5 text-tier-4 group-hover:text-tier-1 transition-all" />
-                  </div>
+                  <ChevronRight className="size-4 text-tier-4 group-hover:text-tier-1 transition-all" />
                 </Link>
               ))
             ) : (
-              <div className="col-span-full h-40 border border-dashed border-border rounded-xl flex flex-col items-center justify-center gap-3 opacity-30">
-                <Zap className="size-6 text-tier-4" />
-                <span className="text-[10px] font-bold uppercase tracking-widest">No urgent bottlenecks</span>
+              <div className="col-span-full h-48 border border-dashed border-white/5 rounded-[24px] flex flex-col items-center justify-center gap-4 opacity-30">
+                <Zap className="size-8 text-tier-4" />
+                <span className="text-[11px] font-bold uppercase tracking-[0.3em]">No urgent missions</span>
               </div>
             )}
           </div>
         </div>
 
-        {/* Recent Activity Mini-Feed */}
-        <div className="lg:col-span-4 flex flex-col gap-6">
-          <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4 px-1">Recent Updates</h3>
-          <div className="flex flex-col gap-3">
+        {/* Recent Activity Column */}
+        <div className="lg:col-span-4 flex flex-col gap-8">
+          <div className="flex flex-col gap-1 px-2">
+            <h3 className="text-[11px] font-bold uppercase tracking-[0.25em] text-tier-1">Mission Log</h3>
+            <p className="text-[13px] text-tier-3 font-medium">Real-time platform synchronization feed.</p>
+          </div>
+          
+          <div className="flex flex-col gap-4">
             {data.recentActivity.map((item) => (
-              <div key={item.id} className="flex items-start gap-4 p-4 bg-white/[0.015] border border-border/50 rounded-xl hover:bg-secondary/30 transition-all cursor-default">
-                <div className="size-1.5 rounded-full bg-primary mt-1.5 shrink-0" />
+              <div key={item.id} className="flex items-start gap-4 p-5 bg-white/[0.015] border border-white/[0.04] rounded-2xl hover:border-white/[0.08] transition-all cursor-default group">
+                <div className="size-1.5 rounded-full bg-primary mt-1.5 shrink-0 group-hover:shadow-[0_0_8px_hsl(var(--primary))]" />
                 <div className="flex flex-col gap-1 overflow-hidden">
-                  <span className="text-[12px] font-semibold text-tier-1 truncate">{item.name}</span>
+                  <span className="text-[13px] font-semibold text-tier-1 truncate tracking-tight">{item.name}</span>
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] text-tier-4 font-bold uppercase tracking-widest">{item.currentStage}</span>
-                    <span className="text-[10px] text-tier-4">•</span>
-                    <span className="text-[10px] text-tier-4 font-medium italic">Synchronized</span>
+                    <span className="text-[10px] text-primary font-bold uppercase tracking-widest">{item.currentStage}</span>
+                    <span className="text-tier-4">•</span>
+                    <span className="text-[9px] text-tier-4 font-bold uppercase tracking-widest tracking-[0.1em]">Verified</span>
                   </div>
                 </div>
               </div>
             ))}
-            <Link href="/channels" className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary hover:underline px-1 mt-2 flex items-center gap-2">
-              View all platforms <ChevronRight className="size-3" />
+            <Link href="/channels" className="text-[10px] font-bold uppercase tracking-[0.25em] text-primary hover:text-accent transition-colors px-1 mt-4 flex items-center gap-2 group w-fit">
+              Explore Full Registry <ChevronRight className="size-3 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
         </div>
@@ -207,16 +228,16 @@ export default function CommandCenter() {
   );
 }
 
-function StatModule({ label, value, highlight, color }: { label: string, value: string | number, highlight?: boolean, color?: string }) {
+function InsightBlock({ label, value, icon: Icon, color }: { label: string, value: string | number, icon: any, color?: string }) {
   return (
-    <div className="flex-1 flex flex-col items-center justify-center gap-1.5 px-4 first:pl-0 last:pr-0">
-      <span className={cn(
-        "text-[15px] font-bold tracking-tight",
-        color ? color : highlight ? "text-primary" : "text-tier-1"
-      )}>
-        {value}
-      </span>
-      <span className="text-[8px] font-bold uppercase tracking-[0.2em] text-tier-4 whitespace-nowrap">{label}</span>
+    <div className="flex items-center gap-4 group">
+      <div className={cn("size-9 rounded-xl bg-white/[0.02] border border-white/[0.06] flex items-center justify-center transition-all group-hover:bg-white/[0.05]", color || "text-tier-3")}>
+        <Icon className="size-4.5" />
+      </div>
+      <div className="flex flex-col">
+        <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-tier-4 mb-0.5">{label}</span>
+        <span className="text-lg font-bold tracking-tight text-tier-1">{value}</span>
+      </div>
     </div>
   );
 }
