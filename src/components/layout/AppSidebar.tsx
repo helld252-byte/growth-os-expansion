@@ -1,6 +1,6 @@
-
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { 
@@ -10,7 +10,9 @@ import {
   CheckSquare, 
   Settings,
   Zap,
-  ShieldAlert
+  ShieldAlert,
+  Sun,
+  Moon
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { 
@@ -44,6 +46,25 @@ interface AppSidebarProps {
 
 export function AppSidebar({ isAdmin }: AppSidebarProps) {
   const pathname = usePathname();
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+
+  useEffect(() => {
+    const isDark = document.documentElement.classList.contains("dark");
+    setTheme(isDark ? "dark" : "light");
+  }, []);
+
+  const toggleTheme = () => {
+    const isDark = document.documentElement.classList.contains("dark");
+    if (isDark) {
+      document.documentElement.classList.remove("dark");
+      localStorage.theme = "light";
+      setTheme("light");
+    } else {
+      document.documentElement.classList.add("dark");
+      localStorage.theme = "dark";
+      setTheme("dark");
+    }
+  };
 
   const renderMenuItem = (item: { icon: any, label: string, path: string }) => {
     const isActive = pathname === item.path;
@@ -114,6 +135,26 @@ export function AppSidebar({ isAdmin }: AppSidebarProps) {
       </SidebarContent>
 
       <SidebarFooter className="p-7">
+        <SidebarMenu className="mb-2">
+          <SidebarMenuItem>
+            <SidebarMenuButton 
+              onClick={toggleTheme}
+              className="h-10 rounded-lg hover:bg-secondary/50 transition-colors px-3 group flex items-center justify-between"
+            >
+              <div className="flex items-center">
+                {theme === "dark" ? (
+                  <Sun className="size-4.5 text-amber-500 transition-transform duration-500 rotate-0 hover:rotate-45" />
+                ) : (
+                  <Moon className="size-4.5 text-blue-600 transition-transform duration-500 hover:translate-x-0.5" />
+                )}
+                <span className="font-medium tracking-tight ml-3.5 text-[13px] text-tier-2 group-hover:text-tier-1">
+                  {theme === "dark" ? "Light Mode" : "Dark Mode"}
+                </span>
+              </div>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+
         {isAdmin && (
           <SidebarMenu>
             <SidebarMenuItem>
