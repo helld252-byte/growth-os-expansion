@@ -12,7 +12,12 @@ import {
   Zap,
   LayoutGrid,
   Star,
-  Loader2
+  Loader2,
+  Bookmark,
+  SquareCheck,
+  CheckCircle2,
+  X,
+  Shield
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,7 +44,7 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 
-type FilterStatus = 'needs-action' | 'waiting' | 'blocked' | 'high-priority' | 'live' | 'all';
+type FilterStatus = 'all' | 'rangeme' | 'applied' | 'waiting' | 'approved' | 'rejected' | 'high-priority';
 
 export default function PlatformsPage() {
   const { toast } = useToast();
@@ -94,8 +99,8 @@ export default function PlatformsPage() {
       nextStep: "Initial Outreach"
     });
     toast({
-      title: "Initiative Launched",
-      description: `${docData.name} has been added to the platforms registry.`,
+      title: "Opportunity Initialized",
+      description: `${docData.name} has been added to the registry.`,
     });
   };
 
@@ -104,27 +109,29 @@ export default function PlatformsPage() {
     if (!matchesSearch) return false;
 
     if (activeFilter === 'all') return true;
-    if (activeFilter === 'live') return p.currentStage === 'Live';
-    if (activeFilter === 'high-priority') return p.priority === 'High';
-    if (activeFilter === 'blocked') return p.blockers && p.blockers.length > 0;
-    if (activeFilter === 'needs-action') return p.currentStage !== 'Live' && (!p.blockers || p.blockers.length === 0);
+    if (activeFilter === 'rangeme') return p.type?.toLowerCase().includes('rangeme') || p.notes?.toLowerCase().includes('rangeme');
+    if (activeFilter === 'applied') return p.currentStage === 'Applied';
     if (activeFilter === 'waiting') return p.currentStage === 'In Review';
+    if (activeFilter === 'approved') return p.currentStage === 'Approved';
+    if (activeFilter === 'rejected') return p.currentStage === 'Rejected';
+    if (activeFilter === 'high-priority') return p.priority === 'High';
     return true;
   });
 
   const counts = {
-    'needs-action': (opportunities || []).filter(p => p.currentStage !== 'Live' && (!p.blockers || p.blockers.length === 0)).length,
+    'all': (opportunities || []).length,
+    'rangeme': (opportunities || []).filter(p => p.type?.toLowerCase().includes('rangeme') || p.notes?.toLowerCase().includes('rangeme')).length,
+    'applied': (opportunities || []).filter(p => p.currentStage === 'Applied').length,
     'waiting': (opportunities || []).filter(p => p.currentStage === 'In Review').length,
-    'blocked': (opportunities || []).filter(p => p.blockers && p.blockers.length > 0).length,
+    'approved': (opportunities || []).filter(p => p.currentStage === 'Approved').length,
+    'rejected': (opportunities || []).filter(p => p.currentStage === 'Rejected').length,
     'high-priority': (opportunities || []).filter(p => p.priority === 'High').length,
-    'live': (opportunities || []).filter(p => p.currentStage === 'Live').length,
-    'all': (opportunities || []).length
   };
 
   return (
     <div className="max-w-[1400px] mx-auto flex gap-12 animate-in fade-in duration-700">
       {/* Operations Sidebar */}
-      <aside className="w-56 shrink-0 flex flex-col gap-10">
+      <aside className="w-64 shrink-0 flex flex-col gap-10">
         <Link 
           href="/" 
           className="flex items-center gap-2.5 text-[11px] font-medium uppercase tracking-[0.2em] text-tier-3 hover:text-tier-1 transition-colors group"
@@ -135,14 +142,28 @@ export default function PlatformsPage() {
 
         <div className="flex flex-col gap-8">
           <div className="flex flex-col gap-3">
-            <h3 className="text-[9px] font-semibold uppercase tracking-[0.25em] text-tier-4 px-3 mb-1">Tactical Filters</h3>
-            <nav className="flex flex-col gap-1.5">
+            <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4 px-4 mb-2">Filter Opportunities</h3>
+            <nav className="flex flex-col gap-1">
               <FilterButton 
-                active={activeFilter === 'needs-action'} 
-                onClick={() => setActiveFilter('needs-action')}
-                icon={Zap}
-                label="Needs Action"
-                count={counts['needs-action']}
+                active={activeFilter === 'all'} 
+                onClick={() => setActiveFilter('all')}
+                icon={Globe}
+                label="All Opportunities"
+                count={counts['all']}
+              />
+              <FilterButton 
+                active={activeFilter === 'rangeme'} 
+                onClick={() => setActiveFilter('rangeme')}
+                icon={Bookmark}
+                label="From RangeMe"
+                count={counts['rangeme']}
+              />
+              <FilterButton 
+                active={activeFilter === 'applied'} 
+                onClick={() => setActiveFilter('applied')}
+                icon={SquareCheck}
+                label="Applied"
+                count={counts['applied']}
               />
               <FilterButton 
                 active={activeFilter === 'waiting'} 
@@ -152,32 +173,25 @@ export default function PlatformsPage() {
                 count={counts['waiting']}
               />
               <FilterButton 
-                active={activeFilter === 'blocked'} 
-                onClick={() => setActiveFilter('blocked')}
-                icon={ShieldAlert}
-                label="Blocked"
-                count={counts['blocked']}
+                active={activeFilter === 'approved'} 
+                onClick={() => setActiveFilter('approved')}
+                icon={CheckCircle2}
+                label="Approved"
+                count={counts['approved']}
+              />
+              <FilterButton 
+                active={activeFilter === 'rejected'} 
+                onClick={() => setActiveFilter('rejected')}
+                icon={X}
+                label="Rejected"
+                count={counts['rejected']}
               />
               <FilterButton 
                 active={activeFilter === 'high-priority'} 
                 onClick={() => setActiveFilter('high-priority')}
-                icon={Star}
+                icon={Shield}
                 label="High Priority"
                 count={counts['high-priority']}
-              />
-              <FilterButton 
-                active={activeFilter === 'live'} 
-                onClick={() => setActiveFilter('live')}
-                icon={Zap}
-                label="Live Ops"
-                count={counts['live']}
-              />
-              <FilterButton 
-                active={activeFilter === 'all'} 
-                onClick={() => setActiveFilter('all')}
-                icon={LayoutGrid}
-                label="All Units"
-                count={counts['all']}
               />
             </nav>
           </div>
@@ -215,6 +229,7 @@ export default function PlatformsPage() {
                         <SelectItem value="Wholesale">Wholesale</SelectItem>
                         <SelectItem value="Dropshipping">Dropshipping</SelectItem>
                         <SelectItem value="Marketplace">Marketplace</SelectItem>
+                        <SelectItem value="RangeMe">RangeMe Lead</SelectItem>
                         <SelectItem value="Partnership">Partnership</SelectItem>
                       </SelectContent>
                     </Select>
@@ -248,7 +263,7 @@ export default function PlatformsPage() {
       <main className="flex-1 flex flex-col gap-10">
         <header className="flex items-center justify-between">
           <div className="flex flex-col gap-2.5">
-            <h1 className="text-3xl font-semibold tracking-tight text-tier-1">Platforms</h1>
+            <h1 className="text-3xl font-semibold tracking-tight text-tier-1">Opportunities</h1>
             <p className="text-tier-2 text-[14px] font-medium leading-relaxed max-w-2xl">
               Manage wholesale, retail, and global digital channel scaling across tactical operational zones.
             </p>
@@ -260,7 +275,7 @@ export default function PlatformsPage() {
               <Input 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search platforms..." 
+                placeholder="Search opportunities..." 
                 className="pl-11 h-11 bg-white/[0.02] border-white/[0.05] rounded-xl font-medium text-[13px] focus-visible:ring-primary/20 placeholder:text-tier-3 transition-all text-tier-1" 
               />
             </div>
@@ -276,7 +291,7 @@ export default function PlatformsPage() {
           ) : filteredPlatforms.length === 0 ? (
             <div className="h-72 border border-dashed border-white/5 rounded-2xl flex flex-col items-center justify-center gap-4 opacity-30">
               <LayoutGrid className="size-12 text-tier-3" />
-              <span className="text-[11px] font-medium uppercase tracking-[0.25em] text-tier-3">No active platforms found</span>
+              <span className="text-[11px] font-medium uppercase tracking-[0.25em] text-tier-3">No matching opportunities found</span>
             </div>
           ) : (
             filteredPlatforms.map((p) => (
@@ -297,17 +312,17 @@ function FilterButton({ icon: Icon, label, count, active, onClick }: any) {
       variant="ghost" 
       onClick={onClick}
       className={cn(
-        "h-10 justify-start gap-4 px-4 rounded-lg transition-all relative group",
+        "h-11 justify-start gap-4 px-4 rounded-xl transition-all relative group",
         active 
-          ? "bg-primary/10 hover:bg-primary/20 text-primary hover:text-primary shadow-[inset_0_0_0_1px_rgba(255,255,255,0.02)]" 
-          : "text-tier-2 hover:bg-white/[0.03] hover:text-tier-1"
+          ? "bg-primary/10 text-primary font-semibold shadow-[inset_0_0_0_1px_rgba(var(--primary),0.1)]" 
+          : "text-tier-3 hover:bg-white/[0.03] hover:text-tier-1"
       )}
     >
       <Icon className={cn("size-4.5", active ? "text-primary" : "text-tier-3 group-hover:text-tier-2")} />
-      <span className={cn("text-[13px] tracking-tight font-medium", active ? "text-primary" : "")}>{label}</span>
+      <span className={cn("text-[14px] tracking-tight", active ? "text-primary" : "")}>{label}</span>
       <span className={cn(
-        "ml-auto text-[10px] font-semibold tracking-tighter",
-        active ? "text-primary" : "text-tier-2"
+        "ml-auto text-[11px] font-bold tabular-nums",
+        active ? "text-primary" : "text-tier-4"
       )}>
         {count}
       </span>
