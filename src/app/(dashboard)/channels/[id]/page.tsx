@@ -1,3 +1,4 @@
+
 "use client";
 
 import { use, useState, useMemo } from "react";
@@ -26,7 +27,9 @@ import {
   Phone,
   BookOpen,
   Frown,
-  TrendingUp
+  TrendingUp,
+  CheckCircle2,
+  Circle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -73,6 +76,7 @@ const BUSINESS_TYPES = [
 ];
 
 const STAGES = ['Not Started', 'Research', 'Applied', 'In Review', 'Approved', 'Rejected', 'Onboarding', 'Live'];
+const ROADMAP_STAGES = ['Research', 'Applied', 'In Review', 'Approved', 'Onboarding', 'Live'];
 
 export default function PlatformDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -376,27 +380,53 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
         </div>
 
         <div className="lg:col-span-4 flex flex-col gap-8">
-          {/* Improved About Platform Section */}
-          <section className="premium-panel p-6 rounded-2xl flex flex-col gap-6 bg-white/[0.01] border-white/[0.05]">
-            <div className="flex items-center gap-3">
-              <div className="size-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-                <BookOpen className="size-4" />
-              </div>
-              <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4">About Platform</h3>
+          
+          {/* Status Overview Card */}
+          <section className="premium-panel p-6 rounded-2xl flex flex-col gap-6 bg-white shadow-sm border-border">
+            <div className="flex items-center justify-between">
+              <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4">Mission Roadmap</h3>
+              <Target className="size-4 text-tier-3" />
             </div>
             <div className="flex flex-col gap-4">
-              <p className="text-[14px] text-tier-2 leading-relaxed font-medium">
-                {platform.notes || "No detailed profile recorded for this opportunity."}
-              </p>
-              <div className="flex flex-col gap-2 pt-2">
-                <div className="flex items-center justify-between text-[11px] font-semibold">
-                  <span className="text-tier-4 uppercase tracking-widest">Strategic Fit</span>
-                  <span className="text-primary">{platform.fitScore || 5}/10</span>
-                </div>
-                <div className="h-1.5 w-full bg-secondary/50 rounded-full overflow-hidden">
-                  <div className="h-full bg-primary/60 rounded-full" style={{ width: `${(platform.fitScore || 5) * 10}%` }} />
-                </div>
-              </div>
+              {ROADMAP_STAGES.map((stage, idx) => {
+                const isCurrent = platform.currentStage === stage;
+                const isCompleted = ROADMAP_STAGES.indexOf(platform.currentStage) > ROADMAP_STAGES.indexOf(stage);
+                const isRejected = platform.currentStage === 'Rejected';
+
+                return (
+                  <div key={stage} className="flex items-center gap-4 group">
+                    <div className="flex flex-col items-center">
+                      <div className={cn(
+                        "size-6 rounded-full flex items-center justify-center border-2 transition-all",
+                        isCompleted ? "bg-emerald-500 border-emerald-500 text-white" : 
+                        isCurrent ? "border-primary bg-primary/10 text-primary animate-pulse" : 
+                        "border-border bg-background text-tier-4"
+                      )}>
+                        {isCompleted ? <CheckCircle2 className="size-3.5" /> : <Circle className={cn("size-2", isCurrent && "fill-current")} />}
+                      </div>
+                      {idx !== ROADMAP_STAGES.length - 1 && (
+                        <div className={cn(
+                          "w-px h-6 mt-1 transition-colors",
+                          isCompleted ? "bg-emerald-500" : "bg-border"
+                        )} />
+                      )}
+                    </div>
+                    <div className="flex flex-col">
+                      <span className={cn(
+                        "text-[13px] font-semibold transition-colors",
+                        isCurrent ? "text-primary" : isCompleted ? "text-tier-1" : "text-tier-4"
+                      )}>
+                        {stage}
+                      </span>
+                      {isCurrent && (
+                        <span className="text-[10px] font-bold text-tier-4 uppercase tracking-widest mt-0.5">
+                          Active Phase
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </section>
 
@@ -429,6 +459,30 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
               )}
             </div>
           </div>
+
+          {/* Improved About Platform Section - Now moved below contacts */}
+          <section className="premium-panel p-6 rounded-2xl flex flex-col gap-6 bg-white/[0.01] border-white/[0.05]">
+            <div className="flex items-center gap-3">
+              <div className="size-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                <BookOpen className="size-4" />
+              </div>
+              <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-tier-4">About Platform</h3>
+            </div>
+            <div className="flex flex-col gap-4">
+              <p className="text-[14px] text-tier-2 leading-relaxed font-medium">
+                {platform.notes || "No detailed profile recorded for this opportunity."}
+              </p>
+              <div className="flex flex-col gap-2 pt-2">
+                <div className="flex items-center justify-between text-[11px] font-semibold">
+                  <span className="text-tier-4 uppercase tracking-widest">Strategic Fit</span>
+                  <span className="text-primary">{platform.fitScore || 5}/10</span>
+                </div>
+                <div className="h-1.5 w-full bg-secondary/50 rounded-full overflow-hidden">
+                  <div className="h-full bg-primary/60 rounded-full" style={{ width: `${(platform.fitScore || 5) * 10}%` }} />
+                </div>
+              </div>
+            </div>
+          </section>
         </div>
       </div>
 
@@ -554,3 +608,4 @@ function TimelineEntry({ date, user, content, type }: { date: string, user: stri
     </div>
   );
 }
+
