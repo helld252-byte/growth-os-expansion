@@ -13,7 +13,12 @@ import {
   Target,
   BarChart3,
   Layers,
-  ArrowRight
+  ArrowRight,
+  Search,
+  Send,
+  Eye,
+  CheckCircle2,
+  Rocket
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useCollection, useMemoFirebase } from "@/firebase";
@@ -41,11 +46,11 @@ export default function CommandCenter() {
 
     // 2. Integrated Pipeline Data (Active Flow)
     const stages = [
-      { label: 'Research', count: opportunities.filter(o => o.currentStage === 'Research' || o.currentStage === 'Not Started').length },
-      { label: 'Applied', count: opportunities.filter(o => o.currentStage === 'Applied').length },
-      { label: 'In Review', count: opportunities.filter(o => o.currentStage === 'In Review').length },
-      { label: 'Approved', count: opportunities.filter(o => o.currentStage === 'Approved' || o.currentStage === 'Onboarding').length },
-      { label: 'Live', count: opportunities.filter(o => o.currentStage === 'Live').length },
+      { label: 'Research', count: opportunities.filter(o => o.currentStage === 'Research' || o.currentStage === 'Not Started').length, icon: Search, color: "from-blue-500/20 to-indigo-500/20 border-blue-500/20 text-blue-400", barColor: "bg-blue-500", glow: "shadow-blue-500/20" },
+      { label: 'Applied', count: opportunities.filter(o => o.currentStage === 'Applied').length, icon: Send, color: "from-indigo-500/20 to-purple-500/20 border-indigo-500/20 text-indigo-400", barColor: "bg-indigo-500", glow: "shadow-indigo-500/20" },
+      { label: 'In Review', count: opportunities.filter(o => o.currentStage === 'In Review').length, icon: Eye, color: "from-purple-500/20 to-pink-500/20 border-purple-500/20 text-purple-400", barColor: "bg-purple-500", glow: "shadow-purple-500/20" },
+      { label: 'Approved', count: opportunities.filter(o => o.currentStage === 'Approved' || o.currentStage === 'Onboarding').length, icon: CheckCircle2, color: "from-pink-500/20 to-rose-500/20 border-pink-500/20 text-pink-400", barColor: "bg-pink-500", glow: "shadow-pink-500/20" },
+      { label: 'Live', count: opportunities.filter(o => o.currentStage === 'Live').length, icon: Rocket, color: "from-emerald-500/20 to-teal-500/20 border-emerald-500/20 text-emerald-400", barColor: "bg-emerald-500", glow: "shadow-emerald-500/30" },
     ];
 
     // 3. Needs Attention (Priority & Bottlenecks)
@@ -126,59 +131,93 @@ export default function CommandCenter() {
 
           {/* Redesigned Growth Pipeline */}
           <div className="lg:col-span-9 flex flex-col gap-8">
-            <div className="flex flex-col gap-1.5">
-              <h3 className="text-[11px] font-bold uppercase tracking-[0.25em] text-tier-1">Growth Pipeline Flow</h3>
+            <div className="flex flex-col gap-2">
+              <h3 className="text-[11px] font-bold uppercase tracking-[0.25em] text-tier-1 font-headline">Growth Pipeline Flow</h3>
               <span className="text-[13px] text-tier-3 font-medium">Distribution of high-impact opportunities across onboarding phases.</span>
             </div>
 
-            <div className="grid grid-cols-5 gap-4">
+            <div className="grid grid-cols-5 gap-5 relative">
               {data.stages.map((stage, i) => {
                 const total = data.intel.trackedOpps || 1;
                 const percentage = Math.min((stage.count / total) * 100, 100);
                 const isFinal = i === 4;
+                const StageIcon = stage.icon;
+                const hasUnits = stage.count > 0;
 
                 return (
-                  <div key={stage.label} className="relative group">
+                  <div key={stage.label} className="relative group flex flex-col">
                     <div className={cn(
-                      "flex flex-col gap-6 p-6 rounded-2xl border transition-all duration-500 h-full",
-                      "bg-white shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] border-white/[0.08]",
-                      "hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] hover:translate-y-[-2px] hover:border-primary/20",
-                      isFinal && "bg-emerald-500/5 border-emerald-500/10"
+                      "flex flex-col gap-5 p-5 rounded-2xl border transition-all duration-500 h-full relative overflow-hidden",
+                      "bg-white/40 dark:bg-white/[0.015] backdrop-blur-md border-slate-200/60 dark:border-white/[0.04] shadow-[0_4px_30px_-10px_rgba(0,0,0,0.03)]",
+                      "hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] hover:translate-y-[-2px]",
+                      hasUnits ? "border-primary/20 dark:border-white/[0.08]" : "opacity-75 hover:opacity-100",
+                      isFinal && hasUnits && "bg-emerald-500/[0.02] border-emerald-500/20 shadow-[0_0_30px_rgba(16,185,129,0.05)]"
                     )}>
-                      <div className="flex flex-col gap-1">
+                      {/* Top gradient highlight for active cards */}
+                      {hasUnits && (
+                        <div className={cn(
+                          "absolute top-0 inset-x-0 h-[3px] bg-gradient-to-r",
+                          stage.color
+                        )} />
+                      )}
+
+                      <div className="flex items-center justify-between">
+                        <div className={cn(
+                          "size-9 rounded-xl flex items-center justify-center border transition-all duration-300",
+                          hasUnits 
+                            ? `bg-gradient-to-br ${stage.color} shadow-lg ${stage.glow}` 
+                            : "bg-slate-100/50 dark:bg-white/[0.02] border-slate-200/20 dark:border-white/[0.04] text-tier-4"
+                        )}>
+                          <StageIcon className={cn("size-4.5 transition-transform duration-300 group-hover:scale-110", hasUnits ? "text-foreground" : "text-tier-4")} />
+                        </div>
+
+                        {hasUnits && (
+                          <span className={cn(
+                            "size-2 rounded-full animate-pulse",
+                            isFinal ? "bg-emerald-500 shadow-[0_0_8px_#10b981]" : "bg-primary shadow-[0_0_8px_#8b5cf6]"
+                          )} />
+                        )}
+                      </div>
+
+                      <div className="flex flex-col gap-1 mt-2">
                         <span className={cn(
-                          "text-[9px] font-bold uppercase tracking-[0.2em]",
-                          isFinal ? "text-emerald-500" : "text-tier-4 group-hover:text-tier-1 transition-colors"
+                          "text-[9px] font-bold uppercase tracking-[0.2em] transition-colors",
+                          hasUnits ? "text-tier-1" : "text-tier-4"
                         )}>
                           {stage.label}
                         </span>
                         <div className="flex items-baseline gap-1.5">
-                          <span className="text-3xl font-bold text-tier-1 tracking-tight">{stage.count}</span>
-                          <span className="text-[10px] font-bold text-tier-4">Units</span>
+                          <span className={cn(
+                            "text-3xl font-bold tracking-tight font-headline",
+                            hasUnits ? "text-tier-1" : "text-tier-3"
+                          )}>{stage.count}</span>
+                          <span className="text-[9px] font-bold uppercase tracking-widest text-tier-4">Units</span>
                         </div>
                       </div>
 
-                      <div className="mt-auto flex flex-col gap-3">
-                        <div className="h-1.5 w-full bg-secondary/50 rounded-full overflow-hidden relative">
+                      <div className="mt-auto flex flex-col gap-2 pt-2">
+                        <div className="h-1.5 w-full bg-slate-100 dark:bg-white/[0.03] rounded-full overflow-hidden relative border border-slate-200/10 dark:border-white/[0.01]">
                           <div 
                             className={cn(
-                              "h-full transition-all duration-1000 ease-out rounded-full",
-                              isFinal 
-                                ? "bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.6)]" 
-                                : "bg-primary/60 shadow-[0_0_10px_rgba(147,51,234,0.3)]"
+                              "h-full transition-all duration-1000 ease-out rounded-full shadow-[0_0_8px]",
+                              stage.barColor,
+                              stage.glow
                             )} 
-                            style={{ width: `${percentage || 5}%` }}
+                            style={{ width: `${hasUnits ? percentage : 0}%` }}
                           />
                         </div>
-                        <div className="flex items-center justify-between text-[9px] font-bold uppercase tracking-widest text-tier-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <span>Verified</span>
-                          <span>{percentage.toFixed(0)}%</span>
+                        <div className="flex items-center justify-between text-[9px] font-bold uppercase tracking-widest text-tier-4 transition-all">
+                          <span className={hasUnits ? "opacity-100 text-primary dark:text-accent font-semibold" : "opacity-40"}>
+                            {hasUnits ? `${percentage.toFixed(0)}% weight` : "empty"}
+                          </span>
                         </div>
                       </div>
                     </div>
+
+                    {/* Clean glowing connector line between cards */}
                     {i < 4 && (
-                      <div className="absolute top-1/2 -right-3 -translate-y-1/2 z-10 opacity-20 group-hover:opacity-40 transition-opacity">
-                        <ArrowRight className="size-4 text-tier-3" />
+                      <div className="absolute top-1/2 -right-4 -translate-y-1/2 z-10 w-3 flex items-center justify-center pointer-events-none opacity-30 group-hover:opacity-75 transition-all">
+                        <ArrowRight className="size-3.5 text-tier-4" />
                       </div>
                     )}
                   </div>
