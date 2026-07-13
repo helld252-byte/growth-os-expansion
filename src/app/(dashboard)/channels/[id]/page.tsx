@@ -155,9 +155,13 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
 
   const handleAddNote = () => {
     if (!docRef || !newNote || !user) return;
+    
+    // Extract first name for personalized touch
+    const firstName = user.displayName?.split(' ')[0] || "Operator";
+
     const journalEntry = {
       date: new Date().toISOString(),
-      user: user.displayName || "System Operator",
+      user: firstName,
       content: newNote,
     };
     const updatedJournal = [journalEntry, ...(platform.journal || [])];
@@ -748,21 +752,22 @@ function ContactField({ label, value, icon: Icon, link }: { label: string, value
 }
 
 function TimelineEntry({ date, user, content, type }: { date: string, user: string, content: string, type: 'note' | 'task' }) {
+  // Only show first name if Mikhail
+  const displayUser = (user === "Mikhail" || user.startsWith("Mikhail ")) ? "Mikhail" : user;
+
   return (
     <div className="flex flex-col gap-2 pl-8 relative">
-      <div className="absolute left-0 top-1.5 size-[23px] rounded-full bg-background border border-border flex items-center justify-center shadow-sm">
-        {type === 'task' ? (
-          <div className="size-full rounded-full bg-emerald-500/10 flex items-center justify-center">
-            <CheckCircle2 className="size-3.5 text-emerald-500" />
-          </div>
-        ) : (
-          <div className="size-[9px] rounded-full bg-primary/20 flex items-center justify-center">
-            <div className="size-1.5 rounded-full bg-primary shadow-[0_0_8px_hsl(var(--primary)/0.5)]" />
-          </div>
-        )}
+      {/* Minimal Stylish Marker Design */}
+      <div className="absolute left-0 top-1.5 size-[23px] flex items-center justify-center">
+        <div className="size-full rounded-full bg-background border border-border absolute inset-0 shadow-sm" />
+        <div className={cn(
+          "size-[7px] rounded-full transition-all relative z-10",
+          type === 'task' ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]" : "bg-primary shadow-[0_0_8px_rgba(147,51,234,0.3)]"
+        )} />
       </div>
+      
       <div className="flex items-center gap-3">
-        <span className="text-[12px] font-semibold text-tier-2">{user}</span>
+        <span className="text-[12px] font-semibold text-tier-2">{displayUser}</span>
         <span className="text-[10px] font-bold uppercase tracking-widest text-tier-4">{date}</span>
         {type === 'task' && <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 text-[8px] uppercase tracking-tighter px-1.5 h-4">Verified Step</Badge>}
       </div>

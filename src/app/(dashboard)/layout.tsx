@@ -52,6 +52,9 @@ export default function DashboardLayout({
 
   const isAdmin = !!adminDoc || !!nestedAdminDoc;
 
+  // Extract first name for Mikhail or generic display
+  const firstName = user?.displayName?.split(' ')[0] || "Operator";
+
   useEffect(() => {
     if (!isUserLoading && !user) {
       router.push('/login');
@@ -151,7 +154,7 @@ export default function DashboardLayout({
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56 mt-2 bg-background/95 backdrop-blur-xl border-border rounded-xl shadow-2xl">
                   <DropdownMenuLabel className="flex flex-col gap-0.5 py-3">
-                    <span className="text-[13px] font-bold text-tier-1">{user.displayName}</span>
+                    <span className="text-[13px] font-bold text-tier-1">{firstName}</span>
                     <span className="text-[10px] text-tier-3 font-medium truncate">{user.email}</span>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator className="bg-border" />
