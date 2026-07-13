@@ -62,6 +62,10 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
   const [isEditOpen, setIsAddOpen] = useState(false);
   const [isNoteOpen, setIsNoteOpen] = useState(false);
   const [newNote, setNewNote] = useState("");
+  
+  // Note Date/Time State
+  const [noteDate, setNoteDate] = useState<string>(new Date().toISOString().split('T')[0]);
+  const [noteTime, setNoteTime] = useState<string>(new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }));
 
   const docRef = useMemoFirebase(() => doc(firestore, 'growth_opportunities', id), [firestore, id]);
   const { data: platform, isLoading } = useDoc(docRef);
@@ -158,8 +162,11 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
     if (!docRef || !newNote || !user) return;
     const firstName = user.displayName?.split(' ')[0] || "Operator";
 
+    // Combine picked date and time
+    const combinedDate = new Date(`${noteDate}T${noteTime}:00`);
+
     const journalEntry = {
-      date: new Date().toISOString(),
+      date: combinedDate.toISOString(),
       user: firstName,
       content: newNote,
     };
@@ -169,6 +176,9 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
       lastUpdate: serverTimestamp(),
     });
     setNewNote("");
+    // Reset date/time to now for next entry
+    setNoteDate(new Date().toISOString().split('T')[0]);
+    setNoteTime(new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }));
     setIsNoteOpen(false);
     toast({
       title: "Field Note Recorded",
@@ -323,17 +333,35 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
                     <Plus className="size-3.5 mr-2" /> New Field Note
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="bg-background/95 backdrop-blur-2xl border-border rounded-2xl">
+                <DialogContent className="bg-background/95 backdrop-blur-2xl border-border rounded-2xl sm:max-w-[500px]">
                   <DialogHeader>
                     <DialogTitle className="text-xl font-bold tracking-tight text-tier-1">Record Field Note</DialogTitle>
                   </DialogHeader>
-                  <div className="py-4">
-                    <Textarea 
-                      placeholder="Enter operational update or contact summary..."
-                      value={newNote}
-                      onChange={(e) => setNewNote(e.target.value)}
-                      className="bg-secondary/50 border-border min-h-[150px] rounded-xl text-tier-1 p-4"
-                    />
+                  <div className="grid gap-6 py-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="grid gap-2">
+                        <Label className="text-[10px] uppercase tracking-widest text-tier-3">Interaction Date</Label>
+                        <DatePicker value={noteDate} onChange={setNoteDate} />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label className="text-[10px] uppercase tracking-widest text-tier-3">Interaction Time</Label>
+                        <Input 
+                          type="time" 
+                          value={noteTime} 
+                          onChange={(e) => setNoteTime(e.target.value)}
+                          className="bg-secondary/50 border-border h-11 rounded-xl text-tier-1 px-4"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid gap-2">
+                      <Label className="text-[10px] uppercase tracking-widest text-tier-3">Interaction Summary</Label>
+                      <Textarea 
+                        placeholder="Enter operational update or contact summary..."
+                        value={newNote}
+                        onChange={(e) => setNewNote(e.target.value)}
+                        className="bg-secondary/50 border-border min-h-[150px] rounded-xl text-tier-1 p-4"
+                      />
+                    </div>
                   </div>
                   <DialogFooter>
                     <Button onClick={handleAddNote} className="w-full bg-primary text-white h-12 rounded-xl font-bold uppercase tracking-widest">
