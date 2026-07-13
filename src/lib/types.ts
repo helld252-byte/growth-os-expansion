@@ -15,6 +15,7 @@ export interface Platform {
   id: string;
   name: string;
   type: string;
+  source?: string;
   market: string;
   website?: string;
   portalUrl?: string;

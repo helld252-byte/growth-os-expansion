@@ -85,6 +85,7 @@
         "id": { "type": "string" },
         "name": { "type": "string" },
         "type": { "type": "string" },
+        "source": { "type": "string", "description": "Where the platform was discovered (RangeMe, Google, AI, etc.)" },
         "market": { "type": "string" },
         "website": { "type": "string", "format": "uri" },
         "portalUrl": { "type": "string", "format": "uri" },

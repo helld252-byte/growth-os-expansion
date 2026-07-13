@@ -9,10 +9,8 @@ import {
   Globe,
   ArrowLeft,
   Clock,
-  ShieldAlert,
   Zap,
   LayoutGrid,
-  Star,
   Loader2,
   Bookmark,
   SquareCheck,
@@ -61,6 +59,7 @@ export default function PlatformsPage() {
   const [newOp, setNewOp] = useState({
     name: "",
     type: "Wholesale",
+    source: "Google",
     market: "Global",
     priority: "Medium",
     currentStage: "Not Started",
@@ -68,7 +67,14 @@ export default function PlatformsPage() {
   });
 
   const handleAddPlatform = () => {
-    if (!user) return;
+    if (!user) {
+      toast({
+        variant: "destructive",
+        title: "Session Expired",
+        description: "Please authenticate to initialize platforms.",
+      });
+      return;
+    }
     
     const docData = {
       ...newOp,
@@ -77,7 +83,7 @@ export default function PlatformsPage() {
       lastUpdate: new Date().toISOString(),
       productsUploaded: false,
       salesStarted: false,
-      blockers: [],
+      blockers: "",
       contactPerson: "N/A",
       contactEmail: "N/A",
       createdAt: serverTimestamp(),
@@ -92,6 +98,7 @@ export default function PlatformsPage() {
     setNewOp({
       name: "",
       type: "Wholesale",
+      source: "Google",
       market: "Global",
       priority: "Medium",
       currentStage: "Not Started",
@@ -108,7 +115,7 @@ export default function PlatformsPage() {
     if (!matchesSearch) return false;
 
     if (activeFilter === 'all') return true;
-    if (activeFilter === 'rangeme') return p.type?.toLowerCase().includes('rangeme') || p.notes?.toLowerCase().includes('rangeme');
+    if (activeFilter === 'rangeme') return p.source === 'RangeMe';
     if (activeFilter === 'applied') return p.currentStage === 'Applied';
     if (activeFilter === 'waiting') return p.currentStage === 'In Review';
     if (activeFilter === 'approved') return p.currentStage === 'Approved';
@@ -119,7 +126,7 @@ export default function PlatformsPage() {
 
   const counts = {
     'all': (opportunities || []).length,
-    'rangeme': (opportunities || []).filter(p => p.type?.toLowerCase().includes('rangeme') || p.notes?.toLowerCase().includes('rangeme')).length,
+    'rangeme': (opportunities || []).filter(p => p.source === 'RangeMe').length,
     'applied': (opportunities || []).filter(p => p.currentStage === 'Applied').length,
     'waiting': (opportunities || []).filter(p => p.currentStage === 'In Review').length,
     'approved': (opportunities || []).filter(p => p.currentStage === 'Approved').length,
@@ -227,27 +234,42 @@ export default function PlatformsPage() {
                         <SelectItem value="Wholesale">Wholesale</SelectItem>
                         <SelectItem value="Dropshipping">Dropshipping</SelectItem>
                         <SelectItem value="Marketplace">Marketplace</SelectItem>
-                        <SelectItem value="RangeMe">RangeMe Lead</SelectItem>
                         <SelectItem value="Partnership">Partnership</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="grid gap-2">
-                    <Label className="text-[10px] uppercase tracking-widest text-tier-3">Market</Label>
-                    <Input 
-                      value={newOp.market}
-                      onChange={(e) => setNewOp({...newOp, market: e.target.value})}
-                      placeholder="e.g. EU, US" 
-                      className="bg-secondary/50 border-border h-12 rounded-xl text-tier-1"
-                    />
+                    <Label className="text-[10px] uppercase tracking-widest text-tier-3">Source</Label>
+                    <Select value={newOp.source} onValueChange={(v) => setNewOp({...newOp, source: v})}>
+                      <SelectTrigger className="bg-secondary/50 border-border h-12 rounded-xl text-tier-1">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-popover/95 backdrop-blur-xl border-border">
+                        <SelectItem value="RangeMe">RangeMe</SelectItem>
+                        <SelectItem value="Google">Google</SelectItem>
+                        <SelectItem value="AI">AI Search</SelectItem>
+                        <SelectItem value="LinkedIn">LinkedIn</SelectItem>
+                        <SelectItem value="Referral">Referral</SelectItem>
+                        <SelectItem value="Other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
+                </div>
+                <div className="grid gap-2">
+                  <Label className="text-[10px] uppercase tracking-widest text-tier-3">Market</Label>
+                  <Input 
+                    value={newOp.market}
+                    onChange={(e) => setNewOp({...newOp, market: e.target.value})}
+                    placeholder="e.g. EU, US" 
+                    className="bg-secondary/50 border-border h-12 rounded-xl text-tier-1"
+                  />
                 </div>
               </div>
               <DialogFooter>
                 <Button 
                   onClick={handleAddPlatform}
                   disabled={!newOp.name}
-                  className="w-full bg-primary text-white h-12 rounded-xl font-bold uppercase tracking-widest"
+                  className="w-full bg-primary text-white h-12 rounded-xl font-bold uppercase tracking-widest shadow-lg shadow-primary/20"
                 >
                   Initialize Platform
                 </Button>
@@ -311,7 +333,7 @@ function FilterButton({ icon: Icon, label, count, active, onClick }: any) {
       className={cn(
         "h-11 justify-start gap-4 px-4 rounded-xl transition-all relative group",
         active 
-          ? "bg-secondary text-tier-1 shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.05)] hover:bg-secondary" 
+          ? "bg-secondary text-tier-1 shadow-[inset_0_0_0_1px_rgba(0,0,0,0.02)] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.02)] hover:bg-secondary" 
           : "text-tier-3 hover:bg-secondary/50 hover:text-tier-1"
       )}
     >
@@ -332,7 +354,7 @@ function PlatformListItem({ platform }: { platform: any }) {
   const getStageStyles = (stage: string) => {
     switch (stage) {
       case 'Live':
-        return "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
+        return "bg-emerald-500/10 text-emerald-500 border-emerald-500/20";
       case 'In Review':
         return "bg-amber-500/10 text-amber-400 border-amber-500/20";
       case 'Approved':
@@ -355,7 +377,7 @@ function PlatformListItem({ platform }: { platform: any }) {
   return (
     <div className="premium-panel p-6 rounded-2xl flex items-center justify-between group hover:bg-secondary/30 hover:border-border cursor-pointer transition-all active:scale-[0.995]">
       <div className="flex items-center gap-7">
-        <div className="size-12 rounded-xl bg-white/[0.02] border border-border flex items-center justify-center text-tier-3 group-hover:text-tier-1 group-hover:bg-secondary/50 transition-all">
+        <div className="size-12 rounded-xl bg-secondary/30 border border-border flex items-center justify-center text-tier-3 group-hover:text-tier-1 group-hover:bg-secondary/50 transition-all">
           <Globe className="size-6" />
         </div>
         
@@ -364,9 +386,16 @@ function PlatformListItem({ platform }: { platform: any }) {
             <h3 className="text-base font-semibold tracking-tight text-tier-1 group-hover:text-primary transition-colors">
               {platform.name}
             </h3>
-            <span className="text-[10px] font-medium uppercase tracking-[0.12em] text-tier-2 px-2.5 py-0.5 border border-border rounded-md bg-white/[0.05]">
-              {platform.type}
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-medium uppercase tracking-[0.12em] text-tier-2 px-2.5 py-0.5 border border-border rounded-md bg-secondary/30">
+                {platform.type}
+              </span>
+              {platform.source && (
+                <span className="text-[9px] font-bold uppercase tracking-widest text-primary px-2 py-0.5 border border-primary/20 rounded-md bg-primary/5">
+                  {platform.source}
+                </span>
+              )}
+            </div>
           </div>
           
           <div className="flex items-center gap-6">
@@ -396,7 +425,7 @@ function PlatformListItem({ platform }: { platform: any }) {
           </span>
         </div>
         
-        <div className="size-10 rounded-full flex items-center justify-center bg-white/[0.015] border border-border group-hover:border-border group-hover:bg-secondary/80 transition-all">
+        <div className="size-10 rounded-full flex items-center justify-center bg-secondary/20 border border-border group-hover:border-border group-hover:bg-secondary/80 transition-all">
           <ChevronRight className="size-5 text-tier-3 group-hover:text-tier-1" />
         </div>
       </div>

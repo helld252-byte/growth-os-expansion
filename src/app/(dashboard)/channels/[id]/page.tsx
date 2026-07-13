@@ -11,17 +11,16 @@ import {
   Plus,
   Zap,
   Loader2,
-  X,
   Mail,
   ShieldCheck,
   Building2,
   MessageSquare,
-  CheckCircle2,
   AlertCircle,
   Lightbulb,
   Link2,
   FileText,
-  Upload
+  Upload,
+  Target
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -139,6 +138,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
       lastContactDate: platform.lastContactDate || "",
       commStatus: platform.commStatus || "No outreach",
       notes: platform.notes || "",
+      source: platform.source || "Google",
       rejectionReason: platform.rejectionReason || "",
       rejectionLessons: platform.rejectionLessons || ""
     });
@@ -160,7 +160,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
 
   const handleAddNote = () => {
     if (!docRef || !newNote || !user) return;
-    const firstName = user.displayName?.split(' ')[0] || "Operator";
+    const firstName = user.displayName?.split(' ')[0] || "Mikhail";
 
     // Combine picked date and time
     const combinedDate = new Date(`${noteDate}T${noteTime}:00`);
@@ -176,7 +176,6 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
       lastUpdate: serverTimestamp(),
     });
     setNewNote("");
-    // Reset date/time to now for next entry
     setNoteDate(new Date().toISOString().split('T')[0]);
     setNoteTime(new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }));
     setIsNoteOpen(false);
@@ -232,6 +231,11 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
                 <Badge variant="outline" className="px-3 py-0.5 text-[10px] font-medium uppercase tracking-wider rounded-lg border-accent/20 text-accent/80 bg-accent/5">
                   {platform.priority} Priority
                 </Badge>
+                {platform.source && (
+                  <Badge className="bg-primary/5 text-primary border-primary/10 text-[9px] uppercase tracking-widest font-bold px-2.5 py-0.5 rounded-lg">
+                    {platform.source} Source
+                  </Badge>
+                )}
               </div>
             </div>
             <div className="flex items-center gap-4 text-[13px] font-medium text-tier-3">
@@ -290,7 +294,7 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
             </div>
           )}
 
-          <div className="premium-panel p-8 rounded-3xl border-primary/20 bg-gradient-to-br from-primary/5 via-transparent to-transparent shadow-xl relative overflow-hidden group">
+          <div className="premium-panel p-8 rounded-3xl border-primary/20 bg-gradient-to-br from-primary/5 via-transparent to-transparent shadow-sm relative overflow-hidden group">
             <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
               <Zap className="size-16 text-primary" />
             </div>
@@ -451,6 +455,11 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
                   icon={Link2} 
                   link={platform.portalUrl}
                 />
+                <ContactField 
+                  label="Discovery Source" 
+                  value={platform.source || "Google"} 
+                  icon={Target} 
+                />
               </div>
 
               <Separator className="bg-border" />
@@ -584,6 +593,35 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
                 </div>
               </div>
 
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label className="text-[10px] uppercase tracking-widest text-tier-3">Discovery Source</Label>
+                  <Select value={editData.source} onValueChange={(v) => setEditData({...editData, source: v})}>
+                    <SelectTrigger className="bg-secondary/50 border-border h-11 rounded-xl text-tier-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {['RangeMe', 'Google', 'AI', 'LinkedIn', 'Referral', 'Other'].map(s => (
+                        <SelectItem key={s} value={s}>{s}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid gap-2">
+                  <Label className="text-[10px] uppercase tracking-widest text-tier-3">Priority</Label>
+                  <Select value={editData.priority} onValueChange={(v) => setEditData({...editData, priority: v})}>
+                    <SelectTrigger className="bg-secondary/50 border-border h-11 rounded-xl text-tier-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {['High', 'Medium', 'Low'].map(s => (
+                        <SelectItem key={s} value={s}>{s}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
               {editData.currentStage === 'Rejected' && (
                 <div className="grid gap-4 p-4 border border-rose-500/20 bg-rose-500/5 rounded-xl">
                   <div className="grid gap-2">
@@ -678,24 +716,6 @@ export default function PlatformDetailPage({ params }: { params: Promise<{ id: s
                       ))}
                     </SelectContent>
                   </Select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                  <Label className="text-[10px] uppercase tracking-widest text-tier-3">Contact Person</Label>
-                  <Input 
-                    value={editData.contactPerson}
-                    onChange={(e) => setEditData({...editData, contactPerson: e.target.value})}
-                    className="bg-secondary/50 border-border h-11 rounded-xl text-tier-1"
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label className="text-[10px] uppercase tracking-widest text-tier-3">Last Contact</Label>
-                  <DatePicker 
-                    value={editData.lastContactDate}
-                    onChange={(v) => setEditData({...editData, lastContactDate: v})}
-                  />
                 </div>
               </div>
 
