@@ -317,7 +317,7 @@ export default function HubPage() {
               className={cn(
                 "justify-start gap-4 h-10 px-3.5 rounded-lg transition-all text-[13px] font-medium",
                 selectedCategory === "All Assets" 
-                  ? "bg-secondary text-tier-1" 
+                  ? "bg-secondary text-tier-1 hover:bg-secondary" 
                   : "text-tier-3 hover:bg-secondary/50 hover:text-tier-1"
               )}
             >
@@ -332,7 +332,7 @@ export default function HubPage() {
                 className={cn(
                   "justify-start gap-4 h-10 px-3.5 rounded-lg transition-all text-[13px] font-medium",
                   selectedCategory === cat.label 
-                    ? "bg-secondary text-tier-1" 
+                    ? "bg-secondary text-tier-1 hover:bg-secondary" 
                     : "text-tier-3 hover:bg-secondary/50 hover:text-tier-1"
                 )}
               >

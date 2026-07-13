@@ -311,7 +311,7 @@ function FilterButton({ icon: Icon, label, count, active, onClick }: any) {
       className={cn(
         "h-11 justify-start gap-4 px-4 rounded-xl transition-all relative group",
         active 
-          ? "bg-secondary text-tier-1 shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.05)]" 
+          ? "bg-secondary text-tier-1 shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.05)] hover:bg-secondary" 
           : "text-tier-3 hover:bg-secondary/50 hover:text-tier-1"
       )}
     >
